@@ -31,7 +31,6 @@
         # macOS - Required for iOS/macOS building
         darwinDeps = with pkgs; [
           cocoapods
-          darwin.apple_sdk.frameworks.CoreServices
         ];
 
       in {
