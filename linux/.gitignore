@@ -1,1 +1,24 @@
-flutter/ephemeral
+# Flutter-related auto-generated files
+flutter/ephemeral/
+flutter/generated_plugin_registrant.cc
+flutter/generated_plugin_registrant.h
+flutter/generated_plugins.cmake
+
+build/
+.built*
+*.a
+*.o
+*.so
+*.ninja
+*.cmake
+CMakeCache.txt
+CMakeFiles/
+Makefile
+compile_commands.json
+
+# IDE / Editor configuration folders specific to C++ development
+.clangd/
+.cache/
+.vscode/
+.idea/
+.direnv/
