@@ -5,12 +5,10 @@ class ProfileScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      body: Center(
-        child: Text(
-          "Me Page",
-          style: Theme.of(context).textTheme.titleLarge,
-        ),
+    return Center(
+      child: Text(
+        'Me Page',
+        style: Theme.of(context).textTheme.titleLarge,
       ),
     );
   }

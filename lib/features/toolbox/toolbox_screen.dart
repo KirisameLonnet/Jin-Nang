@@ -5,12 +5,10 @@ class ToolboxScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      body: Center(
-        child: Text(
-          "Toolbox Page",
-          style: Theme.of(context).textTheme.titleLarge,
-        ),
+    return Center(
+      child: Text(
+        'Toolbox Page',
+        style: Theme.of(context).textTheme.titleLarge,
       ),
     );
   }

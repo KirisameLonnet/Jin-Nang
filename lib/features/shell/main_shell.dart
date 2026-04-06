@@ -81,7 +81,7 @@ class MainShell extends StatelessWidget {
               ),
               decoration: BoxDecoration(
                 color: isSelected
-                    ? AppColors.brandPurple.withOpacity(0.2)
+                    ? AppColors.brandPurple.withValues(alpha: 0.2)
                     : Colors.transparent,
                 borderRadius: BorderRadius.circular(999),
               ),

@@ -44,8 +44,8 @@
             ++ lib.optionals stdenv.isDarwin darwinDeps;
 
           shellHook = ''
-            # Set FLUTTER_ROOT so tooling can find the SDK
-            export FLUTTER_ROOT=${pkgs.flutter.unwrapped or pkgs.flutter}
+            # Set FLUTTER_ROOT to the wrapped SDK (where bin/cache/pkg/sky_engine lives)
+            export FLUTTER_ROOT=$(dirname $(dirname $(readlink -f $(which flutter))))
             export DART_ROOT=${pkgs.dart}
 
             echo "----------------------------------------------------"
