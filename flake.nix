@@ -44,9 +44,11 @@
             ++ lib.optionals stdenv.isDarwin darwinDeps;
 
           shellHook = ''
-            # Point DEVELOPER_DIR to the real Xcode so iOS/macOS SDKs are found
-            # (Nix's mkShell overrides this to a minimal Apple SDK that lacks iOS Simulator)
+            # Fix Nix environment collisions with Xcode for iOS/macOS builds:
+            # 1. DEVELOPER_DIR: Nix points this to a minimal Apple SDK lacking iOS Simulator
+            # 2. SDKROOT: Nix locks this to its own macOS SDK, breaking iOS target resolution
             export DEVELOPER_DIR=/Applications/Xcode.app/Contents/Developer
+            export SDKROOT=
 
             # Set FLUTTER_ROOT to the wrapped SDK (where bin/cache/pkg/sky_engine lives)
             export FLUTTER_ROOT=$(dirname $(dirname $(readlink -f $(which flutter))))
