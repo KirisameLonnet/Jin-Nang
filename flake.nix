@@ -54,10 +54,19 @@
             export FLUTTER_ROOT=$(dirname $(dirname $(readlink -f $(which flutter))))
             export DART_ROOT=${pkgs.dart}
 
+            # Create persistent symlinks for IDEs (Android Studio / VS Code)
+            mkdir -p .nix-sdk
+            ln -sfn $FLUTTER_ROOT .nix-sdk/flutter
+            ln -sfn $DART_ROOT .nix-sdk/dart
+
+            # Fix Wayland EGL crash (No provider of eglGetPlatformDisplayEXT found)
+            export GDK_BACKEND=x11
+
             echo "----------------------------------------------------"
             echo "🚀 Flutter Cross-Platform Dev Environment Loaded!"
             echo "📱 Host System: ${system}"
             echo "🛠️  Flutter path: $FLUTTER_ROOT"
+            echo "🔗 IDE SDK Path: $PWD/.nix-sdk"
             echo "----------------------------------------------------"
           '';
         };

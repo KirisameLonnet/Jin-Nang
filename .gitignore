@@ -25,6 +25,7 @@ migrate_working_dir/
 
 # Nix & direnv
 .direnv/
+.nix-sdk/
 
 # Flutter/Dart/Pub related
 **/doc/api/
