@@ -20,16 +20,17 @@ class MainShell extends StatelessWidget {
   }
 
   Widget _buildBottomNavBar(BuildContext context) {
-    return Container(
-      height: 90,
-      padding: const EdgeInsets.symmetric(
-        horizontal: AppSpacing.md,
-        vertical: AppSpacing.sm,
-      ),
+    return Material(
       color: AppColors.neutralGray01,
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceAround,
-        children: [
+      child: Container(
+        height: 90,
+        padding: const EdgeInsets.symmetric(
+          horizontal: AppSpacing.md,
+          vertical: AppSpacing.sm,
+        ),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.spaceAround,
+          children: [
           _buildNavItem(
             context: context,
             imagePath: 'assets/images/Icon-Study.png',
@@ -50,6 +51,7 @@ class MainShell extends StatelessWidget {
           ),
         ],
       ),
+     ),
     );
   }
 
@@ -62,47 +64,53 @@ class MainShell extends StatelessWidget {
     final isSelected = navigationShell.currentIndex == index;
 
     return Expanded(
-      child: GestureDetector(
-        onTap: () {
-          navigationShell.goBranch(
-            index,
-            initialLocation: index == navigationShell.currentIndex,
-          );
-        },
-        // Remove default opaque layout hit testing issues
-        behavior: HitTestBehavior.opaque,
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Container(
-              padding: const EdgeInsets.symmetric(
-                horizontal: AppSpacing.xl,
-                vertical: AppSpacing.sm,
-              ),
-              decoration: BoxDecoration(
-                color: isSelected
-                    ? AppColors.brandPurple.withValues(alpha: 0.2)
-                    : Colors.transparent,
-                borderRadius: BorderRadius.circular(999),
-              ),
-              child: Image.asset(
-                imagePath,
-                width: 24, // reduced slightly to prevent overflow
-                height: 24,
-                fit: BoxFit.contain,
-                color: isSelected ? AppColors.brandPurple : AppColors.neutralGray05,
-              ),
-            ),
-            const SizedBox(height: AppSpacing.xs),
-            Text(
-              label,
-              style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                    color: isSelected
-                        ? AppColors.brandPurple
-                        : AppColors.neutralGray05,
+      child: Material(
+        color: Colors.transparent,
+        child: InkWell(
+          borderRadius: BorderRadius.circular(16),
+          onTap: () {
+            navigationShell.goBranch(
+              index,
+              initialLocation: index == navigationShell.currentIndex,
+            );
+          },
+          child: Padding(
+            padding: const EdgeInsets.symmetric(vertical: AppSpacing.xs),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Container(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: AppSpacing.xl,
+                    vertical: AppSpacing.sm,
                   ),
+                  decoration: BoxDecoration(
+                    color: isSelected
+                        ? AppColors.brandPurple.withValues(alpha: 0.2)
+                        : Colors.transparent,
+                    borderRadius: BorderRadius.circular(999),
+                  ),
+                  child: Image.asset(
+                    imagePath,
+                    width: 24, // reduced slightly to prevent overflow
+                    height: 24,
+                    fit: BoxFit.contain,
+                    color: isSelected ? AppColors.brandPurple : AppColors.neutralGray05,
+                  ),
+                ),
+                const SizedBox(height: AppSpacing.xs),
+                Text(
+                  label,
+                  style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                        color: isSelected
+                            ? AppColors.brandPurple
+                            : AppColors.neutralGray05,
+                      ),
+                ),
+              ],
             ),
-          ],
+          ),
         ),
       ),
     );
