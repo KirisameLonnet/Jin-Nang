@@ -113,6 +113,9 @@ flutter:
           weight: 900
         - asset: assets/fonts/Inter-Italic.ttf
           style: italic
+    - family: HarmonyOS Sans SC
+      fonts:
+        - asset: assets/fonts/HarmonyOS_Sans_SC.ttf
 
   # For details regarding fonts from package dependencies,
   # see https://flutter.dev/to/font-from-package

@@ -86,7 +86,7 @@ class _ToolboxCardState extends State<ToolboxCard> {
       setState(() { _currentIndex = next; _currentDetail = null; _showRelated = true; });
       await _loadDetail(next);
     } else {
-      context.go('/toolbox');
+      context.go('/study/vocab-scene');
     }
   }
 

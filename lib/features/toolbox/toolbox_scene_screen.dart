@@ -1,21 +1,20 @@
 import 'package:flutter/material.dart';
-import 'package:go_router/go_router.dart';
-import '../../../core/di.dart';
-import '../../../core/models/scene.dart';
-import '../../../theme/app_colors.dart';
-import '../../../theme/app_spacing.dart';
-import '../../../widgets/app_header.dart';
-import '../../../widgets/app_safe_area.dart';
-import '../../../widgets/selectable_card.dart';
+import '../../core/di.dart';
+import '../../core/models/scene.dart';
+import '../../theme/app_colors.dart';
+import '../../theme/app_spacing.dart';
+import '../../widgets/app_safe_area.dart';
+import '../../widgets/selectable_card.dart';
+import '../../widgets/title_section.dart';
 
-class VocabSceneScreen extends StatefulWidget {
-  const VocabSceneScreen({super.key});
+class ToolboxSceneScreen extends StatefulWidget {
+  const ToolboxSceneScreen({super.key});
 
   @override
-  State<VocabSceneScreen> createState() => _VocabSceneScreenState();
+  State<ToolboxSceneScreen> createState() => _ToolboxSceneScreenState();
 }
 
-class _VocabSceneScreenState extends State<VocabSceneScreen> {
+class _ToolboxSceneScreenState extends State<ToolboxSceneScreen> {
   List<Scene>? _scenes;
   String? _error;
 
@@ -38,24 +37,17 @@ class _VocabSceneScreenState extends State<VocabSceneScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: AppColors.springWood14,
-      body: AppSafeArea(
+    return Container(
+      color: AppColors.springWood14,
+      child: AppSafeArea(
         child: Padding(
           padding: const EdgeInsets.symmetric(horizontal: AppSpacing.lg),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               const SizedBox(height: 48),
-              AppHeader(
-                title: 'Vocab Learning',
-                titleColor: AppColors.straw14,
-                onBack: () => context.go('/study'),
-              ),
-              const SizedBox(height: 32),
-              const Text('Select a scene',
-                  style: TextStyle(fontSize: 20, fontWeight: FontWeight.w900, color: AppColors.morandiText)),
-              const SizedBox(height: 24),
+              const TitleSection(title: 'TOOLBOX', subtitle: 'Useful phrases for real life.'),
+              const SizedBox(height: 40),
               Expanded(child: _buildBody(context)),
             ],
           ),
@@ -86,7 +78,7 @@ class _VocabSceneScreenState extends State<VocabSceneScreen> {
                 icon: _iconForScene(scene.nameEn),
                 color: _colorFromHex(scene.colorHex),
                 onTap: scene.isUnlockedDefault
-                    ? () => context.go('/study/vocab-battle/${scene.id}')
+                    ? () => Di.router!.go('/toolbox/${scene.id}')
                     : null,
                 onLockedTap: scene.isUnlockedDefault
                     ? null

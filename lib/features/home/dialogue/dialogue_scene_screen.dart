@@ -8,14 +8,14 @@ import '../../../widgets/app_header.dart';
 import '../../../widgets/app_safe_area.dart';
 import '../../../widgets/selectable_card.dart';
 
-class VocabSceneScreen extends StatefulWidget {
-  const VocabSceneScreen({super.key});
+class DialogueSceneScreen extends StatefulWidget {
+  const DialogueSceneScreen({super.key});
 
   @override
-  State<VocabSceneScreen> createState() => _VocabSceneScreenState();
+  State<DialogueSceneScreen> createState() => _DialogueSceneScreenState();
 }
 
-class _VocabSceneScreenState extends State<VocabSceneScreen> {
+class _DialogueSceneScreenState extends State<DialogueSceneScreen> {
   List<Scene>? _scenes;
   String? _error;
 
@@ -48,8 +48,8 @@ class _VocabSceneScreenState extends State<VocabSceneScreen> {
             children: [
               const SizedBox(height: 48),
               AppHeader(
-                title: 'Vocab Learning',
-                titleColor: AppColors.straw14,
+                title: 'Dialogue Practice',
+                titleColor: AppColors.baliHai30,
                 onBack: () => context.go('/study'),
               ),
               const SizedBox(height: 32),
@@ -86,7 +86,7 @@ class _VocabSceneScreenState extends State<VocabSceneScreen> {
                 icon: _iconForScene(scene.nameEn),
                 color: _colorFromHex(scene.colorHex),
                 onTap: scene.isUnlockedDefault
-                    ? () => context.go('/study/vocab-battle/${scene.id}')
+                    ? () => context.go('/study/dialogue-practice/${scene.id}')
                     : null,
                 onLockedTap: scene.isUnlockedDefault
                     ? null
@@ -105,7 +105,7 @@ class _VocabSceneScreenState extends State<VocabSceneScreen> {
 
   IconData _iconForScene(String name) {
     switch (name.toLowerCase()) {
-      case 'restaurant': return Icons.local_cafe;
+      case 'restaurant': return Icons.restaurant;
       case 'supermarket': return Icons.shopping_cart;
       case 'airport': return Icons.flight;
       default: return Icons.place;

@@ -49,6 +49,37 @@ If regenerating the `ios/` directory: also `chmod -R u+w ios/` afterwards — Ni
 
 Each branch has its own `GlobalKey<NavigatorState>` so tabs preserve their navigation stack independently. Sub-page transitions use the `_slidePage` helper (right-slide) defined in `main.dart` — reuse it for new sub-routes instead of inventing per-screen transitions.
 
+Current routes with path parameters:
+
+| Path | Screen | Shell? |
+|------|--------|--------|
+| `/splash` | SplashScreen | ❌ |
+| `/login` | LoginScreen | ❌ |
+| `/register` | RegisterScreen | ❌ |
+| `/study` | HomeScreen | Study tab |
+| `/study/vocab-scene` | VocabSceneScreen | Study tab |
+| `/study/vocab-learning/:sceneId` | VocabLearningScreen | Study tab |
+| `/study/dialogue-practice/:sceneId` | DialoguePracticeScreen | Study tab |
+| `/study/level/:levelId?sceneId=…` | LevelScreen | Study tab |
+| `/toolbox` | ToolboxScreen | Toolbox tab |
+| `/toolbox/vocab-card/:sceneId` | ToolboxCard | Toolbox tab |
+| `/me` | ProfileScreen | My tab |
+
+### Dependency injection
+
+`lib/core/di.dart` provides a simple service-locator singleton `Di`:
+
+- `Di.tokenStore` — `TokenStore` (flutter_secure_storage wrapper for JWT)
+- `Di.api` — `ApiClient` (Dio + JWT inject/401-clear interceptor)
+- `Di.audioCache` — `AudioCacheManager` (flutter_cache_manager for vocab audio)
+- `Di.router` — set by `main.dart` after router creation, used by the 401 interceptor to redirect to `/login`
+
+### Network layer (`lib/core/network/api_client.dart`)
+
+Dio-based HTTP client pointing at `https://jntest.lonnet.uk`. On every request it injects `Authorization: Bearer <jwt>` from `TokenStore`. On 401 responses it clears the token and redirects to `/login` via `Di.router`.
+
+API methods: `login()`, `register()`, `getMe()`, `getScenes()`, `getSceneVocab()`, `getVocabDetail()`, `getSceneLevels()`, `submitProgress()`.
+
 ### Feature-first layout under `lib/`
 
 ```
@@ -56,6 +87,12 @@ lib/
 ├── main.dart              # entry + router
 ├── theme/                 # design tokens (colors, fonts, spacing, ThemeData)
 ├── widgets/               # cross-feature reusable widgets
+├── core/
+│   ├── network/           # Dio client with JWT injection interceptor
+│   ├── auth/              # TokenStore (flutter_secure_storage)
+│   ├── audio/             # AudioCacheManager (flutter_cache_manager wrapper)
+│   ├── models/            # UserProfile, Scene, VocabItem, VocabDetail, Level
+│   └── di.dart            # service locator singleton
 └── features/<feature>/    # screens grouped by product area
 ```
 
@@ -74,7 +111,7 @@ Every card-like surface follows the same primitive: black ~2.5–4px border, off
 - `widgets/app_card.dart` — base card container
 - `widgets/app_header.dart` — back button + title tab + optional progress counter
 - `widgets/icon_container.dart` — bordered icon tile, multiple sizes
-- `widgets/selectable_card.dart` — scene/tool card; **disabled state = `onTap == null`** (no separate `enabled` flag), per the project's design-system rule
+- `widgets/selectable_card.dart` — scene/tool card; **disabled state = `onTap == null`** (no separate `enabled` flag), per the project's design-system rule. `onLockedTap` handles locked-card taps separately (shows "coming soon").
 - `widgets/pressable.dart` — universal tap wrapper providing the press feedback (offset + opacity dip), haptic, and SFX. Prefer `Pressable` over raw `GestureDetector`/`InkWell` for any interactive surface so press feedback stays consistent.
 
 Press SFX comes from `ButtonSounds` (singleton in `pressable.dart`) playing `assets/audio/btn_pressed.mp3` / `btn_released.mp3`.
@@ -88,11 +125,14 @@ Two categories with different storage and playback:
 | 按钮音效（btn_pressed / btn_released） | App 包体 `assets/audio/` | `AssetSource` |
 | 词汇音频（全部业务音频） | CF R2，按需下载 | `DeviceFileSource`（本地缓存后） |
 
-`AssetSource` 路径相对于 `assets/` — 传 `'audio/btn_pressed.mp3'`，不含 `assets/` 前缀。词汇音频不再打包进 App，由 `flutter_cache_manager` 管理下载和缓存（待接入）。
+`AssetSource` 路径相对于 `assets/` — 传 `'audio/btn_pressed.mp3'`，不含 `assets/` 前缀。词汇音频不再打包进 App，由 `AudioCacheManager`（`flutter_cache_manager` 封装）管理下载和缓存。注意：`DeviceFileSource` 在 Web 平台不可用。
 
 ### State management
 
-Currently `StatefulWidget` + `setState` only — no Riverpod/BLoC yet. All user data (streak, rank, unlock state, vocabulary, questions) is hardcoded in screen files. No persistence layer exists — data will come from the backend once the network layer is built.
+- **Service locator**: `Di` singleton provides shared instances (`Di.api`, `Di.tokenStore`, `Di.audioCache`).
+- **Screen state**: `StatefulWidget` + `setState` — no Riverpod/BLoC yet.
+- **Auth token**: `flutter_secure_storage` via `TokenStore`, not SharedPreferences.
+- **Data source**: screens fetch data from the backend API on `initState`; no local persistence layer.
 
 ## Conventions
 
@@ -100,7 +140,7 @@ Currently `StatefulWidget` + `setState` only — no Riverpod/BLoC yet. All user 
 - Spacing values must come from `lib/theme/app_spacing.dart`, on the 4pt/8pt grid. No raw magic numbers for padding/margin.
 - Strict Figma 1:1 alignment — colors, spacing, and component states come from Figma tokens, not designer-eye approximation in code.
 - All interactive widgets carry their states from Figma Variants: `Default / Pressed / Disabled` (no `Hover` since mobile-only). Disabled = null callback.
-- Commit messages follow Conventional Commits (`feat:`, `fix:`, `refactor:`, `perf:`, `chore:`, `docs:`). Recent history shows this is enforced by convention.
+- Commit messages follow Conventional Commits (`feat:`, `fix:`, `refactor:`, `perf:`, `chore:`, `docs:`).
 - The project's design and Flutter coding rules are written up in `flutter规范.md` and `figma规范.md` at the repo root — read these for style decisions not covered here.
 
 ## Backend architecture
@@ -111,7 +151,7 @@ Currently `StatefulWidget` + `setState` only — no Riverpod/BLoC yet. All user 
 - **D1** (SQLite): all business data — users, scenes, vocab, levels, progress
 - **R2**: vocab audio files (`audio/{scene}/{word}.mp3`)
 
-DB stores `audio_key` as a relative path (e.g. `restaurant/rice.mp3`); the full URL is assembled by Workers at response time.
+DB stores `audio_key` as a relative path (e.g. `restaurant/rice.mp3`); the full URL is assembled by Workers at response time. The production API is at `https://jntest.lonnet.uk`.
 
 ### API surface
 
@@ -120,19 +160,22 @@ POST /auth/register   POST /auth/login    GET /auth/me
 GET  /scenes          GET /scenes/:id/vocab
 GET  /vocab/:id       GET /scenes/:id/levels
 GET  /user/progress   POST /user/progress
+GET  /audio/:scene/:file
 ```
 
-All authenticated endpoints require `Authorization: Bearer <jwt>`.
+All authenticated endpoints require `Authorization: Bearer <jwt>`. All backend code lives in `backend/` with its own README.md covering deployment, migrations, and local dev workflows.
 
-### Flutter network layer (not yet built)
+### Backend commands (run from `backend/`)
 
-Planned under `lib/core/`:
-- `network/` — Dio client with JWT injection interceptor
-- `audio/` — `flutter_cache_manager` wrapper for vocab audio
-- `auth/` — JWT storage and refresh
+```bash
+wrangler deploy                    # deploy Worker
+npm run dev                        # local dev server
+wrangler d1 execute jin-nang-db --remote --file=migrations/000X_xxx.sql  # run migration
+wrangler r2 object put jin-nang-audio/{scene}/{word}.mp3 -f <local.mp3> --remote  # upload audio
+```
 
-Each feature gets a `data/` subfolder with its Repository once the network layer exists.
+Never modify deployed DB tables directly — always create a new migration file under `backend/migrations/`, run it, update `schema.sql`, then redeploy.
 
 ## Project context docs
 
-`業務逻辑文档和进度记录/business_logic.md` is the live spec — every screen's flow, route table, data models, API routes, audio architecture, and the full "未实现功能清单" (P0–P3). Check it before adding screens or changing flow. `progress.md` in the same folder tracks ongoing work.
+`业务逻辑文档和进度记录/business_logic.md` is the live spec — every screen's flow, route table, data models, API routes, audio architecture, and the full "未实现功能清单" (P0–P3). Check it before adding screens or changing flow. `progress.md` in the same folder tracks ongoing work.

@@ -1,111 +1,165 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
-import '../../core/di.dart';
-import '../../core/models/scene.dart';
+import '../../core/models/phrase.dart';
 import '../../theme/app_colors.dart';
 import '../../theme/app_spacing.dart';
+import '../../widgets/app_card.dart';
+import '../../widgets/app_header.dart';
 import '../../widgets/app_safe_area.dart';
-import '../../widgets/title_section.dart';
-import '../../widgets/selectable_card.dart';
+import '../../widgets/pressable.dart';
 
 class ToolboxScreen extends StatefulWidget {
-  const ToolboxScreen({super.key});
+  final int sceneId;
+  const ToolboxScreen({super.key, required this.sceneId});
 
   @override
   State<ToolboxScreen> createState() => _ToolboxScreenState();
 }
 
 class _ToolboxScreenState extends State<ToolboxScreen> {
-  List<Scene>? _scenes;
-  String? _error;
-
-  @override
-  void initState() {
-    super.initState();
-    _loadScenes();
-  }
-
-  Future<void> _loadScenes() async {
-    try {
-      final scenes = await Di.api.getScenes();
-      if (!mounted) return;
-      setState(() => _scenes = scenes);
-    } catch (e) {
-      if (!mounted) return;
-      setState(() => _error = e.toString());
-    }
-  }
+  // 后续可扩展为从 API 根据 widget.sceneId 加载 Topic 数据
+  final Topic topic = demoTopic;
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      color: AppColors.springWood14,
-      child: AppSafeArea(
+    return Scaffold(
+      backgroundColor: AppColors.springWood14,
+      body: AppSafeArea(
         child: Padding(
           padding: const EdgeInsets.symmetric(horizontal: AppSpacing.lg),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               const SizedBox(height: 48),
-              const TitleSection(title: 'TOOLBOX', subtitle: 'Useful phrases for real life.'),
-              const SizedBox(height: 40),
-              Expanded(child: _buildBody(context)),
+              AppHeader(
+                title: 'Restaurant',
+                titleColor: AppColors.straw14,
+                onBack: () => context.go('/toolbox'),
+              ),
+              const SizedBox(height: 24),
+              // 深色横幅
+              AppCard(
+                color: AppColors.morandiText,
+                borderRadius: 20,
+                padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 18),
+                child: Row(
+                  children: [
+                    Container(
+                      width: 44,
+                      height: 44,
+                      decoration: BoxDecoration(
+                        color: AppColors.straw14,
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                      child: Icon(topic.icon, color: AppColors.morandiText, size: 24),
+                    ),
+                    const SizedBox(width: 16),
+                    Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          topic.category,
+                          style: const TextStyle(
+                            fontSize: 12,
+                            fontWeight: FontWeight.w700,
+                            color: AppColors.straw14,
+                            letterSpacing: 1,
+                          ),
+                        ),
+                        const SizedBox(height: 4),
+                        Text(
+                          topic.title,
+                          style: const TextStyle(
+                            fontSize: 20,
+                            fontWeight: FontWeight.w900,
+                            color: Colors.white,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ],
+                ),
+              ),
+              const SizedBox(height: 20),
+              // 章节列表
+              Expanded(
+                child: ListView.separated(
+                  clipBehavior: Clip.none,
+                  itemCount: topic.chapters.length,
+                  separatorBuilder: (_, _) => const SizedBox(height: 14),
+                  itemBuilder: (context, i) {
+                    final ch = topic.chapters[i];
+                    return Pressable(
+                      onPressed: () => context.go('/toolbox/chapter/$i'),
+                      child: AppCard(
+                        color: Colors.white,
+                        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 18),
+                        child: Row(
+                          children: [
+                            Container(
+                              width: 44,
+                              height: 44,
+                              decoration: BoxDecoration(
+                                color: AppColors.baliHai30,
+                                borderRadius: BorderRadius.circular(12),
+                                border: Border.all(color: AppColors.morandiText, width: 2),
+                                boxShadow: const [
+                                  BoxShadow(
+                                    color: AppColors.morandiText,
+                                    offset: Offset(0, 3),
+                                    blurRadius: 0,
+                                  ),
+                                ],
+                              ),
+                              child: Center(
+                                child: Text(
+                                  '${ch.index}',
+                                  style: const TextStyle(
+                                    fontSize: 18,
+                                    fontWeight: FontWeight.w900,
+                                    color: Colors.white,
+                                  ),
+                                ),
+                              ),
+                            ),
+                            const SizedBox(width: 16),
+                            Expanded(
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Text(
+                                    ch.title,
+                                    style: const TextStyle(
+                                      fontSize: 17,
+                                      fontWeight: FontWeight.w900,
+                                      color: AppColors.morandiText,
+                                    ),
+                                  ),
+                                  const SizedBox(height: 4),
+                                  Text(
+                                    '${ch.sentenceCount} sentences',
+                                    style: const TextStyle(
+                                      fontSize: 13,
+                                      fontWeight: FontWeight.w600,
+                                      color: AppColors.naturalGray19,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                            const Icon(Icons.chevron_right, color: AppColors.morandiText, size: 28),
+                          ],
+                        ),
+                      ),
+                    );
+                  },
+                ),
+              ),
+              const SizedBox(height: 12),
             ],
           ),
         ),
       ),
     );
-  }
-
-  Widget _buildBody(BuildContext context) {
-    if (_error != null) {
-      return Center(
-        child: Text(_error!,
-            textAlign: TextAlign.center,
-            style: const TextStyle(color: AppColors.semanticRed, fontWeight: FontWeight.w600)),
-      );
-    }
-    if (_scenes == null) {
-      return const Center(child: CircularProgressIndicator());
-    }
-    return ListView(
-      children: [
-        ..._scenes!.map((scene) => Padding(
-              padding: const EdgeInsets.only(bottom: 24),
-              child: SelectableCard(
-                title: scene.nameEn,
-                subtitle: scene.subtitleEn,
-                color: _colorFromHex(scene.colorHex),
-                icon: _iconForScene(scene.nameEn),
-                onTap: scene.isUnlockedDefault
-                    ? () => context.go('/toolbox/vocab-card/${scene.id}')
-                    : null,
-                onLockedTap: scene.isUnlockedDefault
-                    ? null
-                    : () => ScaffoldMessenger.of(context).showSnackBar(
-                          const SnackBar(
-                            content: Text('This scene is coming soon.'),
-                            duration: Duration(seconds: 2),
-                          ),
-                        ),
-              ),
-            )),
-        const SizedBox(height: 48),
-      ],
-    );
-  }
-
-  IconData _iconForScene(String name) {
-    switch (name.toLowerCase()) {
-      case 'restaurant': return Icons.restaurant;
-      case 'supermarket': return Icons.shopping_cart;
-      case 'airport': return Icons.flight;
-      default: return Icons.place;
-    }
-  }
-
-  Color _colorFromHex(String hex) {
-    final value = int.tryParse(hex.replaceFirst('#', ''), radix: 16);
-    return value != null ? Color(0xFF000000 | value) : AppColors.baliHai30;
   }
 }

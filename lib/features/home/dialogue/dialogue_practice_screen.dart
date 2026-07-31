@@ -71,7 +71,7 @@ class _DialoguePracticeScreenState extends State<DialoguePracticeScreen> {
           const SizedBox(height: 48),
           AppHeader(
             title: 'Dialogue Practice',
-            onBack: () => context.go('/study/vocab-learning/${widget.sceneId}'),
+            onBack: () => context.go('/study/dialogue-scene'),
           ),
           const Spacer(),
           Text(
@@ -94,7 +94,7 @@ class _DialoguePracticeScreenState extends State<DialoguePracticeScreen> {
           const SizedBox(height: 48),
           AppHeader(
             title: 'Dialogue Practice',
-            onBack: () => context.go('/study/vocab-learning/${widget.sceneId}'),
+            onBack: () => context.go('/study/dialogue-scene'),
           ),
           const Spacer(),
           const CircularProgressIndicator(),
@@ -110,13 +110,14 @@ class _DialoguePracticeScreenState extends State<DialoguePracticeScreen> {
         const SizedBox(height: 48),
         AppHeader(
           title: 'Dialogue Practice',
-          onBack: () => context.go('/study/vocab-learning/${widget.sceneId}'),
+          onBack: () => context.go('/study/dialogue-scene'),
         ),
         const SizedBox(height: 32),
         _buildProgressSummary(completedCount),
         const SizedBox(height: 32),
         Expanded(
           child: ListView(
+            clipBehavior: Clip.none,
             children: [
               ..._levels!.map((level) => Padding(
                     padding: const EdgeInsets.only(bottom: 16),

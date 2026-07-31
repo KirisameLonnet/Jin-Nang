@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:go_router/go_router.dart';
 import '../../core/di.dart';
 import '../../core/models/user.dart';
 import '../../theme/app_colors.dart';
@@ -188,7 +187,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
     return Pressable(
       onPressed: () async {
         await Di.tokenStore.clearToken();
-        if (context.mounted) context.go('/login');
+        if (context.mounted) Di.router!.go('/login');
       },
       child: Container(
         width: double.infinity,

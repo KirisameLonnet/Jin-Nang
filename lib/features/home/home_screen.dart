@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:go_router/go_router.dart';
 import '../../core/di.dart';
 import '../../core/models/user.dart';
 import '../../theme/app_colors.dart';
@@ -173,9 +172,10 @@ class _HomeScreenState extends State<HomeScreen> {
         const SizedBox(height: 16),
         Expanded(
           child: ListView(
+            clipBehavior: Clip.none,
             children: [
               Pressable(
-                onPressed: () => context.go('/study/vocab-scene'),
+                onPressed: () => Di.router!.go('/study/vocab-scene'),
                 child: _buildMissionCard(
                   title: 'Vocab\nLearning',
                   subtitle: '${_profile?.totalWordsSeen ?? 0} words learned',
@@ -185,7 +185,7 @@ class _HomeScreenState extends State<HomeScreen> {
               ),
               const SizedBox(height: 16),
               Pressable(
-                onPressed: () => context.go('/study/vocab-scene'),
+                onPressed: () => Di.router!.go('/study/dialogue-scene'),
                 child: _buildMissionCard(
                   title: 'Dialogue\nPractice',
                   subtitle: 'Pick a scene to practice',

@@ -10,10 +10,14 @@ import 'features/auth/login_screen.dart';
 import 'features/auth/register_screen.dart';
 import 'features/home/home_screen.dart';
 import 'features/toolbox/toolbox_screen.dart';
+import 'features/toolbox/toolbox_scene_screen.dart';
+import 'features/toolbox/toolbox_card.dart';
+import 'features/toolbox/toolbox_chapter_screen.dart';
 import 'features/profile/profile_screen.dart';
+import 'core/models/phrase.dart';
 import 'features/home/vocab_learning/vocab_scene_screen.dart';
 import 'features/home/vocab_learning/vocab_learning_screen.dart';
-import 'features/toolbox/toolbox_card.dart';
+import 'features/home/dialogue/dialogue_scene_screen.dart';
 import 'features/home/dialogue/dialogue_practice_screen.dart';
 import 'features/home/dialogue/level_screen.dart';
 
@@ -50,69 +54,78 @@ final GoRouter _router = GoRouter(
     GoRoute(path: '/login',  builder: (context, state) => const LoginScreen()),
     GoRoute(path: '/register', builder: (context, state) => const RegisterScreen()),
 
+    // Sub-pages (no bottom tab) — declared first so they match before the shell
+    GoRoute(
+      path: '/study/vocab-scene',
+      pageBuilder: (context, state) => _slidePage(child: const VocabSceneScreen()),
+    ),
+    GoRoute(
+      path: '/study/vocab-battle/:sceneId',
+      pageBuilder: (context, state) {
+        final sceneId = int.parse(state.pathParameters['sceneId']!);
+        return _slidePage(child: ToolboxCard(sceneId: sceneId));
+      },
+    ),
+    GoRoute(
+      path: '/study/vocab-learning/:sceneId',
+      pageBuilder: (context, state) {
+        final sceneId = int.parse(state.pathParameters['sceneId']!);
+        return _slidePage(child: VocabLearningScreen(sceneId: sceneId));
+      },
+    ),
+    GoRoute(
+      path: '/study/dialogue-scene',
+      pageBuilder: (context, state) => _slidePage(child: const DialogueSceneScreen()),
+    ),
+    GoRoute(
+      path: '/study/dialogue-practice/:sceneId',
+      pageBuilder: (context, state) {
+        final sceneId = int.parse(state.pathParameters['sceneId']!);
+        return _slidePage(child: DialoguePracticeScreen(sceneId: sceneId));
+      },
+    ),
+    GoRoute(
+      path: '/study/level/:levelId',
+      pageBuilder: (context, state) {
+        final levelId = int.parse(state.pathParameters['levelId']!);
+        final sceneId = int.parse(state.uri.queryParameters['sceneId'] ?? '1');
+        return _slidePage(child: LevelScreen(levelId: levelId, sceneId: sceneId));
+      },
+    ),
+    // Toolbox sub-pages
+    GoRoute(
+      path: '/toolbox/:sceneId',
+      pageBuilder: (context, state) {
+        final sceneId = int.parse(state.pathParameters['sceneId']!);
+        return _slidePage(child: ToolboxScreen(sceneId: sceneId));
+      },
+    ),
+    GoRoute(
+      path: '/toolbox/chapter/:initialChapter',
+      pageBuilder: (context, state) {
+        final initialChapter = int.parse(state.pathParameters['initialChapter']!);
+        return _slidePage(child: ToolboxChapterScreen(
+          topic: demoTopic,
+          initialChapter: initialChapter,
+        ));
+      },
+    ),
+    // Shell with bottom tab — only root pages
     StatefulShellRoute.indexedStack(
       builder: (context, state, navigationShell) => MainShell(navigationShell: navigationShell),
       branches: [
-        // Study Tab
         StatefulShellBranch(
           navigatorKey: _shellNavigatorStudyKey,
           routes: [
-            GoRoute(
-              path: '/study',
-              builder: (context, state) => const HomeScreen(),
-              routes: [
-                GoRoute(
-                  path: 'vocab-scene',
-                  pageBuilder: (context, state) => _slidePage(child: const VocabSceneScreen()),
-                ),
-                GoRoute(
-                  path: 'vocab-learning/:sceneId',
-                  pageBuilder: (context, state) {
-                    final sceneId = int.parse(state.pathParameters['sceneId']!);
-                    return _slidePage(child: VocabLearningScreen(sceneId: sceneId));
-                  },
-                ),
-                GoRoute(
-                  path: 'dialogue-practice/:sceneId',
-                  pageBuilder: (context, state) {
-                    final sceneId = int.parse(state.pathParameters['sceneId']!);
-                    return _slidePage(child: DialoguePracticeScreen(sceneId: sceneId));
-                  },
-                ),
-                GoRoute(
-                  path: 'level/:levelId',
-                  pageBuilder: (context, state) {
-                    final levelId = int.parse(state.pathParameters['levelId']!);
-                    final sceneId = int.parse(state.uri.queryParameters['sceneId'] ?? '1');
-                    return _slidePage(child: LevelScreen(levelId: levelId, sceneId: sceneId));
-                  },
-                ),
-              ],
-            ),
+            GoRoute(path: '/study', builder: (context, state) => const HomeScreen()),
           ],
         ),
-
-        // Toolbox Tab
         StatefulShellBranch(
           navigatorKey: _shellNavigatorToolboxKey,
           routes: [
-            GoRoute(
-              path: '/toolbox',
-              builder: (context, state) => const ToolboxScreen(),
-              routes: [
-                GoRoute(
-                  path: 'vocab-card/:sceneId',
-                  pageBuilder: (context, state) {
-                    final sceneId = int.parse(state.pathParameters['sceneId']!);
-                    return _slidePage(child: ToolboxCard(sceneId: sceneId));
-                  },
-                ),
-              ],
-            ),
+            GoRoute(path: '/toolbox', builder: (context, state) => const ToolboxSceneScreen()),
           ],
         ),
-
-        // My Tab
         StatefulShellBranch(
           navigatorKey: _shellNavigatorMeKey,
           routes: [

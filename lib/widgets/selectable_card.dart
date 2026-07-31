@@ -36,6 +36,7 @@ class SelectableCard extends StatelessWidget {
       onPressed: onTap,
       child: Container(
         width: double.infinity,
+        height: 188,
         padding: const EdgeInsets.all(20),
         decoration: BoxDecoration(
           color: cardBg,

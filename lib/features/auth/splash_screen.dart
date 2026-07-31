@@ -34,36 +34,58 @@ class _SplashScreenState extends State<SplashScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.white,
+      backgroundColor: AppColors.straw14,
       body: AnimatedOpacity(
         opacity: _opacity,
         duration: const Duration(milliseconds: 800),
         curve: Curves.easeIn,
         child: Center(
           child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
+            mainAxisSize: MainAxisSize.min,
             children: [
-              Container(
-                width: 80,
-                height: 80,
-                decoration: BoxDecoration(
-                  color: AppColors.baliHai30,
-                  border: Border.all(color: AppColors.morandiText, width: 3),
-                  borderRadius: BorderRadius.circular(20),
-                  boxShadow: const [
-                    BoxShadow(color: AppColors.morandiText, offset: Offset(4, 4), blurRadius: 0),
+              // Jin Nang 标题
+              Text(
+                'Jin Nang',
+                style: TextStyle(
+                  fontSize: 52,
+                  fontWeight: FontWeight.w900,
+                  color: AppColors.morandiText,
+                  letterSpacing: -1,
+                  shadows: const [
+                    Shadow(
+                      offset: Offset(5, 5),
+                      blurRadius: 0,
+                      color: AppColors.baliHai30,
+                    ),
                   ],
                 ),
-                child: const Icon(Icons.school, size: 40, color: AppColors.morandiText),
               ),
-              const SizedBox(height: 24),
-              const Text('JIN NANG',
-                  style: TextStyle(fontSize: 28, fontWeight: FontWeight.w900,
-                      color: AppColors.morandiText, letterSpacing: 2)),
-              const SizedBox(height: 8),
-              Text('Learn Chinese, the fun way',
-                  style: TextStyle(fontSize: 14, fontWeight: FontWeight.w700,
-                      color: AppColors.morandiText.withValues(alpha: 0.6))),
+              const SizedBox(height: 28),
+              // LOADING... 胶囊
+              Container(
+                padding: const EdgeInsets.symmetric(horizontal: 28, vertical: 12),
+                decoration: BoxDecoration(
+                  color: AppColors.springWood14,
+                  borderRadius: BorderRadius.circular(40),
+                  border: Border.all(color: AppColors.morandiText, width: 2),
+                  boxShadow: const [
+                    BoxShadow(
+                      color: AppColors.morandiText,
+                      offset: Offset(0, 5),
+                      blurRadius: 0,
+                    ),
+                  ],
+                ),
+                child: const Text(
+                  'LOADING...',
+                  style: TextStyle(
+                    fontSize: 16,
+                    fontWeight: FontWeight.w800,
+                    color: AppColors.morandiText,
+                    letterSpacing: 0.5,
+                  ),
+                ),
+              ),
             ],
           ),
         ),
