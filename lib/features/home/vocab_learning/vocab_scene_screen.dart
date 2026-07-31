@@ -86,7 +86,7 @@ class _VocabSceneScreenState extends State<VocabSceneScreen> {
                 icon: _iconForScene(scene.nameEn),
                 color: _colorFromHex(scene.colorHex),
                 onTap: scene.isUnlockedDefault
-                    ? () => context.go('/study/vocab-battle/${scene.id}')
+                    ? () => context.push('/study/vocab-battle/${scene.id}')
                     : null,
                 onLockedTap: scene.isUnlockedDefault
                     ? null

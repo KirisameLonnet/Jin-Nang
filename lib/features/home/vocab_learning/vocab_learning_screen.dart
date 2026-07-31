@@ -82,7 +82,7 @@ class _VocabLearningScreenState extends State<VocabLearningScreen> {
   }
 
   void _goToDialoguePractice() =>
-      context.go('/study/dialogue-practice/${widget.sceneId}');
+      context.push('/study/dialogue-practice/${widget.sceneId}');
   void _goBack() => context.go('/study/vocab-scene');
 
   @override
@@ -273,7 +273,7 @@ class _VocabLearningScreenState extends State<VocabLearningScreen> {
             color: _allClicked
                 ? AppColors.morandiText
                 : AppColors.shark40.withValues(alpha: 0.2),
-            width: 2.5,
+            width: 3,
           ),
           borderRadius: BorderRadius.circular(14),
           boxShadow: _allClicked

@@ -89,7 +89,7 @@ class _LevelScreenState extends State<LevelScreen> {
     });
   }
 
-  void _goBack() => context.go('/study/dialogue-practice/${widget.sceneId}');
+  void _goBack() { if (Navigator.of(context).canPop()) { context.pop(); } else { context.go('/study/dialogue-practice/${widget.sceneId}'); } }
 
   @override
   Widget build(BuildContext context) {
@@ -182,7 +182,7 @@ class _LevelScreenState extends State<LevelScreen> {
             height: 44,
             decoration: BoxDecoration(
               color: Colors.white,
-              border: Border.all(color: AppColors.morandiText, width: 2.5),
+              border: Border.all(color: AppColors.morandiText, width: 3),
               borderRadius: BorderRadius.circular(12),
               boxShadow: const [
                 BoxShadow(
@@ -257,7 +257,7 @@ class _LevelScreenState extends State<LevelScreen> {
       padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
         color: Colors.white,
-        border: Border.all(color: AppColors.morandiText, width: 2.389),
+        border: Border.all(color: AppColors.morandiText, width: 3),
         borderRadius: BorderRadius.circular(16),
         boxShadow: const [
           BoxShadow(
@@ -452,7 +452,7 @@ class _LevelScreenState extends State<LevelScreen> {
         height: 56,
         decoration: BoxDecoration(
           color: AppColors.baliHai30,
-          border: Border.all(color: AppColors.morandiText, width: 2.5),
+          border: Border.all(color: AppColors.morandiText, width: 3),
           borderRadius: BorderRadius.circular(14),
           boxShadow: const [
             BoxShadow(
@@ -580,7 +580,7 @@ class _LevelScreenState extends State<LevelScreen> {
         height: 56,
         decoration: BoxDecoration(
           color: AppColors.baliHai30,
-          border: Border.all(color: AppColors.morandiText, width: 2.5),
+          border: Border.all(color: AppColors.morandiText, width: 3),
           borderRadius: BorderRadius.circular(14),
           boxShadow: const [
             BoxShadow(
@@ -616,7 +616,7 @@ class _LevelScreenState extends State<LevelScreen> {
             color: isSecondary
                 ? AppColors.shark40.withValues(alpha: 0.2)
                 : AppColors.morandiText,
-            width: 2.5,
+            width: 3,
           ),
           borderRadius: BorderRadius.circular(14),
           boxShadow: isSecondary

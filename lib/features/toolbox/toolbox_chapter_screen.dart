@@ -65,13 +65,19 @@ class _ToolboxChapterScreenState extends State<ToolboxChapterScreen> {
               child: Row(
                 children: [
                   Pressable(
-                    onPressed: () => context.go('/toolbox'),
+                    onPressed: () {
+                      if (Navigator.of(context).canPop()) {
+                        context.pop();
+                      } else {
+                        context.go('/toolbox');
+                      }
+                    },
                     child: Container(
                       width: 44,
                       height: 44,
                       decoration: BoxDecoration(
                         color: Colors.white,
-                        border: Border.all(color: AppColors.morandiText, width: 2.5),
+                        border: Border.all(color: AppColors.morandiText, width: 3),
                         borderRadius: BorderRadius.circular(12),
                         boxShadow: const [
                           BoxShadow(
@@ -102,7 +108,7 @@ class _ToolboxChapterScreenState extends State<ToolboxChapterScreen> {
                               decoration: BoxDecoration(
                                 color: isActive ? AppColors.straw14 : Colors.white,
                                 borderRadius: BorderRadius.circular(14),
-                                border: Border.all(color: AppColors.morandiText, width: 2.5),
+                                border: Border.all(color: AppColors.morandiText, width: 3),
                                 boxShadow: [
                                   BoxShadow(
                                     color: AppColors.morandiText,
@@ -269,7 +275,7 @@ class _ToolboxChapterScreenState extends State<ToolboxChapterScreen> {
                         if (_currentIndex < _chapters.length - 1) {
                           _goToPage(_currentIndex + 1);
                         } else {
-                          context.go('/toolbox');
+                          if (Navigator.of(context).canPop()) { context.pop(); } else { context.go('/toolbox'); }
                         }
                       },
                       child: AppCard(

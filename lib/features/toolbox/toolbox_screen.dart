@@ -34,7 +34,7 @@ class _ToolboxScreenState extends State<ToolboxScreen> {
               AppHeader(
                 title: 'Restaurant',
                 titleColor: AppColors.straw14,
-                onBack: () => context.go('/toolbox'),
+                onBack: () { if (Navigator.of(context).canPop()) { context.pop(); } else { context.go('/toolbox'); } },
               ),
               const SizedBox(height: 24),
               // 深色横幅
@@ -84,13 +84,12 @@ class _ToolboxScreenState extends State<ToolboxScreen> {
               // 章节列表
               Expanded(
                 child: ListView.separated(
-                  clipBehavior: Clip.none,
                   itemCount: topic.chapters.length,
                   separatorBuilder: (_, _) => const SizedBox(height: 14),
                   itemBuilder: (context, i) {
                     final ch = topic.chapters[i];
                     return Pressable(
-                      onPressed: () => context.go('/toolbox/chapter/$i'),
+                      onPressed: () => context.push('/toolbox/chapter/$i'),
                       child: AppCard(
                         color: Colors.white,
                         padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 18),

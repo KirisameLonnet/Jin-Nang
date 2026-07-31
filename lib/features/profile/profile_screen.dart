@@ -77,11 +77,13 @@ class _ProfileScreenState extends State<ProfileScreen> {
     final label = _profile?.levelLabel ?? '...';
     final rank = _profile?.rank ?? '...';
 
-    return Container(
-      padding: const EdgeInsets.all(20),
+    return Pressable(
+      onPressed: () => _comingSoon(context),
+      child: Container(
+        padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
         color: Colors.white,
-        border: Border.all(color: AppColors.morandiText, width: 2.389),
+        border: Border.all(color: AppColors.morandiText, width: 3),
         borderRadius: BorderRadius.circular(16),
         boxShadow: const [BoxShadow(color: AppColors.morandiText, offset: Offset(4, 4), blurRadius: 0)],
       ),
@@ -101,6 +103,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
           ]),
         ),
       ]),
+      ),
     );
   }
 
@@ -109,7 +112,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
       width: 72, height: 72,
       decoration: BoxDecoration(
         color: AppColors.oldRose15,
-        border: Border.all(color: AppColors.morandiText, width: 2.389),
+        border: Border.all(color: AppColors.morandiText, width: 3),
         borderRadius: BorderRadius.circular(999),
       ),
       child: Center(child: Image.asset('assets/icon/my.png', width: 32, height: 32)),
@@ -144,16 +147,18 @@ class _ProfileScreenState extends State<ProfileScreen> {
   }
 
   Widget _buildStatCard({required String iconPath, required String value, required String label, required Color color}) {
-    return Container(
+    return Pressable(
+      onPressed: () => _comingSoon(context),
+      child: Container(
       padding: const EdgeInsets.all(12),
       decoration: BoxDecoration(
         color: color,
-        border: Border.all(color: AppColors.morandiText, width: 2),
+        border: Border.all(color: AppColors.morandiText, width: 3),
         borderRadius: BorderRadius.circular(16),
         boxShadow: const [BoxShadow(color: AppColors.morandiText, offset: Offset(3, 3), blurRadius: 0)],
       ),
       child: Column(children: [
-        Image.asset(iconPath, width: 20, height: 20),
+        Image.asset(iconPath, width: 30, height: 20),
         const SizedBox(height: 4),
         Text(value,
             style: const TextStyle(fontSize: 18, fontWeight: FontWeight.w900, color: AppColors.morandiText)),
@@ -161,6 +166,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
             textAlign: TextAlign.center,
             style: const TextStyle(fontSize: 11, fontWeight: FontWeight.w700, color: AppColors.morandiText)),
       ]),
+      ),
     );
   }
 
@@ -194,7 +200,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
         padding: const EdgeInsets.symmetric(vertical: 16),
         decoration: BoxDecoration(
           color: Colors.white,
-          border: Border.all(color: AppColors.semanticRed, width: 2),
+          border: Border.all(color: AppColors.semanticRed, width: 3),
           borderRadius: BorderRadius.circular(14),
           boxShadow: const [BoxShadow(color: AppColors.semanticRed, offset: Offset(3, 3), blurRadius: 0)],
         ),
@@ -207,11 +213,13 @@ class _ProfileScreenState extends State<ProfileScreen> {
   }
 
   Widget _buildSettingsItem(String label, Color iconColor) {
-    return Container(
+    return Pressable(
+      onPressed: () => _comingSoon(context),
+      child: Container(
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
       decoration: BoxDecoration(
         color: Colors.white,
-        border: Border.all(color: AppColors.morandiText, width: 2),
+        border: Border.all(color: AppColors.morandiText, width: 3),
         borderRadius: BorderRadius.circular(14),
         boxShadow: const [BoxShadow(color: AppColors.morandiText, offset: Offset(3, 3), blurRadius: 0)],
       ),
@@ -226,6 +234,16 @@ class _ProfileScreenState extends State<ProfileScreen> {
             style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w700, color: AppColors.morandiText))),
         const Icon(Icons.arrow_forward_ios, size: 14, color: AppColors.naturalGray19),
       ]),
+      ),
+    );
+  }
+
+  void _comingSoon(BuildContext context) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(
+        content: Text('Coming soon.'),
+        duration: Duration(seconds: 2),
+      ),
     );
   }
 }

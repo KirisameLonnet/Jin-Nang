@@ -30,7 +30,7 @@ class AppHeader extends StatelessWidget {
             height: 44,
             decoration: BoxDecoration(
               color: Colors.white,
-              border: Border.all(color: AppColors.morandiText, width: 2.5),
+              border: Border.all(color: AppColors.morandiText, width: 3),
               borderRadius: BorderRadius.circular(12),
               boxShadow: const [
                 BoxShadow(
@@ -52,7 +52,7 @@ class AppHeader extends StatelessWidget {
             padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
             decoration: BoxDecoration(
               color: titleColor,
-              border: Border.all(color: AppColors.morandiText, width: 2.5),
+              border: Border.all(color: AppColors.morandiText, width: 3),
               borderRadius: BorderRadius.circular(12),
               boxShadow: const [
                 BoxShadow(

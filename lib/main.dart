@@ -38,11 +38,20 @@ CustomTransitionPage<T> _slidePage<T>({required Widget child}) {
   return CustomTransitionPage<T>(
     child: child,
     transitionsBuilder: (context, animation, secondaryAnimation, child) {
-      const begin = Offset(1.0, 0.0);
-      const end = Offset.zero;
-      final tween = Tween(begin: begin, end: end).chain(CurveTween(curve: Curves.easeInOut));
-      return SlideTransition(position: animation.drive(tween), child: child);
+      return SlideTransition(
+        position: Tween<Offset>(
+          begin: const Offset(1.0, 0.0),
+          end: Offset.zero,
+        ).animate(CurvedAnimation(
+          parent: animation,
+          curve: Curves.easeInOut,
+          reverseCurve: Curves.easeInOut,
+        )),
+        child: child,
+      );
     },
+    transitionDuration: const Duration(milliseconds: 300),
+    reverseTransitionDuration: const Duration(milliseconds: 300),
   );
 }
 
@@ -51,8 +60,8 @@ final GoRouter _router = GoRouter(
   initialLocation: '/splash',
   routes: [
     GoRoute(path: '/splash', builder: (context, state) => const SplashScreen()),
-    GoRoute(path: '/login',  builder: (context, state) => const LoginScreen()),
-    GoRoute(path: '/register', builder: (context, state) => const RegisterScreen()),
+    GoRoute(path: '/login',  pageBuilder: (context, state) => _slidePage(child: const LoginScreen())),
+    GoRoute(path: '/register', pageBuilder: (context, state) => _slidePage(child: const RegisterScreen())),
 
     // Sub-pages (no bottom tab) — declared first so they match before the shell
     GoRoute(

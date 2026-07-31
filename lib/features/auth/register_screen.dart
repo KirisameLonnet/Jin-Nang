@@ -50,45 +50,56 @@ class _RegisterScreenState extends State<RegisterScreen> {
     return Scaffold(
       backgroundColor: AppColors.springWood14,
       body: AppSafeArea(
-        child: SingleChildScrollView(
-          padding: const EdgeInsets.symmetric(horizontal: AppSpacing.lg),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              const SizedBox(height: 64),
-              const Text('Create\nAccount',
-                  style: TextStyle(fontSize: 36, fontWeight: FontWeight.w900, color: AppColors.morandiText, height: 1.1)),
-              const SizedBox(height: 8),
-              Text('Start your Chinese learning journey.',
-                  style: TextStyle(fontSize: 14, fontWeight: FontWeight.w600,
-                      color: AppColors.morandiText.withValues(alpha: 0.6))),
-              const SizedBox(height: 48),
-              _buildField('Name', _nameCtrl),
-              const SizedBox(height: 16),
-              _buildField('Email', _emailCtrl, keyboardType: TextInputType.emailAddress),
-              const SizedBox(height: 16),
-              _buildField('Password', _passwordCtrl, obscure: true),
-              if (_error != null) ...[
-                const SizedBox(height: 12),
-                Text(_error!, style: const TextStyle(color: AppColors.semanticRed, fontWeight: FontWeight.w600)),
-              ],
-              const SizedBox(height: 32),
-              Pressable(
-                onPressed: _loading ? null : _register,
-                child: _buildButton(_loading ? 'Creating...' : 'Create Account', AppColors.lavenderPurple),
-              ),
-              const SizedBox(height: 16),
-              Row(mainAxisAlignment: MainAxisAlignment.center, children: [
-                Text('Already have an account? ',
-                    style: TextStyle(color: AppColors.morandiText.withValues(alpha: 0.6), fontWeight: FontWeight.w600)),
-                Pressable(
-                  onPressed: () => context.go('/login'),
-                  child: const Text('Sign In',
-                      style: TextStyle(color: AppColors.lavenderPurple, fontWeight: FontWeight.w900)),
+        child: LayoutBuilder(
+          builder: (context, constraints) {
+            return SingleChildScrollView(
+              child: ConstrainedBox(
+                constraints: BoxConstraints(minHeight: constraints.maxHeight),
+                child: Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: AppSpacing.lg),
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      const SizedBox(height: 48),
+                      const Text('Create\nAccount',
+                          style: TextStyle(fontSize: 36, fontWeight: FontWeight.w900, color: AppColors.morandiText, height: 1.1)),
+                      const SizedBox(height: 8),
+                      Text('Start your Chinese learning journey.',
+                          style: TextStyle(fontSize: 14, fontWeight: FontWeight.w600,
+                              color: AppColors.morandiText.withValues(alpha: 0.6))),
+                      const SizedBox(height: 48),
+                      _buildField('Name', _nameCtrl),
+                      const SizedBox(height: 16),
+                      _buildField('Email', _emailCtrl, keyboardType: TextInputType.emailAddress),
+                      const SizedBox(height: 16),
+                      _buildField('Password', _passwordCtrl, obscure: true),
+                      if (_error != null) ...[
+                        const SizedBox(height: 12),
+                        Text(_error!, style: const TextStyle(color: AppColors.semanticRed, fontWeight: FontWeight.w600)),
+                      ],
+                      const SizedBox(height: 32),
+                      Pressable(
+                        onPressed: _loading ? null : _register,
+                        child: _buildButton(_loading ? 'Creating...' : 'Create Account', AppColors.lavenderPurple),
+                      ),
+                      const SizedBox(height: 16),
+                      Row(mainAxisAlignment: MainAxisAlignment.center, children: [
+                        Text('Already have an account? ',
+                            style: TextStyle(color: AppColors.morandiText.withValues(alpha: 0.6), fontWeight: FontWeight.w600)),
+                        Pressable(
+                          onPressed: () => context.go('/login'),
+                          child: const Text('Sign In',
+                              style: TextStyle(color: AppColors.lavenderPurple, fontWeight: FontWeight.w900)),
+                        ),
+                      ]),
+                      const SizedBox(height: 48),
+                    ],
+                  ),
                 ),
-              ]),
-            ],
-          ),
+              ),
+            );
+          },
         ),
       ),
     );
@@ -134,7 +145,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
       height: 56,
       decoration: BoxDecoration(
         color: color,
-        border: Border.all(color: AppColors.morandiText, width: 2.5),
+        border: Border.all(color: AppColors.morandiText, width: 3),
         borderRadius: BorderRadius.circular(14),
         boxShadow: const [BoxShadow(color: AppColors.morandiText, offset: Offset(3, 3), blurRadius: 0)],
       ),

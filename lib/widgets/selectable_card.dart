@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import '../theme/app_colors.dart';
+import '../theme/app_spacing.dart';
 import 'pressable.dart';
 
 /// 可点击的场景/工具卡片，支持锁定状态。
@@ -37,12 +38,17 @@ class SelectableCard extends StatelessWidget {
       child: Container(
         width: double.infinity,
         height: 188,
-        padding: const EdgeInsets.all(20),
+        padding: const EdgeInsets.fromLTRB(
+          AppSpacing.lg / 2, // 左 padding 减半
+          AppSpacing.lg,
+          AppSpacing.lg,
+          AppSpacing.lg,
+        ),
         decoration: BoxDecoration(
           color: cardBg,
           border: Border.all(
             color: AppColors.morandiText,
-            width: 2.5,
+            width: 3,
           ),
           borderRadius: BorderRadius.circular(16),
           boxShadow: _isLocked
@@ -55,55 +61,58 @@ class SelectableCard extends StatelessWidget {
                   ),
                 ],
         ),
-        child: Row(
+        child: Stack(
           children: [
-            Container(
-              width: 56,
-              height: 56,
-              decoration: BoxDecoration(
-                color: iconBg,
-                border: Border.all(
-                  color: AppColors.morandiText,
-                  width: 2,
-                ),
-                borderRadius: BorderRadius.circular(14),
-              ),
-              child: Icon(
-                icon,
-                size: 28,
-                color: AppColors.morandiText,
-              ),
-            ),
-            const SizedBox(width: 16),
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    title,
-                    style: const TextStyle(
-                      fontSize: 20,
-                      fontWeight: FontWeight.w900,
+            Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Container(
+                  width: 56,
+                  height: 56,
+                  decoration: BoxDecoration(
+                    color: iconBg,
+                    border: Border.all(
                       color: AppColors.morandiText,
+                      width: 3,
                     ),
+                    borderRadius: BorderRadius.circular(14),
                   ),
-                  const SizedBox(height: 4),
-                  Text(
-                    subtitle,
-                    style: TextStyle(
-                      fontSize: 13,
-                      fontWeight: FontWeight.w700,
-                      color: AppColors.morandiText.withValues(alpha: 0.6),
-                    ),
+                  child: Icon(
+                    icon,
+                    size: 28,
+                    color: AppColors.morandiText,
                   ),
-                ],
-              ),
+                ),
+                const SizedBox(height: 8),
+                Text(
+                  title,
+                  style: const TextStyle(
+                    fontSize: 20,
+                    fontWeight: FontWeight.w900,
+                    color: AppColors.morandiText,
+                  ),
+                ),
+                const SizedBox(height: 6),
+                Text(
+                  subtitle,
+                  style: TextStyle(
+                    fontSize: 13,
+                    fontWeight: FontWeight.w700,
+                    color: AppColors.morandiText.withValues(alpha: 0.6),
+                  ),
+                ),
+              ],
             ),
             if (_isLocked)
-              const Icon(
-                Icons.lock,
-                size: 24,
-                color: AppColors.naturalGray19,
+              const Positioned(
+                top: 0,
+                right: 0,
+                child: Icon(
+                  Icons.lock,
+                  size: 24,
+                  color: AppColors.naturalGray19,
+                ),
               ),
           ],
         ),

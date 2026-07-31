@@ -71,7 +71,7 @@ class _DialoguePracticeScreenState extends State<DialoguePracticeScreen> {
           const SizedBox(height: 48),
           AppHeader(
             title: 'Dialogue Practice',
-            onBack: () => context.go('/study/dialogue-scene'),
+            onBack: () { if (Navigator.of(context).canPop()) { context.pop(); } else { context.go('/study/dialogue-scene'); } },
           ),
           const Spacer(),
           Text(
@@ -94,7 +94,7 @@ class _DialoguePracticeScreenState extends State<DialoguePracticeScreen> {
           const SizedBox(height: 48),
           AppHeader(
             title: 'Dialogue Practice',
-            onBack: () => context.go('/study/dialogue-scene'),
+            onBack: () { if (Navigator.of(context).canPop()) { context.pop(); } else { context.go('/study/dialogue-scene'); } },
           ),
           const Spacer(),
           const CircularProgressIndicator(),
@@ -110,7 +110,7 @@ class _DialoguePracticeScreenState extends State<DialoguePracticeScreen> {
         const SizedBox(height: 48),
         AppHeader(
           title: 'Dialogue Practice',
-          onBack: () => context.go('/study/dialogue-scene'),
+          onBack: () { if (Navigator.of(context).canPop()) { context.pop(); } else { context.go('/study/dialogue-scene'); } },
         ),
         const SizedBox(height: 32),
         _buildProgressSummary(completedCount),
@@ -137,7 +137,7 @@ class _DialoguePracticeScreenState extends State<DialoguePracticeScreen> {
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
         color: Colors.white,
-        border: Border.all(color: AppColors.morandiText, width: 2.389),
+        border: Border.all(color: AppColors.morandiText, width: 3),
         borderRadius: BorderRadius.circular(16),
         boxShadow: const [
           BoxShadow(
@@ -213,7 +213,7 @@ class _DialoguePracticeScreenState extends State<DialoguePracticeScreen> {
 
     return Pressable(
       onPressed: level.isUnlocked
-          ? () => context.go('/study/level/${level.id}?sceneId=${widget.sceneId}')
+          ? () => context.push('/study/level/${level.id}?sceneId=${widget.sceneId}')
           : null,
       child: Container(
         padding: const EdgeInsets.all(16),
@@ -223,7 +223,7 @@ class _DialoguePracticeScreenState extends State<DialoguePracticeScreen> {
             color: level.isUnlocked
                 ? AppColors.morandiText
                 : AppColors.shark40.withValues(alpha: 0.2),
-            width: 2.389,
+            width: 3,
           ),
           borderRadius: BorderRadius.circular(16),
           boxShadow: level.isUnlocked

@@ -79,7 +79,7 @@ class _HomeScreenState extends State<HomeScreen> {
       padding: const EdgeInsets.symmetric(horizontal: 15, vertical: 8),
       decoration: BoxDecoration(
         color: AppColors.baliHai30,
-        border: Border.all(color: AppColors.morandiText, width: 2.389),
+        border: Border.all(color: AppColors.morandiText, width: 3),
         borderRadius: BorderRadius.circular(12),
         boxShadow: const [BoxShadow(color: AppColors.morandiText, offset: Offset(4, 4), blurRadius: 0)],
       ),
@@ -102,52 +102,67 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   Widget _buildStreakCard(int days) {
-    return Container(
+    return Pressable(
+      onPressed: () => _comingSoon(context),
+      child: Container(
+        height: 120,
       padding: const EdgeInsets.all(14),
       decoration: BoxDecoration(
         color: AppColors.lavenderPurple,
-        border: Border.all(color: AppColors.morandiText, width: 2.389),
+        border: Border.all(color: AppColors.morandiText, width: 3),
         borderRadius: BorderRadius.circular(16),
         boxShadow: const [BoxShadow(color: AppColors.morandiText, offset: Offset(4, 4), blurRadius: 0)],
       ),
       child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
           _buildStatIcon('assets/icon/fire.png'),
-          const SizedBox(height: 5),
+          const SizedBox(height: 3),
         const Text('STREAK',
             style: TextStyle(fontSize: 13, fontWeight: FontWeight.w900, color: AppColors.morandiText)),
-          const SizedBox(height: 5),
-          RichText(
-            text: TextSpan(
-              children: [
+          const SizedBox(height: 3),
+          Text.rich(
+            TextSpan(children: [
               TextSpan(text: '$days ',
                   style: const TextStyle(fontSize: 18, fontWeight: FontWeight.w900, color: AppColors.morandiText)),
               const TextSpan(text: 'Days',
                   style: TextStyle(fontSize: 14, fontWeight: FontWeight.w700, color: AppColors.morandiText)),
-              ],
-            ),
+            ]),
           ),
       ]),
+      ),
+    );
+  }
+
+  void _comingSoon(BuildContext context) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(
+        content: Text('This feature is coming soon.'),
+        duration: Duration(seconds: 2),
+      ),
     );
   }
 
   Widget _buildRankCard(String rank) {
-    return Container(
+    return Pressable(
+      onPressed: () => _comingSoon(context),
+      child: Container(
+        height: 120,
       padding: const EdgeInsets.all(14),
       decoration: BoxDecoration(
         color: AppColors.straw14,
-        border: Border.all(color: AppColors.morandiText, width: 2.389),
+        border: Border.all(color: AppColors.morandiText, width: 3),
         borderRadius: BorderRadius.circular(16),
         boxShadow: const [BoxShadow(color: AppColors.morandiText, offset: Offset(4, 4), blurRadius: 0)],
       ),
       child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
           _buildStatIcon('assets/icon/cup.png'),
-          const SizedBox(height: 5),
+          const SizedBox(height: 3),
         const Text('RANK',
             style: TextStyle(fontSize: 13, fontWeight: FontWeight.w900, color: AppColors.morandiText)),
-          const SizedBox(height: 5),
+          const SizedBox(height: 3),
         Text(rank,
             style: const TextStyle(fontSize: 18, fontWeight: FontWeight.w900, color: AppColors.morandiText)),
       ]),
+      ),
     );
   }
 
@@ -210,7 +225,7 @@ class _HomeScreenState extends State<HomeScreen> {
       padding: const EdgeInsets.all(14),
       decoration: BoxDecoration(
         color: color,
-        border: Border.all(color: AppColors.morandiText, width: 2.389),
+        border: Border.all(color: AppColors.morandiText, width: 3),
         borderRadius: BorderRadius.circular(16),
         boxShadow: const [BoxShadow(color: AppColors.morandiText, offset: Offset(4, 4), blurRadius: 0)],
       ),

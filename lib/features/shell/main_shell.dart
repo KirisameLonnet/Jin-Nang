@@ -116,7 +116,7 @@ class MainShell extends StatelessWidget {
                                 : Colors.white,
                             border: Border.all(
                               color: AppColors.morandiText,
-                              width: 2.5,
+                              width: 3,
                             ),
                             borderRadius: BorderRadius.circular(
                               isSelected ? 14 : 12,

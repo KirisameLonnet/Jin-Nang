@@ -86,7 +86,7 @@ class _DialogueSceneScreenState extends State<DialogueSceneScreen> {
                 icon: _iconForScene(scene.nameEn),
                 color: _colorFromHex(scene.colorHex),
                 onTap: scene.isUnlockedDefault
-                    ? () => context.go('/study/dialogue-practice/${scene.id}')
+                    ? () => context.push('/study/dialogue-practice/${scene.id}')
                     : null,
                 onLockedTap: scene.isUnlockedDefault
                     ? null

@@ -40,18 +40,20 @@ class _ToolboxSceneScreenState extends State<ToolboxSceneScreen> {
     return Container(
       color: AppColors.springWood14,
       child: AppSafeArea(
-        child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: AppSpacing.lg),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              const SizedBox(height: 48),
-              const TitleSection(title: 'TOOLBOX', subtitle: 'Useful phrases for real life.'),
-              const SizedBox(height: 40),
-              Expanded(child: _buildBody(context)),
-            ],
-          ),
-        ),
+        child: _scenes == null || _error != null
+            ? Padding(
+                padding: const EdgeInsets.symmetric(horizontal: AppSpacing.lg),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    const SizedBox(height: 48),
+                    const TitleSection(title: 'TOOLBOX', subtitle: 'Useful phrases for real life.'),
+                    const SizedBox(height: 40),
+                    Expanded(child: _buildBody(context)),
+                  ],
+                ),
+              )
+            : _buildBody(context),
       ),
     );
   }
@@ -67,31 +69,37 @@ class _ToolboxSceneScreenState extends State<ToolboxSceneScreen> {
     if (_scenes == null) {
       return const Center(child: CircularProgressIndicator());
     }
-    return ListView(
-      clipBehavior: Clip.none,
-      children: [
-        ..._scenes!.map((scene) => Padding(
-              padding: const EdgeInsets.only(bottom: 24),
-              child: SelectableCard(
-                title: scene.nameEn,
-                subtitle: scene.subtitleEn,
-                icon: _iconForScene(scene.nameEn),
-                color: _colorFromHex(scene.colorHex),
-                onTap: scene.isUnlockedDefault
-                    ? () => Di.router!.go('/toolbox/${scene.id}')
-                    : null,
-                onLockedTap: scene.isUnlockedDefault
-                    ? null
-                    : () => ScaffoldMessenger.of(context).showSnackBar(
-                          const SnackBar(
-                            content: Text('This scene is coming soon.'),
-                            duration: Duration(seconds: 2),
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: AppSpacing.lg),
+      child: ListView(
+        clipBehavior: Clip.none,
+        children: [
+          const SizedBox(height: 48),
+          const TitleSection(title: 'TOOLBOX', subtitle: 'Useful phrases for real life.'),
+          const SizedBox(height: 40),
+          ..._scenes!.map((scene) => Padding(
+                padding: const EdgeInsets.only(bottom: 24),
+                child: SelectableCard(
+                  title: scene.nameEn,
+                  subtitle: scene.subtitleEn,
+                  icon: _iconForScene(scene.nameEn),
+                  color: _colorFromHex(scene.colorHex),
+                  onTap: scene.isUnlockedDefault
+                      ? () => Di.router!.go('/toolbox/${scene.id}')
+                      : null,
+                  onLockedTap: scene.isUnlockedDefault
+                      ? null
+                      : () => ScaffoldMessenger.of(context).showSnackBar(
+                            const SnackBar(
+                              content: Text('This scene is coming soon.'),
+                              duration: Duration(seconds: 2),
+                            ),
                           ),
-                        ),
-              ),
-            )),
-        const SizedBox(height: 48),
-      ],
+                ),
+              )),
+          const SizedBox(height: 48),
+        ],
+      ),
     );
   }
 

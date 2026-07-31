@@ -86,7 +86,7 @@ class _ToolboxCardState extends State<ToolboxCard> {
       setState(() { _currentIndex = next; _currentDetail = null; _showRelated = true; });
       await _loadDetail(next);
     } else {
-      context.go('/study/vocab-scene');
+      if (Navigator.of(context).canPop()) { context.pop(); } else { context.go('/study/vocab-scene'); }
     }
   }
 
@@ -112,7 +112,13 @@ class _ToolboxCardState extends State<ToolboxCard> {
               AppHeader(
                 title: 'Vocab Battle',
                 progress: total > 0 ? '${_currentIndex + 1}/$total' : '',
-                onBack: () => context.go('/toolbox'),
+                onBack: () {
+                  if (Navigator.of(context).canPop()) {
+                    context.pop();
+                  } else {
+                    context.go('/study/vocab-scene');
+                  }
+                },
               ),
               const SizedBox(height: 24),
               Expanded(child: _buildBody()),
@@ -137,15 +143,18 @@ class _ToolboxCardState extends State<ToolboxCard> {
       return const Center(child: CircularProgressIndicator());
     }
     return SingleChildScrollView(
-      child: Column(
-        children: [
-          _buildMainCard(),
-          const SizedBox(height: 20),
-          _buildToggleButtons(),
-          const SizedBox(height: 20),
-          _showRelated ? _buildRelatedSection() : _buildPhraseSection(),
-          const SizedBox(height: 24),
-        ],
+      child: Padding(
+        padding: const EdgeInsets.only(right: 4),
+        child: Column(
+          children: [
+            _buildMainCard(),
+            const SizedBox(height: 20),
+            _buildToggleButtons(),
+            const SizedBox(height: 20),
+            _showRelated ? _buildRelatedSection() : _buildPhraseSection(),
+            const SizedBox(height: 24),
+          ],
+        ),
       ),
     );
   }
@@ -157,7 +166,7 @@ class _ToolboxCardState extends State<ToolboxCard> {
       padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
         color: Colors.white,
-        border: Border.all(color: AppColors.morandiText, width: 2.5),
+        border: Border.all(color: AppColors.morandiText, width: 3),
         borderRadius: BorderRadius.circular(20),
         boxShadow: const [BoxShadow(color: AppColors.morandiText, offset: Offset(4, 4), blurRadius: 0)],
       ),
@@ -181,6 +190,9 @@ class _ToolboxCardState extends State<ToolboxCard> {
                 color: AppColors.baliHai30,
                 border: Border.all(color: AppColors.morandiText, width: 2),
                 borderRadius: BorderRadius.circular(999),
+                boxShadow: const [
+                  BoxShadow(color: AppColors.morandiText, offset: Offset(0, 4), blurRadius: 0),
+                ],
               ),
               child: const Icon(Icons.volume_up, size: 24, color: AppColors.morandiText),
             ),
@@ -205,17 +217,34 @@ class _ToolboxCardState extends State<ToolboxCard> {
         const SizedBox(height: 16),
         _buildDashedDivider(),
         const SizedBox(height: 16),
-        Row(children: [
-          Container(
-            padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-            decoration: BoxDecoration(color: AppColors.oldRose15, borderRadius: BorderRadius.circular(6)),
-            child: const Text('LiJu',
-                style: TextStyle(fontSize: 11, fontWeight: FontWeight.w900, color: AppColors.morandiText)),
-          ),
-          const SizedBox(width: 8),
-          const Text('例句 example sentence',
-              style: TextStyle(fontSize: 14, fontWeight: FontWeight.w900, color: AppColors.morandiText)),
-        ]),
+        Row(
+          mainAxisAlignment: MainAxisAlignment.spaceEvenly, // ← 改这里
+          children: [
+            Container(
+              padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+              decoration: BoxDecoration(
+                color: AppColors.oldRose15,
+                borderRadius: BorderRadius.circular(6),
+              ),
+              child: const Text(
+                'Lìjù',
+                style: TextStyle(
+                  fontSize: 11,
+                  fontWeight: FontWeight.w900,
+                  color: AppColors.morandiText,
+                ),
+              ),
+            ),
+            const Text(
+              '例句 example sentence',
+              style: TextStyle(
+                fontSize: 14,
+                fontWeight: FontWeight.w900,
+                color: AppColors.morandiText,
+              ),
+            ),
+          ],
+        ),
         const SizedBox(height: 12),
         ...w.examples.map(_buildExampleCard),
       ]),
@@ -241,7 +270,7 @@ class _ToolboxCardState extends State<ToolboxCard> {
       margin: const EdgeInsets.only(bottom: 10),
       padding: const EdgeInsets.all(14),
       decoration: BoxDecoration(
-        color: AppColors.whisper15,
+        color: const Color(0xFFF2F1EC),
         border: Border.all(color: AppColors.shark40.withValues(alpha: 0.15), width: 1.5),
         borderRadius: BorderRadius.circular(12),
       ),
@@ -271,10 +300,10 @@ class _ToolboxCardState extends State<ToolboxCard> {
     return Pressable(
       onPressed: onPressed,
       child: Container(
-        height: 52,
+        height: 72,
         decoration: BoxDecoration(
           color: active ? AppColors.straw14 : Colors.white,
-          border: Border.all(color: AppColors.morandiText, width: 2.5),
+          border: Border.all(color: AppColors.morandiText, width: 3),
           borderRadius: BorderRadius.circular(14),
           boxShadow: active ? const [BoxShadow(color: AppColors.morandiText, offset: Offset(3, 3), blurRadius: 0)] : null,
         ),
@@ -299,30 +328,25 @@ class _ToolboxCardState extends State<ToolboxCard> {
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
         color: Colors.white,
-        border: Border.all(color: AppColors.morandiText, width: 2.5),
+        border: Border.all(color: AppColors.morandiText, width: 1.5),
         borderRadius: BorderRadius.circular(20),
         boxShadow: const [BoxShadow(color: AppColors.morandiText, offset: Offset(4, 4), blurRadius: 0)],
       ),
       child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-        if (synonyms.isNotEmpty) ...[
-          _buildCategoryTag('近义词 synonym', AppColors.baliHai30),
-          const SizedBox(height: 12),
-          ...synonyms.map(_buildRelatedRow),
-        ],
-        if (antonyms.isNotEmpty) ...[
-          const SizedBox(height: 16),
-          _buildCategoryTag('反义词 antonym', AppColors.oldRose15),
-          const SizedBox(height: 12),
-          ...antonyms.map(_buildRelatedRow),
-        ],
-        if (expands.isNotEmpty) ...[
-          const SizedBox(height: 16),
-          _buildCategoryTag('拓展词 expand word', AppColors.lavenderPurple.withValues(alpha: 0.3)),
-          const SizedBox(height: 12),
-          ...expands.map(_buildRelatedRow),
-        ],
-        if (synonyms.isEmpty && antonyms.isEmpty && expands.isEmpty)
-          const Text('无', style: TextStyle(fontSize: 14, color: AppColors.shark40)),
+        _buildCategoryTag('近义词 synonym', AppColors.baliHai30),
+        const SizedBox(height: 12),
+        if (synonyms.isNotEmpty) ...synonyms.map(_buildRelatedRow)
+        else const Text('无 (None)', style: TextStyle(fontSize: 14, color: AppColors.naturalGray19)),
+        const SizedBox(height: 16),
+        _buildCategoryTag('反义词 antonym', AppColors.oldRose15),
+        const SizedBox(height: 12),
+        if (antonyms.isNotEmpty) ...antonyms.map(_buildRelatedRow)
+        else const Text('无 (None)', style: TextStyle(fontSize: 14, color: AppColors.naturalGray19)),
+        const SizedBox(height: 16),
+        _buildCategoryTag('拓展词 expand word', AppColors.lavenderPurple.withValues(alpha: 0.3)),
+        const SizedBox(height: 12),
+        if (expands.isNotEmpty) ...expands.map(_buildRelatedRow)
+        else const Text('无 (None)', style: TextStyle(fontSize: 14, color: AppColors.naturalGray19)),
       ]),
     );
   }
@@ -360,7 +384,7 @@ class _ToolboxCardState extends State<ToolboxCard> {
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
         color: Colors.white,
-        border: Border.all(color: AppColors.morandiText, width: 2.5),
+        border: Border.all(color: AppColors.morandiText, width: 1.5),
         borderRadius: BorderRadius.circular(20),
         boxShadow: const [BoxShadow(color: AppColors.morandiText, offset: Offset(4, 4), blurRadius: 0)],
       ),
@@ -400,9 +424,9 @@ class _ToolboxCardState extends State<ToolboxCard> {
             decoration: BoxDecoration(
               color: isFirst ? AppColors.whisper15 : Colors.white,
               border: Border.all(
-                  color: isFirst ? AppColors.shark40.withValues(alpha: 0.2) : AppColors.morandiText, width: 2.5),
+                  color: isFirst ? AppColors.shark40.withValues(alpha: 0.2) : AppColors.morandiText, width: 3),
               borderRadius: BorderRadius.circular(14),
-              boxShadow: isFirst ? null : const [BoxShadow(color: AppColors.morandiText, offset: Offset(3, 3), blurRadius: 0)],
+              boxShadow: const [BoxShadow(color: AppColors.morandiText, offset: Offset(3, 3), blurRadius: 0)],
             ),
             child: Center(child: Text('← Prev',
                 style: TextStyle(fontSize: 15, fontWeight: FontWeight.w900,
@@ -418,7 +442,7 @@ class _ToolboxCardState extends State<ToolboxCard> {
             height: 52,
             decoration: BoxDecoration(
               color: isLast ? AppColors.baliHai30 : AppColors.straw14,
-              border: Border.all(color: AppColors.morandiText, width: 2.5),
+              border: Border.all(color: AppColors.morandiText, width: 3),
               borderRadius: BorderRadius.circular(14),
               boxShadow: const [BoxShadow(color: AppColors.morandiText, offset: Offset(3, 3), blurRadius: 0)],
             ),
