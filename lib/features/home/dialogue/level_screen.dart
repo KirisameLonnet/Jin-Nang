@@ -25,7 +25,7 @@ class _LevelScreenState extends State<LevelScreen> {
 
   int _currentQIndex = 0;
   int? _selectedOption;
-  bool _hasAnswered = false;
+  bool _hasSubmitted = false;
   bool _isCorrect = false;
   int _correctCount = 0;
   bool _showResult = false;
@@ -53,12 +53,17 @@ class _LevelScreenState extends State<LevelScreen> {
   bool get _isLastQ => _currentQIndex == _totalQ - 1;
 
   void _selectOption(int index) {
-    if (_hasAnswered) return;
+    if (_hasSubmitted) return;
+    setState(() => _selectedOption = index);
+  }
+
+  void _submitAnswer() {
+    if (_selectedOption == null || _hasSubmitted) return;
+    final correct = _selectedOption == _currentQ.correctIndex;
     setState(() {
-      _selectedOption = index;
-      _hasAnswered = true;
-      _isCorrect = index == _currentQ.correctIndex;
-      if (_isCorrect) _correctCount++;
+      _hasSubmitted = true;
+      _isCorrect = correct;
+      if (correct) _correctCount++;
     });
   }
 
@@ -71,7 +76,7 @@ class _LevelScreenState extends State<LevelScreen> {
       setState(() {
         _currentQIndex++;
         _selectedOption = null;
-        _hasAnswered = false;
+        _hasSubmitted = false;
         _isCorrect = false;
       });
     }
@@ -84,7 +89,7 @@ class _LevelScreenState extends State<LevelScreen> {
     setState(() {
       _currentQIndex = 0;
       _selectedOption = null;
-      _hasAnswered = false;
+      _hasSubmitted = false;
       _isCorrect = false;
       _correctCount = 0;
       _showResult = false;
@@ -108,7 +113,7 @@ class _LevelScreenState extends State<LevelScreen> {
           child: Center(
             child: Text(_error!,
                 textAlign: TextAlign.center,
-                style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w700, color: AppColors.semanticRed)),
+                style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w700, color: AppColors.quizError)),
           ),
         ),
       );
@@ -128,8 +133,6 @@ class _LevelScreenState extends State<LevelScreen> {
   // ═══════════════════════════════════════════════════════════
 
   Widget _buildQuestionView() {
-    final q = _currentQ;
-
     return Scaffold(
       backgroundColor: AppColors.springWood14,
       body: AppSafeArea(
@@ -140,39 +143,21 @@ class _LevelScreenState extends State<LevelScreen> {
               padding: const EdgeInsets.symmetric(horizontal: AppSpacing.lg),
               child: _buildTopBar(),
             ),
-            const SizedBox(height: 16),
+            const SizedBox(height: 8),
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: AppSpacing.lg),
               child: _buildProgressBar(),
             ),
-            const SizedBox(height: 24),
+            const SizedBox(height: 12),
             Expanded(
-              child: Padding(
+              child: SingleChildScrollView(
                 padding: const EdgeInsets.symmetric(horizontal: AppSpacing.lg),
-                child: SingleChildScrollView(
-                  child: Column(
-                    children: [
-                      _buildQuestionCard(),
-                      const SizedBox(height: 16),
-                      ...List.generate(q.options.length, (i) {
-                        return Padding(
-                          padding: const EdgeInsets.only(bottom: 12),
-                          child: _buildOptionButton(i),
-                        );
-                      }),
-                      if (_hasAnswered) ...[
-                        const SizedBox(height: 12),
-                        _buildFeedbackCard(),
-                      ],
-                      const SizedBox(height: 24),
-                    ],
-                  ),
-                ),
+                child: _buildQuestionCard(),
               ),
             ),
             Padding(
               padding: const EdgeInsets.fromLTRB(AppSpacing.lg, 0, AppSpacing.lg, AppSpacing.lg),
-              child: _buildNextButton(),
+              child: _buildBottomButton(),
             ),
           ],
         ),
@@ -187,28 +172,23 @@ class _LevelScreenState extends State<LevelScreen> {
 
     return Row(
       children: [
-        _buildCircleBackBtn(),
+        _buildBackBtn(),
         const SizedBox(width: 12),
         Expanded(
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Text('LEVEL ${level.levelNum} / ${_totalQ > 0 ? _totalQ : 4}',
+              Text('LEVEL ${level.levelNum} / 4',
                   style: const TextStyle(fontSize: 11, fontWeight: FontWeight.w800, color: Colors.black45, letterSpacing: 1)),
               const SizedBox(height: 2),
-              Row(
-                children: [
-                  Text(level.title,
-                      style: const TextStyle(fontSize: 18, fontWeight: FontWeight.w900, color: AppColors.morandiText)),
-                  const SizedBox(width: 8),
-                  Text(level.subtitle,
-                      style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w700, color: Colors.black54)),
-                ],
-              ),
+              Text(level.title,
+                  style: const TextStyle(fontSize: 18, fontWeight: FontWeight.w900, color: AppColors.morandiText)),
+              const SizedBox(height: 2),
+              Text(level.subtitle,
+                  style: const TextStyle(fontSize: 18, fontWeight: FontWeight.w900, color: AppColors.morandiText)),
             ],
           ),
         ),
-        const SizedBox(width: 8),
         Container(
           padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
           decoration: BoxDecoration(
@@ -223,89 +203,124 @@ class _LevelScreenState extends State<LevelScreen> {
     );
   }
 
-  Widget _buildCircleBackBtn() {
+  Widget _buildBackBtn() {
     return Pressable(
       onPressed: _goBack,
       child: Container(
-        width: 40,
-        height: 40,
+        width: 44,
+        height: 44,
         decoration: BoxDecoration(
           color: Colors.white,
-          shape: BoxShape.circle,
-          border: Border.all(color: AppColors.morandiText, width: 2.5),
+          border: Border.all(color: AppColors.morandiText, width: 3),
+          borderRadius: BorderRadius.circular(16),
           boxShadow: const [
-            BoxShadow(color: AppColors.morandiText, offset: Offset(3, 3), blurRadius: 0),
+            BoxShadow(color: AppColors.morandiText, offset: Offset(6, 6), blurRadius: 0),
           ],
         ),
-        child: const Icon(Icons.arrow_back, color: AppColors.morandiText, size: 20),
+        child: const Icon(Icons.arrow_back, color: AppColors.morandiText),
       ),
     );
   }
 
-  // ── Progress bar ─────────────────────────────────────────
+  // ── Progress bar (已修复：从左到右) ───────────────────────
 
   Widget _buildProgressBar() {
-    final progress = (_currentQIndex + (_hasAnswered ? 1 : 0)) / _totalQ;
-    return Container(
-      height: 14,
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(10),
-        border: Border.all(color: AppColors.morandiText, width: 2.5),
-      ),
-      child: ClipRRect(
-        borderRadius: BorderRadius.circular(7),
-        child: FractionallySizedBox(
-          alignment: Alignment.centerLeft,
-          widthFactor: progress.clamp(0.0, 1.0),
-          child: Container(color: AppColors.baliHai30),
-        ),
-      ),
+    final progress = (_currentQIndex + (_hasSubmitted ? 1 : 0)) / _totalQ;
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        return Container(
+          height: 14,
+          decoration: BoxDecoration(
+            color: Colors.white,
+            borderRadius: BorderRadius.circular(10),
+            border: Border.all(color: AppColors.morandiText, width: 2.5),
+          ),
+          child: ClipRRect(
+            borderRadius: BorderRadius.circular(7),
+            child: Align(
+              alignment: Alignment.centerLeft,
+              child: Container(
+                width: constraints.maxWidth * progress.clamp(0.0, 1.0),
+                color: AppColors.baliHai30,
+              ),
+            ),
+          ),
+        );
+      },
     );
   }
 
-  // ── Question card (the big white container) ──────────────
+  // ── Question card (big white container with everything) ──
 
   Widget _buildQuestionCard() {
     final q = _currentQ;
 
-    // Role play: history card + current question card
+    // Role play: two cards (history + current)
     if (q.type == QuestionType.rolePlay) {
       return Column(
         children: [
           if (q.history.isNotEmpty) _buildHistoryCard(),
           const SizedBox(height: 16),
           _buildCurrentQuestionCard(q),
+          const SizedBox(height: 24),
+          ...List.generate(q.options.length, (i) {
+            return Padding(
+              padding: const EdgeInsets.only(bottom: 12),
+              child: _buildOptionButton(i),
+            );
+          }),
+          if (_hasSubmitted) ...[
+            const SizedBox(height: 12),
+            _buildFeedbackCard(),
+          ],
+          const SizedBox(height: 48),
         ],
       );
     }
 
-    // Standard question types: single card
-    return Container(
-      width: double.infinity,
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(28),
-        border: Border.all(color: AppColors.morandiText, width: 3),
-        boxShadow: const [
-          BoxShadow(color: AppColors.morandiText, offset: Offset(5, 5), blurRadius: 0),
-        ],
-      ),
-      child: Padding(
-        padding: const EdgeInsets.all(24),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            _buildQuestionArea(q),
-            const SizedBox(height: 24),
-            const DashedDivider(color: AppColors.mercury25),
-          ],
+    // Standard types: single big card
+    return Column(
+      children: [
+        Container(
+          width: double.infinity,
+          decoration: BoxDecoration(
+            color: Colors.white,
+            borderRadius: BorderRadius.circular(28),
+            border: Border.all(color: AppColors.morandiText, width: 3),
+            boxShadow: const [
+              BoxShadow(color: AppColors.morandiText, offset: Offset(5, 5), blurRadius: 0),
+            ],
+          ),
+          child: Padding(
+            padding: const EdgeInsets.all(20),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                _buildQuestionArea(q),
+                const SizedBox(height: 16),
+                const DashedDivider(color: AppColors.mercury25),
+                const SizedBox(height: 16),
+                // Options inside the card
+                ...List.generate(q.options.length, (i) {
+                  return Padding(
+                    padding: const EdgeInsets.only(bottom: 10),
+                    child: _buildOptionButton(i),
+                  );
+                }),
+                if (_hasSubmitted) ...[
+                  const SizedBox(height: 10),
+                  _buildFeedbackCard(),
+                ],
+              ],
+            ),
+          ),
         ),
-      ),
+        const SizedBox(height: 48),
+      ],
     );
   }
 
-  // ── Question area (varies by type) ───────────────────────
+  // ── Question area ────────────────────────────────────────
 
   Widget _buildQuestionArea(Question q) {
     switch (q.type) {
@@ -321,41 +336,38 @@ class _LevelScreenState extends State<LevelScreen> {
   }
 
   Widget _buildVocabMatchArea(Question q) {
-    return Row(
+    return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Expanded(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              if (q.instruction != null) ...[
-                Text(q.instruction!,
-                    style: const TextStyle(fontSize: 14, color: Colors.black54, fontWeight: FontWeight.w600)),
-                const SizedBox(height: 8),
-              ],
-              Text(q.mainText ?? q.questionText,
+        if (q.instruction != null)
+          Text(q.instruction!,
+              style: const TextStyle(fontSize: 13, color: Colors.black54, fontWeight: FontWeight.w600)),
+        if (q.instruction != null) const SizedBox(height: 6),
+        Row(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Expanded(
+              child: Text(q.mainText ?? q.questionText,
                   style: const TextStyle(fontSize: 48, fontWeight: FontWeight.w900, color: AppColors.morandiText)),
-            ],
-          ),
-        ),
-        // Speaker button
-        if (q.audioUrl != null)
-          Pressable(
-            onPressed: () => _playAudio(q.audioUrl!),
-            child: Container(
-              width: 48,
-              height: 48,
-              decoration: BoxDecoration(
-                color: Colors.white,
-                borderRadius: BorderRadius.circular(14),
-                border: Border.all(color: AppColors.morandiText, width: 2),
-                boxShadow: const [
-                  BoxShadow(color: AppColors.morandiText, offset: Offset(3, 3), blurRadius: 0),
-                ],
-              ),
-              child: const Icon(Icons.volume_up, color: AppColors.morandiText, size: 22),
             ),
-          ),
+            if (q.audioUrl != null)
+              Pressable(
+                onPressed: () => _playAudio(q.audioUrl!),
+                child: Container(
+                  width: 48, height: 48,
+                  decoration: BoxDecoration(
+                    color: Colors.white,
+                    borderRadius: BorderRadius.circular(14),
+                    border: Border.all(color: AppColors.morandiText, width: 2),
+                    boxShadow: const [
+                      BoxShadow(color: AppColors.morandiText, offset: Offset(3, 3), blurRadius: 0),
+                    ],
+                  ),
+                  child: const Icon(Icons.volume_up, color: AppColors.morandiText, size: 22),
+                ),
+              ),
+          ],
+        ),
       ],
     );
   }
@@ -363,23 +375,22 @@ class _LevelScreenState extends State<LevelScreen> {
   Widget _buildListeningArea(Question q) {
     return Column(
       children: [
-        // Large speaker circle
-        Pressable(
-          onPressed: q.audioUrl != null ? () => _playAudio(q.audioUrl!) : null,
-          child: Container(
-            width: 80,
-            height: 80,
-            decoration: BoxDecoration(
-              color: AppColors.baliHai30,
-              shape: BoxShape.circle,
-              border: Border.all(color: AppColors.morandiText, width: 3),
-              boxShadow: const [
-                BoxShadow(color: AppColors.morandiText, offset: Offset(4, 4), blurRadius: 0),
-              ],
+        if (q.audioUrl != null)
+          Pressable(
+            onPressed: () => _playAudio(q.audioUrl!),
+            child: Container(
+              width: 80, height: 80,
+              decoration: BoxDecoration(
+                color: AppColors.baliHai30,
+                shape: BoxShape.circle,
+                border: Border.all(color: AppColors.morandiText, width: 3),
+                boxShadow: const [
+                  BoxShadow(color: AppColors.morandiText, offset: Offset(4, 4), blurRadius: 0),
+                ],
+              ),
+              child: const Icon(Icons.volume_up, color: AppColors.morandiText, size: 36),
             ),
-            child: const Icon(Icons.volume_up, color: AppColors.morandiText, size: 36),
           ),
-        ),
         const SizedBox(height: 12),
         if (q.audioUrl != null)
           const Text('请播放拼音音频',
@@ -400,14 +411,13 @@ class _LevelScreenState extends State<LevelScreen> {
   Widget _buildBlankFillingArea(Question q) {
     final text = q.mainText ?? q.questionText;
     final parts = text.split('____');
-
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        if (q.instruction != null) ...[
-          Text(q.instruction!, style: const TextStyle(fontSize: 14, color: Colors.black54, fontWeight: FontWeight.w600)),
-          const SizedBox(height: 10),
-        ],
+        if (q.instruction != null)
+          Text(q.instruction!,
+              style: const TextStyle(fontSize: 14, color: Colors.black54, fontWeight: FontWeight.w600)),
+        if (q.instruction != null) const SizedBox(height: 10),
         if (parts.length == 2)
           Text.rich(
             TextSpan(
@@ -418,8 +428,7 @@ class _LevelScreenState extends State<LevelScreen> {
                   alignment: PlaceholderAlignment.baseline,
                   baseline: TextBaseline.alphabetic,
                   child: Container(
-                    width: 48,
-                    height: 3,
+                    width: 48, height: 3,
                     color: AppColors.morandiText,
                     margin: const EdgeInsets.symmetric(horizontal: 2),
                   ),
@@ -434,6 +443,166 @@ class _LevelScreenState extends State<LevelScreen> {
     );
   }
 
+  // ── Option button (已修复：选中淡蓝、正确绿色、错误红色) ──
+
+  Widget _buildOptionButton(int index) {
+    final opt = _currentQ.options[index];
+    final label = String.fromCharCode(65 + index);
+    final isSel = _selectedOption == index;
+    final showCorrect = _hasSubmitted && index == _currentQ.correctIndex;
+    final showWrong = _hasSubmitted && isSel && !_isCorrect;
+
+    Color bgColor = Colors.white;
+    if (isSel && !_hasSubmitted) bgColor = AppColors.baliHai30;
+    if (showCorrect) bgColor = AppColors.quizCorrect;
+    if (showWrong) bgColor = AppColors.quizError;
+
+    // 边框：永远是 morandiText，不变蓝/绿/红
+    const borderColor = AppColors.morandiText;
+
+    // 文字颜色：未选中灰色，选中/正确/错误后黑色
+    Color textColor = const Color(0xFF8B8983);
+    if (isSel || showCorrect || showWrong) textColor = Colors.black;
+
+    // 圆圈字母颜色
+    
+    return Pressable(
+      onPressed: () => _selectOption(index),
+      feedback: PressFeedback.none,
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+        decoration: BoxDecoration(
+          color: bgColor,
+          borderRadius: BorderRadius.circular(16),
+          border: Border.all(color: borderColor, width: 2.5),
+          boxShadow: const [
+            BoxShadow(color: AppColors.morandiText, offset: Offset(3, 3), blurRadius: 0),
+          ],
+        ),
+        child: Row(
+          children: [
+            Container(
+              width: 36, height: 36,
+              decoration: BoxDecoration(
+                color: AppColors.mercury25,
+                borderRadius: BorderRadius.circular(10),
+                border: Border.all(color: AppColors.morandiText, width: 2),
+              ),
+              child: Center(
+                child: Text(label,
+                    style: TextStyle(
+                        fontSize: 15, fontWeight: FontWeight.w900, color: AppColors.morandiText)),
+              ),
+            ),
+            const SizedBox(width: 14),
+            Expanded(
+              child: Text(opt,
+                  style: TextStyle(
+                      fontSize: 17, fontWeight: FontWeight.w800, color: textColor)),
+            ),
+            if (showCorrect)
+              Icon(Icons.check_circle, color: AppColors.quizCorrect, size: 22)
+            else if (showWrong)
+              Icon(Icons.cancel, color: AppColors.quizError, size: 22),
+          ],
+        ),
+      ),
+    );
+  }
+
+  // ── Feedback card ────────────────────────────────────────
+
+  Widget _buildFeedbackCard() {
+    final q = _currentQ;
+    return Container(
+      width: double.infinity,
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: _isCorrect
+            ? AppColors.quizCorrect.withValues(alpha: 0.08)
+            : AppColors.quizError.withValues(alpha: 0.08),
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(color: AppColors.shark40.withValues(alpha: 0.15), width: 1.5),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              Container(
+                width: 24, height: 24,
+                decoration: BoxDecoration(
+                  color: _isCorrect ? AppColors.quizCorrect : AppColors.quizError,
+                  shape: BoxShape.circle,
+                ),
+                child: Icon(_isCorrect ? Icons.check : Icons.close, size: 16, color: Colors.white),
+              ),
+              const SizedBox(width: 8),
+              Text(_isCorrect ? '回答正确 (Correct)' : '回答错误 (Incorrect)',
+                  style: TextStyle(
+                      fontSize: 16, fontWeight: FontWeight.w900,
+                      color: _isCorrect ? AppColors.quizCorrect : AppColors.quizError)),
+            ],
+          ),
+          const SizedBox(height: 8),
+          Text(q.explanation,
+              style: const TextStyle(fontSize: 13, color: Colors.black54, fontWeight: FontWeight.w600)),
+        ],
+      ),
+    );
+  }
+
+  // ── Bottom button ────────────────────────────────────────
+
+  Widget _buildBottomButton() {
+    final canSubmit = _selectedOption != null && !_hasSubmitted;
+    final isNext = _hasSubmitted;
+
+    return Pressable(
+      onPressed: isNext ? _nextQuestion : (canSubmit ? _submitAnswer : null),
+      child: Opacity(
+        opacity: (isNext || canSubmit) ? 1.0 : 0.45,
+        child: Container(
+          width: double.infinity,
+          padding: const EdgeInsets.symmetric(vertical: 12),
+          decoration: BoxDecoration(
+            color: isNext ? AppColors.baliHai30 : AppColors.straw14,
+            borderRadius: BorderRadius.circular(16),
+            border: Border.all(color: AppColors.morandiText, width: 3),
+            boxShadow: const [
+              BoxShadow(color: AppColors.morandiText, offset: Offset(4, 4), blurRadius: 0),
+            ],
+          ),
+          child: isNext
+              ? Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Text(_isLastQ ? '查看结果' : '下一题',
+                        style: const TextStyle(fontSize: 17, fontWeight: FontWeight.w900, color: AppColors.morandiText)),
+                    const SizedBox(width: 6),
+                    Text(_isLastQ ? 'See Results' : 'Next Question',
+                        style: const TextStyle(fontSize: 17, fontWeight: FontWeight.w900, color: AppColors.morandiText)),
+                    const SizedBox(width: 6),
+                    const Icon(Icons.chevron_right, color: AppColors.morandiText, size: 22),
+                  ],
+                )
+              : Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: const [
+                    Text('确认提交',
+                        style: TextStyle(fontSize: 17, fontWeight: FontWeight.w900, color: AppColors.morandiText)),
+                    SizedBox(width: 6),
+                    Text('Submit Answer',
+                        style: TextStyle(fontSize: 17, fontWeight: FontWeight.w900, color: AppColors.morandiText)),
+                  ],
+                ),
+        ),
+      ),
+    );
+  }
+
+  // ── Audio ────────────────────────────────────────────────
+
   Future<void> _playAudio(String url) async {
     try {
       final file = await Di.audioCache.getSingleFile(url);
@@ -442,7 +611,7 @@ class _LevelScreenState extends State<LevelScreen> {
     } catch (_) {}
   }
 
-  // ── Role Play: history card ──────────────────────────────
+  // ── Role Play helpers ────────────────────────────────────
 
   Widget _buildHistoryCard() {
     return Container(
@@ -462,12 +631,10 @@ class _LevelScreenState extends State<LevelScreen> {
     );
   }
 
-  // ── Role Play: current question card ─────────────────────
-
   Widget _buildCurrentQuestionCard(Question q) {
     return Container(
       width: double.infinity,
-      padding: const EdgeInsets.all(20),
+      padding: const EdgeInsets.all(24),
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(24),
@@ -480,7 +647,7 @@ class _LevelScreenState extends State<LevelScreen> {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           _buildRolePlayArea(q),
-          const SizedBox(height: 20),
+          const SizedBox(height: 16),
           const DashedDivider(color: AppColors.mercury25),
         ],
       ),
@@ -491,10 +658,10 @@ class _LevelScreenState extends State<LevelScreen> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        if (q.instruction != null) ...[
-          Text(q.instruction!, style: const TextStyle(fontSize: 14, color: Colors.black54, fontWeight: FontWeight.w600)),
-          const SizedBox(height: 10),
-        ],
+        if (q.instruction != null)
+          Text(q.instruction!,
+              style: const TextStyle(fontSize: 14, color: Colors.black54, fontWeight: FontWeight.w600)),
+        if (q.instruction != null) const SizedBox(height: 10),
         Text(q.currentQuestion ?? q.questionText,
             style: const TextStyle(fontSize: 22, fontWeight: FontWeight.w900, color: AppColors.morandiText, height: 1.4)),
       ],
@@ -503,15 +670,13 @@ class _LevelScreenState extends State<LevelScreen> {
 
   Widget _buildChatTurn(DialogueTurn turn) {
     if (turn.isWaiter) {
-      // Waiter (left)
       return Padding(
         padding: const EdgeInsets.only(bottom: 12),
         child: Row(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Container(
-              width: 36,
-              height: 36,
+              width: 36, height: 36,
               decoration: BoxDecoration(
                 color: AppColors.whisper15,
                 shape: BoxShape.circle,
@@ -542,7 +707,6 @@ class _LevelScreenState extends State<LevelScreen> {
         ),
       );
     } else {
-      // User (right)
       return Padding(
         padding: const EdgeInsets.only(bottom: 12),
         child: Column(
@@ -578,10 +742,10 @@ class _LevelScreenState extends State<LevelScreen> {
                 child: Row(
                   mainAxisSize: MainAxisSize.min,
                   children: const [
-                    Icon(Icons.check, size: 13, color: AppColors.semanticGreen),
+                    Icon(Icons.check, size: 13, color: AppColors.quizCorrect),
                     SizedBox(width: 4),
                     Text('CORRECT',
-                        style: TextStyle(fontSize: 12, fontWeight: FontWeight.w900, color: AppColors.semanticGreen)),
+                        style: TextStyle(fontSize: 12, fontWeight: FontWeight.w900, color: AppColors.quizCorrect)),
                   ],
                 ),
               ),
@@ -589,173 +753,6 @@ class _LevelScreenState extends State<LevelScreen> {
         ),
       );
     }
-  }
-
-  // ── Option buttons ───────────────────────────────────────
-
-  Widget _buildOptionButton(int index) {
-    final opt = _currentQ.options[index];
-    final label = String.fromCharCode(65 + index); // A, B, C
-    final isSel = _selectedOption == index;
-    final showCorrect = _hasAnswered && index == _currentQ.correctIndex;
-    final showWrong = _hasAnswered && isSel && !_isCorrect;
-
-    Color bgColor = Colors.white;
-    if (showCorrect) bgColor = AppColors.semanticGreen.withValues(alpha: 0.15);
-    if (showWrong) bgColor = AppColors.semanticRed.withValues(alpha: 0.15);
-
-    return Pressable(
-      onPressed: () => _selectOption(index),
-      child: Container(
-        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
-        decoration: BoxDecoration(
-          color: bgColor,
-          borderRadius: BorderRadius.circular(16),
-          border: Border.all(
-            color: showCorrect
-                ? AppColors.semanticGreen
-                : showWrong
-                    ? AppColors.semanticRed
-                    : AppColors.morandiText,
-            width: 2.5,
-          ),
-          boxShadow: const [
-            BoxShadow(color: AppColors.morandiText, offset: Offset(3, 3), blurRadius: 0),
-          ],
-        ),
-        child: Row(
-          children: [
-            Container(
-              width: 36,
-              height: 36,
-              decoration: BoxDecoration(
-                color: showCorrect
-                    ? AppColors.semanticGreen
-                    : showWrong
-                        ? AppColors.semanticRed
-                        : Colors.white,
-                borderRadius: BorderRadius.circular(10),
-                border: Border.all(
-                  color: showCorrect || showWrong ? Colors.transparent : AppColors.morandiText,
-                  width: 2,
-                ),
-              ),
-              child: Center(
-                child: Text(label,
-                    style: TextStyle(
-                        fontSize: 15,
-                        fontWeight: FontWeight.w900,
-                        color: showCorrect || showWrong ? Colors.white : AppColors.morandiText)),
-              ),
-            ),
-            const SizedBox(width: 14),
-            Expanded(
-              child: Text(opt,
-                  style: TextStyle(
-                      fontSize: 17,
-                      fontWeight: FontWeight.w800,
-                      color: showCorrect || showWrong ? AppColors.morandiText : Colors.black87)),
-            ),
-            if (showCorrect)
-              const Icon(Icons.check_circle, color: AppColors.semanticGreen, size: 22)
-            else if (showWrong)
-              const Icon(Icons.cancel, color: AppColors.semanticRed, size: 22),
-          ],
-        ),
-      ),
-    );
-  }
-
-  // ── Feedback card ────────────────────────────────────────
-
-  Widget _buildFeedbackCard() {
-    final q = _currentQ;
-
-    return Container(
-      width: double.infinity,
-      padding: const EdgeInsets.all(16),
-      decoration: BoxDecoration(
-        color: _isCorrect
-            ? AppColors.semanticGreen.withValues(alpha: 0.08)
-            : AppColors.semanticRed.withValues(alpha: 0.08),
-        borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: AppColors.shark40.withValues(alpha: 0.15), width: 1.5),
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Row(
-            children: [
-              Container(
-                width: 24,
-                height: 24,
-                decoration: BoxDecoration(
-                  color: _isCorrect ? AppColors.semanticGreen : AppColors.semanticRed,
-                  shape: BoxShape.circle,
-                ),
-                child: Icon(_isCorrect ? Icons.check : Icons.close, size: 16, color: Colors.white),
-              ),
-              const SizedBox(width: 8),
-              Text(_isCorrect ? '回答正确 (Correct)' : '回答错误 (Incorrect)',
-                  style: TextStyle(
-                      fontSize: 16, fontWeight: FontWeight.w900, color: _isCorrect ? AppColors.semanticGreen : AppColors.semanticRed)),
-            ],
-          ),
-          const SizedBox(height: 8),
-          Text(q.explanation,
-              style: const TextStyle(fontSize: 13, color: Colors.black54, fontWeight: FontWeight.w600)),
-        ],
-      ),
-    );
-  }
-
-  // ── Next button ──────────────────────────────────────────
-
-  Widget _buildNextButton() {
-    final isRolePlay = _currentQ.type == QuestionType.rolePlay;
-    final beforeAnswer = !_hasAnswered;
-    final showSubmit = isRolePlay && beforeAnswer;
-
-    return Pressable(
-      onPressed: _hasAnswered ? _nextQuestion : null,
-      child: Opacity(
-        opacity: _hasAnswered ? 1.0 : 0.45,
-        child: Container(
-          width: double.infinity,
-          padding: const EdgeInsets.symmetric(vertical: 16),
-          decoration: BoxDecoration(
-            color: AppColors.baliHai30,
-            borderRadius: BorderRadius.circular(16),
-            border: Border.all(color: AppColors.morandiText, width: 3),
-            boxShadow: const [
-              BoxShadow(color: AppColors.morandiText, offset: Offset(4, 4), blurRadius: 0),
-            ],
-          ),
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Text(
-                  showSubmit
-                      ? '确认提交'
-                      : _isLastQ
-                          ? '查看结果'
-                          : '下一题',
-                  style: const TextStyle(fontSize: 17, fontWeight: FontWeight.w900, color: AppColors.morandiText)),
-              const SizedBox(width: 6),
-              Text(
-                  showSubmit
-                      ? 'Submit Answer'
-                      : _isLastQ
-                          ? 'See Results'
-                          : 'Next Question',
-                  style: const TextStyle(fontSize: 17, fontWeight: FontWeight.w900, color: AppColors.morandiText)),
-              const SizedBox(width: 6),
-              const Icon(Icons.chevron_right, color: AppColors.morandiText, size: 22),
-            ],
-          ),
-        ),
-      ),
-    );
   }
 
   // ═══════════════════════════════════════════════════════════
@@ -772,12 +769,11 @@ class _LevelScreenState extends State<LevelScreen> {
         child: Column(
           children: [
             const SizedBox(height: 48),
-            // Back + title
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: AppSpacing.lg),
               child: Row(
                 children: [
-                  _buildCircleBackBtn(),
+                  _buildBackBtn(),
                   const SizedBox(width: 12),
                   const Text('闯关报告 (Summary)',
                       style: TextStyle(fontSize: 18, fontWeight: FontWeight.w900, color: AppColors.morandiText)),
@@ -785,7 +781,6 @@ class _LevelScreenState extends State<LevelScreen> {
               ),
             ),
             const SizedBox(height: 24),
-            // Main card
             Expanded(
               child: Center(
                 child: Padding(
@@ -794,7 +789,6 @@ class _LevelScreenState extends State<LevelScreen> {
                     clipBehavior: Clip.none,
                     alignment: Alignment.topCenter,
                     children: [
-                      // Large white card
                       Container(
                         width: double.infinity,
                         padding: const EdgeInsets.fromLTRB(24, 50, 24, 24),
@@ -809,7 +803,6 @@ class _LevelScreenState extends State<LevelScreen> {
                         child: Column(
                           mainAxisSize: MainAxisSize.min,
                           children: [
-                            // Stars
                             Row(
                               mainAxisAlignment: MainAxisAlignment.center,
                               children: List.generate(3, (i) {
@@ -820,13 +813,9 @@ class _LevelScreenState extends State<LevelScreen> {
                               }),
                             ),
                             const SizedBox(height: 24),
-
-                            // Score label
                             const Text('得分 SCORE',
                                 style: TextStyle(fontSize: 13, color: Colors.black54, fontWeight: FontWeight.w700, letterSpacing: 0.5)),
                             const SizedBox(height: 6),
-
-                            // Score number
                             Text.rich(
                               textAlign: TextAlign.center,
                               TextSpan(
@@ -838,19 +827,15 @@ class _LevelScreenState extends State<LevelScreen> {
                               ),
                             ),
                             const SizedBox(height: 12),
-
-                            // Pass/fail description
                             Text(
-                              _passed ? '🎉 恭喜通过本关！' : '需正确率 ≥ ${level.passThreshold}% 才可通关',
+                              _passed ? '恭喜通过本关！ Passed!' : '再来一次！ Try again!',
                               style: TextStyle(
                                   fontSize: 13,
-                                  color: _passed ? AppColors.semanticGreen : AppColors.semanticRed,
+                                  color: _passed ? AppColors.quizCorrect : AppColors.quizError,
                                   fontWeight: FontWeight.w700),
                               textAlign: TextAlign.center,
                             ),
                             const SizedBox(height: 20),
-
-                            // Reward area
                             if (_passed)
                               Container(
                                 width: double.infinity,
@@ -862,7 +847,7 @@ class _LevelScreenState extends State<LevelScreen> {
                                 ),
                                 child: Column(
                                   children: [
-                                    const Text('通关获得奖励',
+                                    const Text('通关获得奖励 Rewards',
                                         style: TextStyle(fontSize: 12, color: Colors.black54, fontWeight: FontWeight.w600)),
                                     const SizedBox(height: 8),
                                     Row(
@@ -877,12 +862,9 @@ class _LevelScreenState extends State<LevelScreen> {
                                   ],
                                 ),
                               ),
-
                             const SizedBox(height: 20),
                             const DashedDivider(color: AppColors.mercury25),
                             const SizedBox(height: 20),
-
-                            // Back to level select button
                             Pressable(
                               onPressed: _goBack,
                               child: Container(
@@ -896,13 +878,11 @@ class _LevelScreenState extends State<LevelScreen> {
                                     BoxShadow(color: AppColors.morandiText, offset: Offset(3, 3), blurRadius: 0),
                                   ],
                                 ),
-                                child: const Text('返回关卡选择',
+                                child: const Text('返回关卡选择 Return',
                                     textAlign: TextAlign.center,
                                     style: TextStyle(fontSize: 16, fontWeight: FontWeight.w900, color: AppColors.morandiText)),
                               ),
                             ),
-
-                            // Retry button
                             const SizedBox(height: 12),
                             Pressable(
                               onPressed: _retry,
@@ -917,7 +897,7 @@ class _LevelScreenState extends State<LevelScreen> {
                                     BoxShadow(color: AppColors.morandiText, offset: Offset(3, 3), blurRadius: 0),
                                   ],
                                 ),
-                                child: const Text('Retry Level',
+                                child: const Text('重试 Retry Level',
                                     textAlign: TextAlign.center,
                                     style: TextStyle(fontSize: 16, fontWeight: FontWeight.w900, color: AppColors.morandiText)),
                               ),
@@ -925,14 +905,12 @@ class _LevelScreenState extends State<LevelScreen> {
                           ],
                         ),
                       ),
-
-                      // "闯关成功！" badge overlapping top
                       Positioned(
                         top: -20,
                         child: Container(
                           padding: const EdgeInsets.symmetric(horizontal: 28, vertical: 10),
                           decoration: BoxDecoration(
-                            color: _passed ? AppColors.baliHai30 : AppColors.semanticRed.withValues(alpha: 0.8),
+                            color: _passed ? AppColors.baliHai30 : AppColors.quizError.withValues(alpha: 0.8),
                             borderRadius: BorderRadius.circular(16),
                             border: Border.all(color: AppColors.morandiText, width: 3),
                             boxShadow: const [
@@ -941,7 +919,7 @@ class _LevelScreenState extends State<LevelScreen> {
                           ),
                           child: Text(
                             _passed ? '闯关成功！' : '未通过',
-                            style: const TextStyle(fontSize: 20, fontWeight: FontWeight.w900, color: AppColors.morandiText),
+                            style: const TextStyle(fontSize: 28, fontWeight: FontWeight.w900, color: AppColors.morandiText,letterSpacing: 1.2),
                           ),
                         ),
                       ),

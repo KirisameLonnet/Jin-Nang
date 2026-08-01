@@ -33,4 +33,8 @@ class AppColors {
   static const Color shark40 = Color(0xFF1C1C1E);
   static const Color mercury25 = Color(0xFFE5E5EA);
   static const Color oldRose15 = Color(0xFFBB7C7C);
+
+  // Quiz feedback
+  static const Color quizCorrect = Color(0xFF8CD58A);
+  static const Color quizError = Color(0xFFFE6C6C);
 }

@@ -83,7 +83,7 @@ class _ReviewScreenState extends State<ReviewScreen> {
           const Spacer(),
           Text(_error!,
               textAlign: TextAlign.center,
-              style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w700, color: AppColors.semanticRed)),
+              style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w700, color: AppColors.quizError)),
           const Spacer(),
         ],
       );
@@ -269,10 +269,10 @@ class _ReviewScreenState extends State<ReviewScreen> {
                 child: Row(
                   mainAxisSize: MainAxisSize.min,
                   children: const [
-                    Icon(Icons.check, size: 13, color: AppColors.semanticGreen),
+                    Icon(Icons.check, size: 13, color: AppColors.quizCorrect),
                     SizedBox(width: 4),
                     Text('CORRECT',
-                        style: TextStyle(fontSize: 12, fontWeight: FontWeight.w900, color: AppColors.semanticGreen)),
+                        style: TextStyle(fontSize: 12, fontWeight: FontWeight.w900, color: AppColors.quizCorrect)),
                   ],
                 ),
               ),

@@ -47,7 +47,7 @@ class _SplashScreenState extends State<SplashScreen> {
               Text(
                 'Jin Nang',
                 style: TextStyle(
-                  fontSize: 52,
+                  fontSize: 36,
                   fontWeight: FontWeight.w900,
                   color: AppColors.morandiText,
                   letterSpacing: -1,
@@ -63,15 +63,15 @@ class _SplashScreenState extends State<SplashScreen> {
               const SizedBox(height: 28),
               // LOADING... 胶囊
               Container(
-                padding: const EdgeInsets.symmetric(horizontal: 28, vertical: 12),
+                padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
                 decoration: BoxDecoration(
                   color: AppColors.springWood14,
-                  borderRadius: BorderRadius.circular(40),
+                  borderRadius: BorderRadius.circular(24),
                   border: Border.all(color: AppColors.morandiText, width: 2),
                   boxShadow: const [
                     BoxShadow(
                       color: AppColors.morandiText,
-                      offset: Offset(0, 5),
+                      offset: Offset(0, 3),
                       blurRadius: 0,
                     ),
                   ],
@@ -79,7 +79,7 @@ class _SplashScreenState extends State<SplashScreen> {
                 child: const Text(
                   'LOADING...',
                   style: TextStyle(
-                    fontSize: 16,
+                    fontSize: 12,
                     fontWeight: FontWeight.w800,
                     color: AppColors.morandiText,
                     letterSpacing: 0.5,

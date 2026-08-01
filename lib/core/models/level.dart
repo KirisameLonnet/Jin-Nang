@@ -84,11 +84,50 @@ class Question {
     );
   }
 
-  /// Enrich with local role-play fallback data for Level 4 debugging.
-  /// Only applies when backend hasn't set question_type yet (still default).
+  /// Enrich with local fallback data when backend doesn't return new fields yet.
   Question enrichForLocal({int levelNum = 1}) {
-    if (levelNum != 4 || type != QuestionType.vocabularyMatch) return this;
-    // Backend hasn't returned role_play yet — use local mock data
+    // Only apply when backend hasn't set question_type (still default vocabularyMatch)
+    if (type != QuestionType.vocabularyMatch) return this;
+
+    switch (levelNum) {
+      case 1: // 词汇匹配
+        return Question(
+          id: id, type: QuestionType.vocabularyMatch,
+          questionText: questionText, options: options,
+          correctIndex: correctIndex, explanation: explanation,
+          instruction: '请翻译中文词组含义',
+          mainText: _extractMainWord(questionText),
+        );
+      case 2: // 听力选择
+        return Question(
+          id: id, type: QuestionType.listeningChoice,
+          questionText: questionText, options: options,
+          correctIndex: correctIndex, explanation: explanation,
+          instruction: '请播放拼音音频',
+          phonetic: _extractMainWord(questionText),
+        );
+      case 3: // 句子填空
+        return Question(
+          id: id, type: QuestionType.blankFilling,
+          questionText: questionText, options: options,
+          correctIndex: correctIndex, explanation: explanation,
+          instruction: '填空：请寻找最合适的词语补全对话',
+          mainText: questionText,
+        );
+      case 4: // 角色扮演
+        return _rolePlayMock();
+      default:
+        return this;
+    }
+  }
+
+  /// Extract the quoted word from question_text like '"水" 是什么意思？' → '水'
+  String? _extractMainWord(String text) {
+    final match = RegExp(r'"([^"]+)"').firstMatch(text);
+    return match?.group(1);
+  }
+
+  Question _rolePlayMock() {
     const mockHistoryQ1 = [
       DialogueTurn(isWaiter: true, text: '您好，欢迎光临！请坐。您想吃点什么？'),
       DialogueTurn(isWaiter: false, text: '请给我菜单。', isCorrect: true, optionLabel: 'B.请给我菜单。'),
@@ -97,23 +136,15 @@ class Question {
       DialogueTurn(isWaiter: true, text: '好的，一杯茶。那您想吃什么菜？我们有鱼香肉丝、麻婆豆腐、炒青菜。'),
     ];
     const mockHistoryQ2 = [
-      DialogueTurn(isWaiter: true, text: '您好，欢迎光临！'),
-      DialogueTurn(isWaiter: false, text: '请给我菜单。', isCorrect: true, optionLabel: 'B.请给我菜单。'),
-      DialogueTurn(isWaiter: true, text: '好的，这是菜单。您想喝点什么？'),
-      DialogueTurn(isWaiter: false, text: '我想喝茶。', isCorrect: true, optionLabel: 'A.我想喝茶。'),
-      DialogueTurn(isWaiter: true, text: '好的，一杯茶。那您想吃什么菜？我们有鱼香肉丝、麻婆豆腐、炒青菜。'),
+      ...mockHistoryQ1,
       DialogueTurn(isWaiter: false, text: '我要一份炒青菜和一碗米饭。', isCorrect: true, optionLabel: 'A.我要一份炒青菜和一碗米饭。'),
       DialogueTurn(isWaiter: true, text: '好的。请慢用。\n（上菜后）您吃好了吗？还需要加点什么吗？'),
     ];
-
-    final isQ1 = (id % 2 == 1); // odd id = first question
+    final isQ1 = (id % 2 == 1);
     return Question(
-      id: id,
-      type: QuestionType.rolePlay,
-      questionText: questionText,
-      options: options,
-      correctIndex: correctIndex,
-      explanation: explanation,
+      id: id, type: QuestionType.rolePlay,
+      questionText: questionText, options: options,
+      correctIndex: correctIndex, explanation: explanation,
       instruction: '角色扮演：针对服务员的对话作答',
       currentQuestion: isQ1
           ? '好的，一杯茶。那您想吃点什么菜？我们有鱼香肉丝、麻婆豆腐、炒青菜。'
