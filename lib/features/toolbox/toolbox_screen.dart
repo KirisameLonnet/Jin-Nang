@@ -39,51 +39,52 @@ class _ToolboxScreenState extends State<ToolboxScreen> {
               const SizedBox(height: 24),
               // 深色横幅
               AppCard(
-                color: AppColors.morandiText,
-                borderRadius: 20,
-                padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 18),
-                child: Row(
-                  children: [
-                    Container(
-                      width: 44,
-                      height: 44,
-                      decoration: BoxDecoration(
-                        color: AppColors.straw14,
-                        borderRadius: BorderRadius.circular(12),
+                  color: AppColors.morandiText,
+                  borderRadius: 20,
+                  padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 18),
+                  child: Row(
+                    children: [
+                      Container(
+                        width: 44,
+                        height: 44,
+                        decoration: BoxDecoration(
+                          color: AppColors.straw14,
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                        child: Icon(topic.icon, color: AppColors.morandiText, size: 24),
                       ),
-                      child: Icon(topic.icon, color: AppColors.morandiText, size: 24),
-                    ),
-                    const SizedBox(width: 16),
-                    Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          topic.category,
-                          style: const TextStyle(
-                            fontSize: 12,
-                            fontWeight: FontWeight.w700,
-                            color: AppColors.straw14,
-                            letterSpacing: 1,
+                      const SizedBox(width: 16),
+                      Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            topic.category,
+                            style: const TextStyle(
+                              fontSize: 12,
+                              fontWeight: FontWeight.w700,
+                              color: AppColors.straw14,
+                              letterSpacing: 1,
+                            ),
                           ),
-                        ),
-                        const SizedBox(height: 4),
-                        Text(
-                          topic.title,
-                          style: const TextStyle(
-                            fontSize: 20,
-                            fontWeight: FontWeight.w900,
-                            color: Colors.white,
+                          const SizedBox(height: 4),
+                          Text(
+                            topic.title,
+                            style: const TextStyle(
+                              fontSize: 20,
+                              fontWeight: FontWeight.w900,
+                              color: Colors.white,
+                            ),
                           ),
-                        ),
-                      ],
-                    ),
-                  ],
+                        ],
+                      ),
+                    ],
+                  ),
                 ),
-              ),
               const SizedBox(height: 20),
               // 章节列表
               Expanded(
                 child: ListView.separated(
+                  clipBehavior: Clip.none,
                   itemCount: topic.chapters.length,
                   separatorBuilder: (_, _) => const SizedBox(height: 14),
                   itemBuilder: (context, i) {

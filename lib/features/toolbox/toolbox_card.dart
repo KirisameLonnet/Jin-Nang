@@ -110,7 +110,7 @@ class _ToolboxCardState extends State<ToolboxCard> {
             children: [
               const SizedBox(height: 48),
               AppHeader(
-                title: 'Vocab Battle',
+                title: 'Vocab Learning',
                 progress: total > 0 ? '${_currentIndex + 1}/$total' : '',
                 onBack: () {
                   if (Navigator.of(context).canPop()) {

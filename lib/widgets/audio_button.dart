@@ -24,12 +24,12 @@ class AudioButton extends StatelessWidget {
           boxShadow: const [
             BoxShadow(
               color: AppColors.morandiText,
-              offset: Offset(0, 4),
+              offset: Offset(4, 4),
               blurRadius: 0,
             ),
           ],
         ),
-        child: const Icon(Icons.volume_up, color: Colors.white, size: 22),
+        child: const Icon(Icons.volume_up, color: Colors.black, size: 22),
       ),
     );
   }

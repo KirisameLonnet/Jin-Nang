@@ -4,6 +4,7 @@ import '../../core/models/phrase.dart';
 import '../../theme/app_colors.dart';
 import '../../theme/app_spacing.dart';
 import '../../widgets/app_card.dart';
+import '../../widgets/chapter_header.dart';
 import '../../widgets/app_safe_area.dart';
 import '../../widgets/audio_button.dart';
 import '../../widgets/dashed_divider.dart';
@@ -26,6 +27,7 @@ class ToolboxChapterScreen extends StatefulWidget {
 class _ToolboxChapterScreenState extends State<ToolboxChapterScreen> {
   late final PageController _pageController;
   late int _currentIndex;
+  bool _sliderExpanded = false;
 
   List<Chapter> get _chapters => widget.topic.chapters;
 
@@ -58,84 +60,54 @@ class _ToolboxChapterScreenState extends State<ToolboxChapterScreen> {
       body: AppSafeArea(
         child: Column(
           children: [
-            const SizedBox(height: 12),
-            // 顶部：返回 + 横向 SlideBar 章节选择器
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: AppSpacing.lg),
-              child: Row(
-                children: [
-                  Pressable(
-                    onPressed: () {
-                      if (Navigator.of(context).canPop()) {
-                        context.pop();
-                      } else {
-                        context.go('/toolbox');
-                      }
-                    },
-                    child: Container(
-                      width: 44,
-                      height: 44,
-                      decoration: BoxDecoration(
-                        color: Colors.white,
-                        border: Border.all(color: AppColors.morandiText, width: 3),
-                        borderRadius: BorderRadius.circular(12),
-                        boxShadow: const [
-                          BoxShadow(
-                            color: AppColors.morandiText,
-                            offset: Offset(3, 3),
-                            blurRadius: 0,
-                          ),
-                        ],
+            const SizedBox(height: 48),
+            // 顶部：AppHeader（收起）或 横向 SlideBar（展开）
+            if (_sliderExpanded)
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: AppSpacing.lg),
+                child: SizedBox(
+                  height: 52,
+                  child: Stack(
+                    clipBehavior: Clip.none,
+                    children: [
+                      Positioned(
+                        left: 56,
+                        right: 0,
+                        top: 0,
+                        bottom: 0,
+                        child: _buildChapterSlider(),
                       ),
-                      child: const Icon(Icons.arrow_back, color: AppColors.morandiText),
+                      Positioned(
+                        left: 0,
+                        top: 2,
+                        child: _buildBackButton(),
+                      ),
+                    ],
+                  ),
+                ),
+              )
+            else
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: AppSpacing.lg),
+                child: GestureDetector(
+                  onTap: () => setState(() => _sliderExpanded = true),
+                  child: Transform.rotate(
+                    angle: -0.01745,
+                    alignment: Alignment.center,
+                    child: ChapterHeader(
+                      title: 'Chapter ${_chapters[_currentIndex].index}',
+                      titleColor: AppColors.straw14,
+                      onBack: () {
+                        if (Navigator.of(context).canPop()) {
+                          context.pop();
+                        } else {
+                          context.go('/toolbox');
+                        }
+                      },
                     ),
                   ),
-                  const SizedBox(width: 12),
-                  Expanded(
-                    child: SizedBox(
-                      height: 52,
-                      child: ListView.separated(
-                        scrollDirection: Axis.horizontal,
-                        itemCount: _chapters.length,
-                        separatorBuilder: (_, _) => const SizedBox(width: 10),
-                        itemBuilder: (context, i) {
-                          final isActive = i == _currentIndex;
-                          return Pressable(
-                            onPressed: () => _goToPage(i),
-                            child: AnimatedContainer(
-                              duration: const Duration(milliseconds: 200),
-                              padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
-                              decoration: BoxDecoration(
-                                color: isActive ? AppColors.straw14 : Colors.white,
-                                borderRadius: BorderRadius.circular(14),
-                                border: Border.all(color: AppColors.morandiText, width: 3),
-                                boxShadow: [
-                                  BoxShadow(
-                                    color: AppColors.morandiText,
-                                    offset: Offset(0, isActive ? 4 : 3),
-                                    blurRadius: 0,
-                                  ),
-                                ],
-                              ),
-                              child: Center(
-                                child: Text(
-                                  'Chapter ${_chapters[i].index}',
-                                  style: TextStyle(
-                                    fontSize: 15,
-                                    fontWeight: FontWeight.w900,
-                                    color: isActive ? AppColors.morandiText : AppColors.naturalGray19,
-                                  ),
-                                ),
-                              ),
-                            ),
-                          );
-                        },
-                      ),
-                    ),
-                  ),
-                ],
+                ),
               ),
-            ),
             const SizedBox(height: 20),
             // 章节大标题
             Padding(
@@ -309,6 +281,79 @@ class _ToolboxChapterScreenState extends State<ToolboxChapterScreen> {
           ],
         ),
       ),
+    );
+  }
+
+  Widget _buildBackButton() {
+    return Pressable(
+      onPressed: () {
+        if (Navigator.of(context).canPop()) {
+          context.pop();
+        } else {
+          context.go('/toolbox');
+        }
+      },
+      child: Container(
+        width: 44,
+        height: 44,
+        decoration: BoxDecoration(
+          color: Colors.white,
+          border: Border.all(color: AppColors.morandiText, width: 3),
+          borderRadius: BorderRadius.circular(16),
+          boxShadow: const [
+            BoxShadow(
+              color: AppColors.morandiText,
+              offset: Offset(6, 6),
+              blurRadius: 0,
+            ),
+          ],
+        ),
+        child: const Icon(Icons.arrow_back, color: AppColors.morandiText),
+      ),
+    );
+  }
+
+  Widget _buildChapterSlider() {
+    return ListView.separated(
+      padding: const EdgeInsets.only(top: 4),
+      scrollDirection: Axis.horizontal,
+      itemCount: _chapters.length,
+      separatorBuilder: (_, _) => const SizedBox(width: 10),
+      itemBuilder: (context, i) {
+        final isActive = i == _currentIndex;
+        return Padding(
+          padding: EdgeInsets.only(bottom: isActive ? 4.0 : 3.0),
+          child: Pressable(
+            onPressed: () => _goToPage(i),
+            child: AnimatedContainer(
+              duration: const Duration(milliseconds: 200),
+              padding: const EdgeInsets.symmetric(horizontal: 28, vertical: 6),
+              decoration: BoxDecoration(
+                color: isActive ? AppColors.straw14 : Colors.white,
+                borderRadius: BorderRadius.circular(14),
+                border: Border.all(color: AppColors.morandiText, width: 3),
+                boxShadow: [
+                  BoxShadow(
+                    color: AppColors.morandiText,
+                    offset: Offset(0, isActive ? 4 : 3),
+                    blurRadius: 0,
+                  ),
+                ],
+              ),
+              child: Center(
+                child: Text(
+                  'Chapter ${_chapters[i].index}',
+                  style: TextStyle(
+                    fontSize: 15,
+                    fontWeight: FontWeight.w900,
+                    color: isActive ? AppColors.morandiText : AppColors.naturalGray19,
+                  ),
+                ),
+              ),
+            ),
+          ),
+        );
+      },
     );
   }
 }
