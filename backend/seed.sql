@@ -142,11 +142,11 @@ INSERT INTO vocab_phrases (vocab_id, chinese, english, sort_order) VALUES
   (6, '吃什么', 'what to eat',      3);
 
 -- Levels: Restaurant (scene_id = 1)
-INSERT INTO levels (scene_id, level_num, title, subtitle, pass_threshold, sort_order) VALUES
-  (1, 1, '词汇匹配', '(Vocabulary Match)',      80,  1),
-  (1, 2, '听力选择', '(Listening Choice)',  80,  2),
-  (1, 3, '句子填空', '(Blank Filling)',   80,  3),
-  (1, 4, '点餐角色扮演', '(Role Play)',  100, 4);
+INSERT INTO levels (scene_id, level_num, title, subtitle, pass_threshold, points_reward, description, sort_order) VALUES
+  (1, 1, '词汇匹配', '(Vocabulary Match)',  80, 10, '识形、知意：选择正确的英文释义或匹配中文词。', 1),
+  (1, 2, '听力选择', '(Listening Choice)',  80, 15, '听音知意：播放音频，从备选中文汉字里选择正确的对应。', 2),
+  (1, 3, '句子填空', '(Blank Filling)',     80, 15, '选择最合适的词语补全餐厅对话。', 3),
+  (1, 4, '点餐角色扮演', '(Role Play)',    100, 20, '模拟真实餐厅场景，与服务员进行中文对话练习。', 4);
 
 -- Questions: Level 1 (level_id = 1)
 INSERT INTO questions (level_id, question_text, options, correct_index, explanation, sort_order) VALUES
@@ -173,7 +173,18 @@ INSERT INTO questions (level_id, question_text, options, correct_index, explanat
    '["便宜","贵","大","小"]', 1, '贵 (guì) = expensive', 3);
 
 -- Questions: Level 4 / 点餐角色扮演 (level_id = 4)
-INSERT INTO questions (level_id, question_text, options, correct_index, explanation, sort_order) VALUES
-  (4, '将以下句子按点餐流程排序：\na. 请给我菜单。\nb. 我要一份米饭和鱼。\nc. 谢谢，再见。\nd. 请结账。\ne. 您好，请坐。',
-   '["e→a→b→d→c","a→e→b→c→d","e→b→a→d→c","a→b→e→d→c"]',
-   0, '正确顺序：您好请坐 → 给菜单 → 点菜 → 结账 → 再见', 1);
+INSERT INTO questions (level_id, question_type, question_text, options, correct_index, explanation, instruction, current_question, history, sort_order) VALUES
+  (4, 'role_play',
+   '角色扮演', '["我要一份炒青菜和一碗米饭。","我喜欢蛋糕。","多少钱？"]', 0,
+   '蛋糕（cake）通常是甜点或下午茶。而在中餐饭店，一般先要点热菜下饭。',
+   '角色扮演：针对服务员的对话作答',
+   '好的，一杯茶。那您想吃点什么菜？我们有鱼香肉丝、麻婆豆腐、炒青菜。',
+   '[{"is_waiter":true,"text":"您好，欢迎光临！请坐。您想吃点什么？"},{"is_waiter":false,"text":"请给我菜单。","is_correct":true,"option_label":"B.请给我菜单。"},{"is_waiter":true,"text":"好的，这是菜单。\n您想喝点什么？"},{"is_waiter":false,"text":"我想喝茶。","is_correct":true,"option_label":"A.我想喝茶。"},{"is_waiter":true,"text":"好的，一杯茶。那您想吃什么菜？我们有鱼香肉丝、麻婆豆腐、炒青菜。"}]',
+   1),
+  (4, 'role_play',
+   '角色扮演', '["不用了，谢谢。","多少钱？","再给我一瓶啤酒。"]', 2,
+   '在中餐场合，吃完饭后可以向服务员请求结账，并询问价格。',
+   '角色扮演：针对服务员的对话作答',
+   '您吃好了吗？还需要加点什么吗？',
+   '[{"is_waiter":true,"text":"您好，欢迎光临！"},{"is_waiter":false,"text":"请给我菜单。","is_correct":true,"option_label":"B.请给我菜单。"},{"is_waiter":true,"text":"好的，这是菜单。您想喝点什么？"},{"is_waiter":false,"text":"我想喝茶。","is_correct":true,"option_label":"A.我想喝茶。"},{"is_waiter":true,"text":"好的，一杯茶。那您想吃什么菜？我们有鱼香肉丝、麻婆豆腐、炒青菜。"},{"is_waiter":false,"text":"我要一份炒青菜和一碗米饭。","is_correct":true,"option_label":"A.我要一份炒青菜和一碗米饭。"},{"is_waiter":true,"text":"好的。请慢用。\n（上菜后）您吃好了吗？还需要加点什么吗？"}]',
+   2);

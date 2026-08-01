@@ -40,7 +40,7 @@ class _LevelScreenState extends State<LevelScreen> {
     try {
       final levels = await Di.api.getSceneLevels(widget.sceneId);
       if (!mounted) return;
-      final level = levels.firstWhere((l) => l.id == widget.levelId);
+      final level = levels.firstWhere((l) => l.id == widget.levelId).enrichForLocal();
       setState(() => _level = level);
     } catch (e) {
       if (!mounted) return;

@@ -31,8 +31,9 @@ class _DialoguePracticeScreenState extends State<DialoguePracticeScreen> {
 
   Future<void> _loadLevels() async {
     try {
-      final levels = await Di.api.getSceneLevels(widget.sceneId);
+      final raw = await Di.api.getSceneLevels(widget.sceneId);
       if (!mounted) return;
+      final levels = raw.map((l) => l.enrichForLocal()).toList();
       setState(() {
         _levels = levels;
         _totalPts = levels.fold(0, (sum, l) => sum + l.pointsReward);
@@ -232,7 +233,7 @@ class _DialoguePracticeScreenState extends State<DialoguePracticeScreen> {
             Container(height: 2, color: AppColors.morandiText),
             Container(
               width: double.infinity,
-              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+              padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 16),
               decoration: const BoxDecoration(
                 color: Color(0xFFF2F1EC),
                 borderRadius: BorderRadius.only(
@@ -261,15 +262,17 @@ class _DialoguePracticeScreenState extends State<DialoguePracticeScreen> {
   }
 
   Widget _buildDualButtons(Level level) {
-    return Row(
-      children: [
-        Expanded(
-          child: Pressable(
+    return Align(
+      alignment: Alignment.centerRight,
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Pressable(
             onPressed: () => context.push('/study/level/${level.id}/review?sceneId=${widget.sceneId}'),
             child: Container(
-              padding: const EdgeInsets.symmetric(vertical: 12),
+              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
               decoration: BoxDecoration(
-                color: AppColors.whisper15,
+                color: const Color(0xFFD6C6F5),
                 borderRadius: BorderRadius.circular(14),
                 border: Border.all(color: AppColors.morandiText, width: 2.5),
                 boxShadow: const [
@@ -277,22 +280,20 @@ class _DialoguePracticeScreenState extends State<DialoguePracticeScreen> {
                 ],
               ),
               child: Row(
-                mainAxisAlignment: MainAxisAlignment.center,
+                mainAxisSize: MainAxisSize.min,
                 children: const [
                   Icon(Icons.play_arrow, size: 18, color: AppColors.morandiText),
                   SizedBox(width: 4),
-                  Text('Review', style: TextStyle(fontSize: 14, fontWeight: FontWeight.w900, color: AppColors.morandiText)),
+                  Text(' Review', style: TextStyle(fontSize: 18, fontWeight: FontWeight.w900, color: AppColors.morandiText)),
                 ],
               ),
             ),
           ),
-        ),
-        const SizedBox(width: 12),
-        Expanded(
-          child: Pressable(
+          const SizedBox(width: 10),
+          Pressable(
             onPressed: () => _startLevel(level),
             child: Container(
-              padding: const EdgeInsets.symmetric(vertical: 12),
+              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
               decoration: BoxDecoration(
                 color: AppColors.straw14,
                 borderRadius: BorderRadius.circular(14),
@@ -302,17 +303,17 @@ class _DialoguePracticeScreenState extends State<DialoguePracticeScreen> {
                 ],
               ),
               child: Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: const [
-                  Icon(Icons.play_arrow, size: 18, color: AppColors.morandiText),
-                  SizedBox(width: 4),
-                  Text('Replay', style: TextStyle(fontSize: 14, fontWeight: FontWeight.w900, color: AppColors.morandiText)),
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  const Icon(Icons.play_arrow, size: 18, color: AppColors.morandiText),
+                  const SizedBox(width: 4),
+                  const Text(' Replay', style: TextStyle(fontSize: 18, fontWeight: FontWeight.w900, color: AppColors.morandiText)),
                 ],
               ),
             ),
           ),
-        ),
-      ],
+        ],
+      ),
     );
   }
 
@@ -322,7 +323,7 @@ class _DialoguePracticeScreenState extends State<DialoguePracticeScreen> {
       child: Pressable(
         onPressed: () => _startLevel(level),
         child: Container(
-          padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
           decoration: BoxDecoration(
             color: AppColors.straw14,
             borderRadius: BorderRadius.circular(14),
@@ -336,7 +337,7 @@ class _DialoguePracticeScreenState extends State<DialoguePracticeScreen> {
             children: [
               const Icon(Icons.play_arrow, size: 18, color: AppColors.morandiText),
               const SizedBox(width: 4),
-              Text(done ? 'Replay' : 'START',
+              Text(done ? ' Replay' : ' START',
                   style: const TextStyle(fontSize: 18, fontWeight: FontWeight.w900, color: AppColors.morandiText)),
             ],
           ),

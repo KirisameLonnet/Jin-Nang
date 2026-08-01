@@ -30,7 +30,7 @@ class _ReviewScreenState extends State<ReviewScreen> {
     try {
       final levels = await Di.api.getSceneLevels(widget.sceneId);
       if (!mounted) return;
-      final level = levels.firstWhere((l) => l.id == widget.levelId);
+      final level = levels.firstWhere((l) => l.id == widget.levelId).enrichForLocal();
       final turns = <DialogueTurn>[];
       for (final q in level.questions) {
         turns.addAll(q.history);

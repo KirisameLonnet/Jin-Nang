@@ -68,16 +68,25 @@ CREATE TABLE IF NOT EXISTS levels (
   title TEXT NOT NULL,
   subtitle TEXT NOT NULL,
   pass_threshold INTEGER NOT NULL DEFAULT 80,
+  points_reward INTEGER NOT NULL DEFAULT 0,
+  description TEXT NOT NULL DEFAULT '',
   sort_order INTEGER NOT NULL DEFAULT 0
 );
 
 CREATE TABLE IF NOT EXISTS questions (
   id INTEGER PRIMARY KEY AUTOINCREMENT,
   level_id INTEGER NOT NULL REFERENCES levels(id),
+  question_type TEXT NOT NULL DEFAULT 'vocabulary_match',
   question_text TEXT NOT NULL,
   options TEXT NOT NULL,
   correct_index INTEGER NOT NULL,
   explanation TEXT NOT NULL,
+  main_text TEXT,
+  phonetic TEXT,
+  instruction TEXT,
+  audio_url TEXT,
+  current_question TEXT,
+  history TEXT,
   sort_order INTEGER NOT NULL DEFAULT 0
 );
 
