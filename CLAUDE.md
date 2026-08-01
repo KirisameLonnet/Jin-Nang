@@ -24,6 +24,15 @@ flutter test test/widget_test.dart -p "MyApp ..."   # single test by name
 dart run flutter_native_splash:create
 ```
 
+### Nix dev environment
+
+The repo includes `flake.nix` + `direnv` for reproducible tooling. On first clone run `direnv allow`. `flake.nix` also patches two Xcode env conflicts:
+
+- `DEVELOPER_DIR` → real Xcode.app (not Nix's minimal Apple SDK)
+- `SDKROOT` → cleared so Xcode resolves the real iOS SDK
+
+Do not override these.
+
 ### iOS builds — non-standard
 
 The Nix-packaged Flutter SDK does **not** include the full iOS engine framework. iOS device builds must use the Homebrew Flutter:
@@ -35,35 +44,38 @@ open ios/Runner.xcworkspace   # configure signing in Xcode, then Cmd+R
 
 If regenerating the `ios/` directory: also `chmod -R u+w ios/` afterwards — Nix-created files are read-only and break pod installs.
 
-`flake.nix` exports `DEVELOPER_DIR=/Applications/Xcode.app/...` and clears `SDKROOT` so Xcode resolves the real iOS SDK rather than Nix's minimal Apple SDK. Don't override these.
-
 ## Architecture
 
 ### Routing — go_router with StatefulShellRoute
 
-`lib/main.dart` is the single source of truth for the route table. Three top-level full-screen routes (`/splash`, `/login`, `/register`) sit outside the shell. Everything else lives inside a `StatefulShellRoute.indexedStack` with three branches:
+`lib/main.dart` is the single source of truth for the route table. Three full-screen routes (`/splash`, `/login`, `/register`) and all **sub-pages** are declared as top-level `GoRoute`s *before* the shell. Only the three tab-root routes live inside `StatefulShellRoute.indexedStack`:
 
-- **Study** (`/study/...`) — home, vocab scene selection, vocab learning, dialogue practice, individual levels
-- **Toolbox** (`/toolbox/...`) — toolbox grid, Vocab Battle card
-- **My** (`/me`) — profile
+- **Study** (`/study`) — `HomeScreen`
+- **Toolbox** (`/toolbox`) — `ToolboxSceneScreen`
+- **My** (`/me`) — `ProfileScreen`
 
-Each branch has its own `GlobalKey<NavigatorState>` so tabs preserve their navigation stack independently. Sub-page transitions use the `_slidePage` helper (right-slide) defined in `main.dart` — reuse it for new sub-routes instead of inventing per-screen transitions.
+Each branch has its own `GlobalKey<NavigatorState>` so tabs preserve their navigation stack independently. Sub-page transitions use the `_slidePage` helper (right-slide, 300ms `Curves.easeInOut`) defined in `main.dart` — reuse it for new sub-routes.
 
-Current routes with path parameters:
+Current routes:
 
-| Path | Screen | Shell? |
-|------|--------|--------|
+| Path | Screen | In Shell? |
+|------|--------|-----------|
 | `/splash` | SplashScreen | ❌ |
 | `/login` | LoginScreen | ❌ |
 | `/register` | RegisterScreen | ❌ |
-| `/study` | HomeScreen | Study tab |
-| `/study/vocab-scene` | VocabSceneScreen | Study tab |
-| `/study/vocab-learning/:sceneId` | VocabLearningScreen | Study tab |
-| `/study/dialogue-practice/:sceneId` | DialoguePracticeScreen | Study tab |
-| `/study/level/:levelId?sceneId=…` | LevelScreen | Study tab |
-| `/toolbox` | ToolboxScreen | Toolbox tab |
-| `/toolbox/vocab-card/:sceneId` | ToolboxCard | Toolbox tab |
-| `/me` | ProfileScreen | My tab |
+| `/study` | HomeScreen | ✅ Study tab |
+| `/study/vocab-scene` | VocabSceneScreen | ❌ (top-level) |
+| `/study/vocab-battle/:sceneId` | ToolboxCard | ❌ (top-level) |
+| `/study/vocab-learning/:sceneId` | VocabLearningScreen | ❌ (top-level) |
+| `/study/dialogue-scene` | DialogueSceneScreen | ❌ (top-level) |
+| `/study/dialogue-practice/:sceneId` | DialoguePracticeScreen | ❌ (top-level) |
+| `/study/level/:levelId?sceneId=…` | LevelScreen | ❌ (top-level) |
+| `/toolbox` | ToolboxSceneScreen | ✅ Toolbox tab |
+| `/toolbox/:sceneId` | ToolboxScreen | ❌ (top-level) |
+| `/toolbox/chapter/:initialChapter` | ToolboxChapterScreen | ❌ (top-level) |
+| `/me` | ProfileScreen | ✅ My tab |
+
+**Key rule**: sub-pages live outside the shell so the bottom tab bar is hidden during drill-down navigation. When adding a new sub-page, declare it as a top-level `GoRoute` before the `StatefulShellRoute`, not inside a branch.
 
 ### Dependency injection
 
@@ -91,7 +103,7 @@ lib/
 │   ├── network/           # Dio client with JWT injection interceptor
 │   ├── auth/              # TokenStore (flutter_secure_storage)
 │   ├── audio/             # AudioCacheManager (flutter_cache_manager wrapper)
-│   ├── models/            # UserProfile, Scene, VocabItem, VocabDetail, Level
+│   ├── models/            # UserProfile, Scene, VocabItem, VocabDetail, Level, Phrase
 │   └── di.dart            # service locator singleton
 └── features/<feature>/    # screens grouped by product area
 ```
@@ -101,7 +113,7 @@ Feature folders are flat by default (`features/auth/login_screen.dart`); nested 
 ### Theming
 
 - `AppTheme.lightTheme` in `lib/theme/app_theme.dart` is wired into `MaterialApp.router`. There is no dark theme yet.
-- `AppFonts` declares **two font families** with fallback: `Inter` for Latin glyphs, system default font for Chinese. Always set `fontFamily: AppFonts.english` with `fontFamilyFallback: [AppFonts.chinese]` (already done globally in the theme) — don't hardcode font families on individual `TextStyle`s.
+- `AppFonts` declares **two font families**: `Inter` (Latin glyphs, 5 weights + italic) and `HarmonyOS Sans SC` (Chinese). Always set `fontFamily: AppFonts.english` with `fontFamilyFallback: [AppFonts.chinese]` (already done globally in the theme) — don't hardcode font families on individual `TextStyle`s.
 - `AppColors` is the only place HEX values live. Two namespaces coexist: standard semantic (`brandPurple`, `semanticRed`, `neutralGray0X`) and the Figma-named Morandi palette (`morandiText`, `baliHai30`, `straw14`, `oldRose15`, …). Tabs in `MainShell` and feature screens use the Figma names.
 
 ### Visual language — thick-border + hard-shadow card system
@@ -112,9 +124,12 @@ Every card-like surface follows the same primitive: black ~2.5–4px border, off
 - `widgets/app_header.dart` — back button + title tab + optional progress counter
 - `widgets/icon_container.dart` — bordered icon tile, multiple sizes
 - `widgets/selectable_card.dart` — scene/tool card; **disabled state = `onTap == null`** (no separate `enabled` flag), per the project's design-system rule. `onLockedTap` handles locked-card taps separately (shows "coming soon").
-- `widgets/pressable.dart` — universal tap wrapper providing the press feedback (offset + opacity dip), haptic, and SFX. Prefer `Pressable` over raw `GestureDetector`/`InkWell` for any interactive surface so press feedback stays consistent.
-
-Press SFX comes from `ButtonSounds` (singleton in `pressable.dart`) playing `assets/audio/btn_pressed.mp3` / `btn_released.mp3`.
+- `widgets/pressable.dart` — universal tap wrapper providing press feedback (offset + opacity dip), haptic, and SFX. Also exports `ButtonSounds`, a singleton that plays `assets/audio/btn_pressed.mp3` / `btn_released.mp3`. **Prefer `Pressable` over raw `GestureDetector`/`InkWell`** for any interactive surface so press feedback stays consistent.
+- `widgets/audio_button.dart` — bordered speaker-icon button that plays cached vocab audio via `AudioCacheManager`.
+- `widgets/app_safe_area.dart` — `SafeArea` wrapper with the app's background color.
+- `widgets/title_section.dart` — section heading with optional action link.
+- `widgets/chapter_header.dart` — chapter/tab selector bar (used in ToolboxChapterScreen).
+- `widgets/dashed_divider.dart` — dashed horizontal rule.
 
 ### Audio
 

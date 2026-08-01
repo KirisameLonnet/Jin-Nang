@@ -41,24 +41,41 @@ class _DialogueSceneScreenState extends State<DialogueSceneScreen> {
     return Scaffold(
       backgroundColor: AppColors.springWood14,
       body: AppSafeArea(
-        child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: AppSpacing.lg),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              const SizedBox(height: 48),
-              AppHeader(
-                title: 'Dialogue Practice',
-                titleColor: AppColors.baliHai30,
-                onBack: () => context.go('/study'),
+        child: Stack(
+          children: [
+            // Scrollable scene cards (behind header)
+            Positioned.fill(
+              child: Padding(
+                padding: const EdgeInsets.fromLTRB(AppSpacing.lg, 176, AppSpacing.lg, 0),
+                child: _buildBody(context),
               ),
-              const SizedBox(height: 32),
-              const Text('Select a scene',
-                  style: TextStyle(fontSize: 20, fontWeight: FontWeight.w900, color: AppColors.morandiText)),
-              const SizedBox(height: 24),
-              Expanded(child: _buildBody(context)),
-            ],
-          ),
+            ),
+            // Fixed header (on top)
+            Positioned(
+              top: 0,
+              left: 0,
+              right: 0,
+              child: Container(
+                color: AppColors.springWood14,
+                padding: const EdgeInsets.symmetric(horizontal: AppSpacing.lg),
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    const SizedBox(height: 48),
+                    AppHeader(
+                      title: 'Dialogue Practice',
+                      titleColor: AppColors.baliHai30,
+                      onBack: () => context.go('/study'),
+                    ),
+                    const SizedBox(height: 32),
+                    const Text('Select a scene',
+                        style: TextStyle(fontSize: 20, fontWeight: FontWeight.w900, color: AppColors.morandiText)),
+                  ],
+                ),
+              ),
+            ),
+          ],
         ),
       ),
     );
@@ -86,7 +103,10 @@ class _DialogueSceneScreenState extends State<DialogueSceneScreen> {
                 icon: _iconForScene(scene.nameEn),
                 color: _colorFromHex(scene.colorHex),
                 onTap: scene.isUnlockedDefault
-                    ? () => context.push('/study/dialogue-practice/${scene.id}')
+                    ? () {
+                        final pageTitle = _dialoguePageTitle(scene.nameZh);
+                        context.push('/study/dialogue-practice/${scene.id}?sceneName=${Uri.encodeComponent(scene.nameEn)}&sceneNameZh=${Uri.encodeComponent(pageTitle)}');
+                      }
                     : null,
                 onLockedTap: scene.isUnlockedDefault
                     ? null
@@ -109,6 +129,15 @@ class _DialogueSceneScreenState extends State<DialogueSceneScreen> {
       case 'supermarket': return Icons.shopping_cart;
       case 'airport': return Icons.flight;
       default: return Icons.place;
+    }
+  }
+
+  String _dialoguePageTitle(String nameZh) {
+    switch (nameZh) {
+      case '餐厅': return '餐厅点餐';
+      case '超市': return '超市购物';
+      case '机场': return '机场出行';
+      default: return nameZh;
     }
   }
 

@@ -20,6 +20,7 @@ import 'features/home/vocab_learning/vocab_learning_screen.dart';
 import 'features/home/dialogue/dialogue_scene_screen.dart';
 import 'features/home/dialogue/dialogue_practice_screen.dart';
 import 'features/home/dialogue/level_screen.dart';
+import 'features/home/dialogue/review_screen.dart';
 
 void main() {
   WidgetsFlutterBinding.ensureInitialized();
@@ -90,7 +91,17 @@ final GoRouter _router = GoRouter(
       path: '/study/dialogue-practice/:sceneId',
       pageBuilder: (context, state) {
         final sceneId = int.parse(state.pathParameters['sceneId']!);
-        return _slidePage(child: DialoguePracticeScreen(sceneId: sceneId));
+        final sceneName = state.uri.queryParameters['sceneName'] ?? 'Scene';
+        final sceneNameZh = state.uri.queryParameters['sceneNameZh'] ?? sceneName;
+        return _slidePage(child: DialoguePracticeScreen(sceneId: sceneId, sceneName: sceneName, sceneNameZh: sceneNameZh));
+      },
+    ),
+    GoRoute(
+      path: '/study/level/:levelId/review',
+      pageBuilder: (context, state) {
+        final levelId = int.parse(state.pathParameters['levelId']!);
+        final sceneId = int.parse(state.uri.queryParameters['sceneId'] ?? '1');
+        return _slidePage(child: ReviewScreen(levelId: levelId, sceneId: sceneId));
       },
     ),
     GoRoute(

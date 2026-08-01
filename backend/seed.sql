@@ -143,10 +143,10 @@ INSERT INTO vocab_phrases (vocab_id, chinese, english, sort_order) VALUES
 
 -- Levels: Restaurant (scene_id = 1)
 INSERT INTO levels (scene_id, level_num, title, subtitle, pass_threshold, sort_order) VALUES
-  (1, 1, 'Level 1', 'Vocab Match',      80,  1),
-  (1, 2, 'Level 2', 'Listen & Choose',  80,  2),
-  (1, 3, 'Level 3', 'Fill in Blanks',   80,  3),
-  (1, 4, 'Challenge', 'Scenario Sort',  100, 4);
+  (1, 1, '词汇匹配', '(Vocabulary Match)',      80,  1),
+  (1, 2, '听力选择', '(Listening Choice)',  80,  2),
+  (1, 3, '句子填空', '(Blank Filling)',   80,  3),
+  (1, 4, '点餐角色扮演', '(Role Play)',  100, 4);
 
 -- Questions: Level 1 (level_id = 1)
 INSERT INTO questions (level_id, question_text, options, correct_index, explanation, sort_order) VALUES
@@ -172,7 +172,7 @@ INSERT INTO questions (level_id, question_text, options, correct_index, explanat
   (3, '这个菜很____，但是很好吃。',
    '["便宜","贵","大","小"]', 1, '贵 (guì) = expensive', 3);
 
--- Questions: Level 4 / Challenge (level_id = 4)
+-- Questions: Level 4 / 点餐角色扮演 (level_id = 4)
 INSERT INTO questions (level_id, question_text, options, correct_index, explanation, sort_order) VALUES
   (4, '将以下句子按点餐流程排序：\na. 请给我菜单。\nb. 我要一份米饭和鱼。\nc. 谢谢，再见。\nd. 请结账。\ne. 您好，请坐。',
    '["e→a→b→d→c","a→e→b→c→d","e→b→a→d→c","a→b→e→d→c"]',

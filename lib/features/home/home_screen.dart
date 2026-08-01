@@ -184,34 +184,26 @@ class _HomeScreenState extends State<HomeScreen> {
       const Text('MISSIONS',
           style: TextStyle(fontSize: 26, fontWeight: FontWeight.w900,
               color: AppColors.morandiText, letterSpacing: -0.65)),
-        const SizedBox(height: 16),
-        Expanded(
-          child: ListView(
-            clipBehavior: Clip.none,
-            children: [
-              Pressable(
-                onPressed: () => Di.router!.go('/study/vocab-scene'),
-                child: _buildMissionCard(
-                  title: 'Vocab\nLearning',
-                  subtitle: '${_profile?.totalWordsSeen ?? 0} words learned',
-                  color: AppColors.straw14,
-                  iconPath: 'assets/icon/study.png',
-                ),
-              ),
-              const SizedBox(height: 16),
-              Pressable(
-                onPressed: () => Di.router!.go('/study/dialogue-scene'),
-                child: _buildMissionCard(
-                  title: 'Dialogue\nPractice',
-                  subtitle: 'Pick a scene to practice',
-                  color: AppColors.baliHai30,
-                  iconPath: 'assets/icon/dialogue_learning.png',
-                ),
-              ),
-              const SizedBox(height: 48),
-            ],
-          ),
+      const SizedBox(height: 16),
+      Pressable(
+        onPressed: () => Di.router!.go('/study/vocab-scene'),
+        child: _buildMissionCard(
+          title: 'Vocab\nLearning',
+          subtitle: '${_profile?.totalWordsSeen ?? 0} words learned',
+          color: AppColors.straw14,
+          iconPath: 'assets/icon/study.png',
         ),
+      ),
+      const SizedBox(height: 16),
+      Pressable(
+        onPressed: () => Di.router!.go('/study/dialogue-scene'),
+        child: _buildMissionCard(
+          title: 'Dialogue\nPractice',
+          subtitle: 'Pick a scene to practice',
+          color: AppColors.baliHai30,
+          iconPath: 'assets/icon/dialogue_learning.png',
+        ),
+      ),
     ]);
   }
 

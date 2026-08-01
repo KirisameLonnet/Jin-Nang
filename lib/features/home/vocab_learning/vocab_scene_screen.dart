@@ -41,24 +41,41 @@ class _VocabSceneScreenState extends State<VocabSceneScreen> {
     return Scaffold(
       backgroundColor: AppColors.springWood14,
       body: AppSafeArea(
-        child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: AppSpacing.lg),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              const SizedBox(height: 48),
-              AppHeader(
-                title: 'Vocab Learning',
-                titleColor: AppColors.straw14,
-                onBack: () => context.go('/study'),
+        child: Stack(
+          children: [
+            // Scrollable scene cards (behind header)
+            Positioned.fill(
+              child: Padding(
+                padding: const EdgeInsets.fromLTRB(AppSpacing.lg, 176, AppSpacing.lg, 0),
+                child: _buildBody(context),
               ),
-              const SizedBox(height: 32),
-              const Text('Select a scene',
-                  style: TextStyle(fontSize: 20, fontWeight: FontWeight.w900, color: AppColors.morandiText)),
-              const SizedBox(height: 24),
-              Expanded(child: _buildBody(context)),
-            ],
-          ),
+            ),
+            // Fixed header (on top)
+            Positioned(
+              top: 0,
+              left: 0,
+              right: 0,
+              child: Container(
+                color: AppColors.springWood14,
+                padding: const EdgeInsets.symmetric(horizontal: AppSpacing.lg),
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    const SizedBox(height: 48),
+                    AppHeader(
+                      title: 'Vocab Learning',
+                      titleColor: AppColors.straw14,
+                      onBack: () => context.go('/study'),
+                    ),
+                    const SizedBox(height: 32),
+                    const Text('Select a scene',
+                        style: TextStyle(fontSize: 20, fontWeight: FontWeight.w900, color: AppColors.morandiText)),
+                  ],
+                ),
+              ),
+            ),
+          ],
         ),
       ),
     );
