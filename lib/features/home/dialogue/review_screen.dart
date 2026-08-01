@@ -32,21 +32,36 @@ class _ReviewScreenState extends State<ReviewScreen> {
       if (!mounted) return;
       final level = levels.firstWhere((l) => l.id == widget.levelId).enrichForLocal();
       final turns = <DialogueTurn>[];
-      for (final q in level.questions) {
-        turns.addAll(q.history);
-        // Add the waiter's current question as a turn
-        if (q.currentQuestion != null) {
-          turns.add(DialogueTurn(isWaiter: true, text: q.currentQuestion!));
+      final lastQ = level.questions.last;
+      // Role play: just use last question's complete dialogue
+      if (lastQ.type == QuestionType.rolePlay) {
+        turns.addAll(lastQ.history);
+        if (lastQ.currentQuestion != null) {
+          turns.add(DialogueTurn(isWaiter: true, text: lastQ.currentQuestion!));
         }
-        // Add the user's correct response if available
-        if (q.correctIndex >= 0 && q.correctIndex < q.options.length) {
-          final label = String.fromCharCode(65 + q.correctIndex);
+        if (lastQ.correctIndex >= 0 && lastQ.correctIndex < lastQ.options.length) {
+          final label = String.fromCharCode(65 + lastQ.correctIndex);
           turns.add(DialogueTurn(
             isWaiter: false,
-            text: q.options[q.correctIndex],
+            text: lastQ.options[lastQ.correctIndex],
             isCorrect: true,
-            optionLabel: '$label.${q.options[q.correctIndex]}',
+            optionLabel: '$label.${lastQ.options[lastQ.correctIndex]}',
           ));
+        }
+      } else {
+        for (final q in level.questions) {
+          if (q.currentQuestion != null) {
+            turns.add(DialogueTurn(isWaiter: true, text: q.currentQuestion!));
+          }
+          if (q.correctIndex >= 0 && q.correctIndex < q.options.length) {
+            final label = String.fromCharCode(65 + q.correctIndex);
+            turns.add(DialogueTurn(
+              isWaiter: false,
+              text: q.options[q.correctIndex],
+              isCorrect: true,
+              optionLabel: '$label.${q.options[q.correctIndex]}',
+            ));
+          }
         }
       }
       setState(() => _dialogue = turns);
@@ -204,9 +219,12 @@ class _ReviewScreenState extends State<ReviewScreen> {
               width: 40,
               height: 40,
               decoration: BoxDecoration(
-                color: AppColors.whisper15,
+                color: Color(0xFFD6C6F5),
                 shape: BoxShape.circle,
                 border: Border.all(color: AppColors.morandiText, width: 2),
+                boxShadow: const [
+                  BoxShadow(color: AppColors.morandiText, offset: Offset(4, 4), blurRadius: 0),
+                ],
               ),
               child: const Icon(Icons.person_outline, color: AppColors.morandiText, size: 22),
             ),
@@ -215,7 +233,7 @@ class _ReviewScreenState extends State<ReviewScreen> {
               child: Container(
                 padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
                 decoration: BoxDecoration(
-                  color: AppColors.whisper15,
+                  color: Color(0xFFD6C6F5),
                   borderRadius: const BorderRadius.only(
                     topLeft: Radius.circular(4),
                     topRight: Radius.circular(16),

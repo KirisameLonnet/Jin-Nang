@@ -271,7 +271,7 @@ class _ToolboxCardState extends State<ToolboxCard> {
       padding: const EdgeInsets.all(14),
       decoration: BoxDecoration(
         color: const Color(0xFFF2F1EC),
-        border: Border.all(color: AppColors.shark40.withValues(alpha: 0.15), width: 1.5),
+        border: Border.all(color: AppColors.shark40.withValues(alpha: 0.15), width: 3),
         borderRadius: BorderRadius.circular(12),
       ),
       child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
@@ -328,7 +328,7 @@ class _ToolboxCardState extends State<ToolboxCard> {
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
         color: Colors.white,
-        border: Border.all(color: AppColors.morandiText, width: 1.5),
+        border: Border.all(color: AppColors.morandiText, width: 3),
         borderRadius: BorderRadius.circular(20),
         boxShadow: const [BoxShadow(color: AppColors.morandiText, offset: Offset(4, 4), blurRadius: 0)],
       ),
@@ -354,7 +354,11 @@ class _ToolboxCardState extends State<ToolboxCard> {
   Widget _buildCategoryTag(String text, Color bgColor) {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
-      decoration: BoxDecoration(color: bgColor, borderRadius: BorderRadius.circular(8)),
+      decoration: BoxDecoration(
+        color: bgColor,
+        borderRadius: BorderRadius.circular(8),
+        border: Border.all(color: Colors.black, width: 2.0),
+      ),
       child: Text(text,
           style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w900, color: AppColors.morandiText)),
     );
@@ -384,7 +388,7 @@ class _ToolboxCardState extends State<ToolboxCard> {
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
         color: Colors.white,
-        border: Border.all(color: AppColors.morandiText, width: 1.5),
+        border: Border.all(color: AppColors.morandiText, width: 3),
         borderRadius: BorderRadius.circular(20),
         boxShadow: const [BoxShadow(color: AppColors.morandiText, offset: Offset(4, 4), blurRadius: 0)],
       ),

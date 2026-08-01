@@ -85,7 +85,7 @@ class Question {
   }
 
   /// Enrich with local fallback data when backend doesn't return new fields yet.
-  Question enrichForLocal({int levelNum = 1}) {
+  Question enrichForLocal({int levelNum = 1, int questionIndex = 0}) {
     // Only apply when backend hasn't set question_type (still default vocabularyMatch)
     if (type != QuestionType.vocabularyMatch) return this;
 
@@ -97,6 +97,7 @@ class Question {
           correctIndex: correctIndex, explanation: explanation,
           instruction: '请翻译中文词组含义',
           mainText: _extractMainWord(questionText),
+          audioUrl: 'audio/placeholder.mp3',
         );
       case 2: // 听力选择
         return Question(
@@ -105,6 +106,7 @@ class Question {
           correctIndex: correctIndex, explanation: explanation,
           instruction: '请播放拼音音频',
           phonetic: _extractMainWord(questionText),
+          audioUrl: 'audio/placeholder.mp3', // tappable mock
         );
       case 3: // 句子填空
         return Question(
@@ -115,7 +117,7 @@ class Question {
           mainText: questionText,
         );
       case 4: // 角色扮演
-        return _rolePlayMock();
+        return _rolePlayMock(questionIndex);
       default:
         return this;
     }
@@ -127,29 +129,59 @@ class Question {
     return match?.group(1);
   }
 
-  Question _rolePlayMock() {
-    const mockHistoryQ1 = [
-      DialogueTurn(isWaiter: true, text: '您好，欢迎光临！请坐。您想吃点什么？'),
-      DialogueTurn(isWaiter: false, text: '请给我菜单。', isCorrect: true, optionLabel: 'B.请给我菜单。'),
-      DialogueTurn(isWaiter: true, text: '好的，这是菜单。\n您想喝点什么？'),
-      DialogueTurn(isWaiter: false, text: '我想喝茶。', isCorrect: true, optionLabel: 'A.我想喝茶。'),
-      DialogueTurn(isWaiter: true, text: '好的，一杯茶。那您想吃什么菜？我们有鱼香肉丝、麻婆豆腐、炒青菜。'),
+  /// Create a standalone role-play stub question (when backend has too few questions).
+  static Question _rolePlayStub(int qIndex) {
+    const options = [
+      ['请给我菜单。', '我想喝水。', '有什么推荐吗？'],
+      ['我想喝茶。', '我要咖啡。', '来一杯水。'],
+      ['我要一份炒青菜和一碗米饭。', '我不吃了。', '有没有甜点？'],
+      ['不用了，谢谢。请结账吧。', '再来一份。', '打包带走。'],
     ];
-    const mockHistoryQ2 = [
-      ...mockHistoryQ1,
-      DialogueTurn(isWaiter: false, text: '我要一份炒青菜和一碗米饭。', isCorrect: true, optionLabel: 'A.我要一份炒青菜和一碗米饭。'),
-      DialogueTurn(isWaiter: true, text: '好的。请慢用。\n（上菜后）您吃好了吗？还需要加点什么吗？'),
+    const correctIndices = [0, 0, 0, 0];
+    final q = Question(
+      id: -(qIndex + 1), type: QuestionType.vocabularyMatch, // force enrichment
+      questionText: '角色扮演', options: options[qIndex],
+      correctIndex: correctIndices[qIndex],
+      explanation: '请根据餐厅场景选择最合适的回答。',
+    );
+    return q.enrichForLocal(levelNum: 4, questionIndex: qIndex);
+  }
+
+  Question _rolePlayMock(int qIndex) {
+    const waiterLines = [
+      '您好，欢迎光临！请坐。您想吃点什么？',
+      '好的，这是菜单。您想喝点什么？',
+      '好的，一杯茶。那您想吃什么菜？我们有鱼香肉丝、麻婆豆腐、炒青菜。',
+      '好的。请慢用。\n（上菜后）您吃好了吗？还需要加点什么吗？',
     ];
-    final isQ1 = (id % 2 == 1);
+    const userAnswers = [
+      '请给我菜单。',
+      '我想喝茶。',
+      '我要一份炒青菜和一碗米饭。',
+      '不用了，谢谢。请结账吧。',
+    ];
+    // Distinct mock options per question (override backend data)
+    const mockOptions = [
+      ['请给我菜单。', '我想喝水。', '有什么推荐？'],
+      ['我想喝茶。', '我要咖啡。', '来一杯水。'],
+      ['我要一份炒青菜和一碗米饭。', '我不吃了，谢谢。', '有没有甜点？'],
+      ['不用了，谢谢。请结账吧。', '再来一份米饭。', '打包带走可以吗？'],
+    ];
+    // Build history: all previous turns
+    final history = <DialogueTurn>[];
+    for (var i = 0; i < qIndex; i++) {
+      history.add(DialogueTurn(isWaiter: true, text: waiterLines[i]));
+      history.add(DialogueTurn(isWaiter: false, text: userAnswers[i], isCorrect: true, optionLabel: '${String.fromCharCode(65)}.${userAnswers[i]}'));
+    }
     return Question(
       id: id, type: QuestionType.rolePlay,
-      questionText: questionText, options: options,
-      correctIndex: correctIndex, explanation: explanation,
+      questionText: '角色扮演',
+      options: mockOptions[qIndex],
+      correctIndex: 0,
+      explanation: '请根据餐厅场景选择最合适的回答。',
       instruction: '角色扮演：针对服务员的对话作答',
-      currentQuestion: isQ1
-          ? '好的，一杯茶。那您想吃点什么菜？我们有鱼香肉丝、麻婆豆腐、炒青菜。'
-          : '您吃好了吗？还需要加点什么吗？',
-      history: isQ1 ? mockHistoryQ1 : mockHistoryQ2,
+      currentQuestion: waiterLines[qIndex],
+      history: history,
     );
   }
 }
@@ -227,7 +259,19 @@ class Level {
       passThreshold: passThreshold,
       stars: stars, bestScore: bestScore,
       isUnlocked: isUnlocked,
-      questions: questions.map((q) => q.enrichForLocal(levelNum: levelNum)).toList(),
+      questions: (() {
+        final enriched = <Question>[];
+        for (var i = 0; i < questions.length; i++) {
+          enriched.add(questions[i].enrichForLocal(levelNum: levelNum, questionIndex: i));
+        }
+        // Level 4: pad to at least 4 questions if backend hasn't provided enough
+        if (levelNum == 4) {
+          while (enriched.length < 4) {
+            enriched.add(Question._rolePlayStub(enriched.length));
+          }
+        }
+        return enriched;
+      })(),
       pointsReward: newPts, description: newDesc,
     );
   }

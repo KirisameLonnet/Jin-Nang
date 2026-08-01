@@ -29,6 +29,7 @@ class _LevelScreenState extends State<LevelScreen> {
   bool _isCorrect = false;
   int _correctCount = 0;
   bool _showResult = false;
+  final ScrollController _chatScroll = ScrollController();
 
   @override
   void initState() {
@@ -65,6 +66,15 @@ class _LevelScreenState extends State<LevelScreen> {
       _isCorrect = correct;
       if (correct) _correctCount++;
     });
+    // Auto-scroll chat to bottom
+    if (_currentQ.type == QuestionType.rolePlay) {
+      Future.delayed(const Duration(milliseconds: 100), () {
+        if (_chatScroll.hasClients) {
+          _chatScroll.animateTo(_chatScroll.position.maxScrollExtent,
+              duration: const Duration(milliseconds: 200), curve: Curves.easeOut);
+        }
+      });
+    }
   }
 
   void _nextQuestion() {
@@ -79,6 +89,15 @@ class _LevelScreenState extends State<LevelScreen> {
         _hasSubmitted = false;
         _isCorrect = false;
       });
+      // Auto-scroll chat on next question
+      if (_currentQ.type == QuestionType.rolePlay) {
+        Future.delayed(const Duration(milliseconds: 100), () {
+          if (_chatScroll.hasClients) {
+            _chatScroll.animateTo(_chatScroll.position.maxScrollExtent,
+                duration: const Duration(milliseconds: 200), curve: Curves.easeOut);
+          }
+        });
+      }
     }
   }
 
@@ -94,6 +113,12 @@ class _LevelScreenState extends State<LevelScreen> {
       _correctCount = 0;
       _showResult = false;
     });
+  }
+
+  @override
+  void dispose() {
+    _chatScroll.dispose();
+    super.dispose();
   }
 
   void _goBack() {
@@ -255,22 +280,20 @@ class _LevelScreenState extends State<LevelScreen> {
   Widget _buildQuestionCard() {
     final q = _currentQ;
 
-    // Role play: two cards (history + current)
+    // Role play: chat window + options outside
     if (q.type == QuestionType.rolePlay) {
       return Column(
         children: [
-          if (q.history.isNotEmpty) _buildHistoryCard(),
+          _buildChatWindow(),
           const SizedBox(height: 16),
-          _buildCurrentQuestionCard(q),
-          const SizedBox(height: 24),
           ...List.generate(q.options.length, (i) {
             return Padding(
-              padding: const EdgeInsets.only(bottom: 12),
+              padding: const EdgeInsets.only(bottom: 10),
               child: _buildOptionButton(i),
             );
           }),
           if (_hasSubmitted) ...[
-            const SizedBox(height: 12),
+            const SizedBox(height: 10),
             _buildFeedbackCard(),
           ],
           const SizedBox(height: 48),
@@ -375,11 +398,12 @@ class _LevelScreenState extends State<LevelScreen> {
   Widget _buildListeningArea(Question q) {
     return Column(
       children: [
-        if (q.audioUrl != null)
-          Pressable(
-            onPressed: () => _playAudio(q.audioUrl!),
+        const SizedBox(height: 8),
+        Center(
+          child: Pressable(
+            onPressed: q.audioUrl != null ? () => _playAudio(q.audioUrl!) : null,
             child: Container(
-              width: 80, height: 80,
+              width: 88, height: 88,
               decoration: BoxDecoration(
                 color: AppColors.baliHai30,
                 shape: BoxShape.circle,
@@ -388,28 +412,27 @@ class _LevelScreenState extends State<LevelScreen> {
                   BoxShadow(color: AppColors.morandiText, offset: Offset(4, 4), blurRadius: 0),
                 ],
               ),
-              child: const Icon(Icons.volume_up, color: AppColors.morandiText, size: 36),
+              child: const Icon(Icons.volume_up, color: AppColors.morandiText, size: 40),
             ),
           ),
-        const SizedBox(height: 12),
-        if (q.audioUrl != null)
-          const Text('请播放拼音音频',
+        ),
+        const SizedBox(height: 16),
+        const Center(
+          child: Text('请播放拼音音频',
               style: TextStyle(fontSize: 13, color: Colors.black54, fontWeight: FontWeight.w600)),
-        const SizedBox(height: 4),
-        if (q.phonetic != null)
-          Text(q.phonetic!,
+        ),
+        const SizedBox(height: 6),
+        Center(
+          child: Text(q.phonetic ?? '',
               style: const TextStyle(fontSize: 20, fontWeight: FontWeight.w900, color: AppColors.morandiText)),
-        if (q.instruction != null) ...[
-          const SizedBox(height: 8),
-          Text(q.instruction!,
-              style: const TextStyle(fontSize: 13, color: Colors.black54, fontWeight: FontWeight.w600)),
-        ],
+        ),
       ],
     );
   }
 
   Widget _buildBlankFillingArea(Question q) {
-    final text = q.mainText ?? q.questionText;
+    String text = q.mainText ?? q.questionText;
+    text = text.replaceAll(r'\n', '\n');
     final parts = text.split('____');
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -522,7 +545,7 @@ class _LevelScreenState extends State<LevelScreen> {
             ? AppColors.quizCorrect.withValues(alpha: 0.08)
             : AppColors.quizError.withValues(alpha: 0.08),
         borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: AppColors.shark40.withValues(alpha: 0.15), width: 1.5),
+        border: Border.all(color: AppColors.shark40.withValues(alpha: 0.15), width: 3),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -613,59 +636,47 @@ class _LevelScreenState extends State<LevelScreen> {
 
   // ── Role Play helpers ────────────────────────────────────
 
-  Widget _buildHistoryCard() {
-    return Container(
-      width: double.infinity,
-      padding: const EdgeInsets.all(16),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(24),
-        border: Border.all(color: AppColors.morandiText, width: 3),
-        boxShadow: const [
-          BoxShadow(color: AppColors.morandiText, offset: Offset(4, 4), blurRadius: 0),
-        ],
-      ),
-      child: Column(
-        children: _currentQ.history.map((turn) => _buildChatTurn(turn)).toList(),
-      ),
-    );
-  }
+  // ── Role Play: chat window (fixed 195px, scrollable, auto-scroll on submit) ──
 
-  Widget _buildCurrentQuestionCard(Question q) {
+  Widget _buildChatWindow() {
+    final q = _currentQ;
+    // Assemble all visible turns: history + current waiter question + user response (if submitted)
+    final turns = <DialogueTurn>[...q.history];
+    turns.add(DialogueTurn(isWaiter: true, text: q.currentQuestion ?? q.questionText));
+    if (_hasSubmitted && _selectedOption != null) {
+      final label = String.fromCharCode(65 + _selectedOption!);
+      turns.add(DialogueTurn(
+        isWaiter: false,
+        text: q.options[_selectedOption!],
+        isCorrect: _isCorrect,
+        optionLabel: '$label.${q.options[_selectedOption!]}',
+      ));
+    }
+
     return Container(
-      width: double.infinity,
-      padding: const EdgeInsets.all(24),
+      height: 195,
       decoration: BoxDecoration(
         color: Colors.white,
-        borderRadius: BorderRadius.circular(24),
+        borderRadius: BorderRadius.circular(20),
         border: Border.all(color: AppColors.morandiText, width: 3),
         boxShadow: const [
           BoxShadow(color: AppColors.morandiText, offset: Offset(4, 4), blurRadius: 0),
         ],
       ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          _buildRolePlayArea(q),
-          const SizedBox(height: 16),
-          const DashedDivider(color: AppColors.mercury25),
-        ],
+      child: ClipRRect(
+        borderRadius: BorderRadius.circular(17),
+        child: ListView(
+          controller: _chatScroll,
+          padding: const EdgeInsets.all(14),
+          children: turns.map((t) => _buildChatTurn(t)).toList(),
+        ),
       ),
     );
   }
 
   Widget _buildRolePlayArea(Question q) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        if (q.instruction != null)
-          Text(q.instruction!,
-              style: const TextStyle(fontSize: 14, color: Colors.black54, fontWeight: FontWeight.w600)),
-        if (q.instruction != null) const SizedBox(height: 10),
-        Text(q.currentQuestion ?? q.questionText,
-            style: const TextStyle(fontSize: 22, fontWeight: FontWeight.w900, color: AppColors.morandiText, height: 1.4)),
-      ],
-    );
+    // Not used separately anymore — handled by _buildChatWindow
+    return const SizedBox.shrink();
   }
 
   Widget _buildChatTurn(DialogueTurn turn) {
@@ -678,9 +689,12 @@ class _LevelScreenState extends State<LevelScreen> {
             Container(
               width: 36, height: 36,
               decoration: BoxDecoration(
-                color: AppColors.whisper15,
+                color: const Color(0xFFD6C6F5),
                 shape: BoxShape.circle,
                 border: Border.all(color: AppColors.morandiText, width: 2),
+                boxShadow: const [
+                  BoxShadow(color: AppColors.morandiText, offset: Offset(4, 4), blurRadius: 0),
+                ],
               ),
               child: const Icon(Icons.person_outline, color: AppColors.morandiText, size: 20),
             ),
@@ -689,7 +703,7 @@ class _LevelScreenState extends State<LevelScreen> {
               child: Container(
                 padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
                 decoration: BoxDecoration(
-                  color: AppColors.whisper15,
+                  color: const Color(0xFFD6C6F5),
                   borderRadius: const BorderRadius.only(
                     topLeft: Radius.circular(4),
                     topRight: Radius.circular(16),
@@ -746,6 +760,19 @@ class _LevelScreenState extends State<LevelScreen> {
                     SizedBox(width: 4),
                     Text('CORRECT',
                         style: TextStyle(fontSize: 12, fontWeight: FontWeight.w900, color: AppColors.quizCorrect)),
+                  ],
+                ),
+              )
+            else if (turn.isCorrect == false)
+              Padding(
+                padding: const EdgeInsets.only(top: 4, right: 4),
+                child: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: const [
+                    Icon(Icons.close, size: 13, color: AppColors.quizError),
+                    SizedBox(width: 4),
+                    Text('INCORRECT',
+                        style: TextStyle(fontSize: 12, fontWeight: FontWeight.w900, color: AppColors.quizError)),
                   ],
                 ),
               ),

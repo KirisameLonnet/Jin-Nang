@@ -124,7 +124,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
       padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
       decoration: BoxDecoration(
         color: AppColors.straw14,
-        border: Border.all(color: AppColors.morandiText, width: 1.5),
+        border: Border.all(color: AppColors.morandiText, width: 3),
         borderRadius: BorderRadius.circular(8),
       ),
       child: Text('$rank Rank',

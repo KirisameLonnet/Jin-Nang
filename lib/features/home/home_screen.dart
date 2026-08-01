@@ -172,7 +172,7 @@ class _HomeScreenState extends State<HomeScreen> {
       padding: const EdgeInsets.all(6),
       decoration: BoxDecoration(
         color: Colors.white,
-        border: Border.all(color: AppColors.morandiText, width: 1.5),
+        border: Border.all(color: AppColors.morandiText, width: 3),
         borderRadius: BorderRadius.circular(999),
       ),
       child: Image.asset(assetPath),
@@ -199,7 +199,7 @@ class _HomeScreenState extends State<HomeScreen> {
         onPressed: () => Di.router!.go('/study/dialogue-scene'),
         child: _buildMissionCard(
           title: 'Dialogue\nPractice',
-          subtitle: 'Pick a scene to practice',
+          subtitle: '10 mins',
           color: AppColors.baliHai30,
           iconPath: 'assets/icon/dialogue_learning.png',
         ),
