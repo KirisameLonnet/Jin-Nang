@@ -830,16 +830,17 @@ class _LevelScreenState extends State<LevelScreen> {
                         child: Column(
                           mainAxisSize: MainAxisSize.min,
                           children: [
+                            const SizedBox(height: 12),
                             Row(
                               mainAxisAlignment: MainAxisAlignment.center,
                               children: List.generate(3, (i) {
                                 return Padding(
-                                  padding: const EdgeInsets.symmetric(horizontal: 4),
+                                  padding: const EdgeInsets.symmetric(horizontal: 6),
                                   child: _buildSummaryStar(filled: i < starCount),
                                 );
                               }),
                             ),
-                            const SizedBox(height: 24),
+                            const SizedBox(height: 10),
                             const Text('得分 SCORE',
                                 style: TextStyle(fontSize: 13, color: Colors.black54, fontWeight: FontWeight.w700, letterSpacing: 0.5)),
                             const SizedBox(height: 6),
@@ -963,12 +964,64 @@ class _LevelScreenState extends State<LevelScreen> {
   }
 
   Widget _buildSummaryStar({required bool filled}) {
-    return Stack(
-      alignment: Alignment.center,
-      children: [
-        Icon(Icons.star, size: 42, color: AppColors.morandiText),
-        Icon(Icons.star, size: 34, color: filled ? AppColors.straw14 : AppColors.mercury25),
-      ],
+    return SizedBox(
+      width: 52,
+      height: 52,
+      child: CustomPaint(
+        painter: _StarPainter(
+          fillColor: filled ? AppColors.straw14 : AppColors.mercury25,
+          borderColor: AppColors.morandiText,
+          borderWidth: 3.5,
+        ),
+      ),
     );
   }
+}
+
+class _StarPainter extends CustomPainter {
+  final Color fillColor;
+  final Color borderColor;
+  final double borderWidth;
+
+  _StarPainter({required this.fillColor, required this.borderColor, required this.borderWidth});
+
+  @override
+  void paint(Canvas canvas, Size size) {
+    final path = _starPath(size);
+    // Fill
+    canvas.drawPath(path, Paint()..color = fillColor..style = PaintingStyle.fill);
+    // Border
+    canvas.drawPath(path, Paint()
+      ..color = borderColor
+      ..style = PaintingStyle.stroke
+      ..strokeWidth = borderWidth
+      ..strokeJoin = StrokeJoin.round
+      ..strokeCap = StrokeCap.round);
+  }
+
+  Path _starPath(Size size) {
+    final cx = size.width / 2;
+    final cy = size.height / 2;
+    final outerR = size.width / 2 - borderWidth / 2;
+    final innerR = outerR * 0.4;
+    const points = 5;
+    final path = Path();
+    for (int i = 0; i < points * 2; i++) {
+      final angle = -pi / 2 + i * pi / points;
+      final r = i.isEven ? outerR : innerR;
+      final x = cx + r * cos(angle);
+      final y = cy + r * sin(angle);
+      if (i == 0) {
+        path.moveTo(x, y);
+      } else {
+        path.lineTo(x, y);
+      }
+    }
+    path.close();
+    return path;
+  }
+
+  @override
+  bool shouldRepaint(covariant _StarPainter old) =>
+      fillColor != old.fillColor || borderColor != old.borderColor || borderWidth != old.borderWidth;
 }
