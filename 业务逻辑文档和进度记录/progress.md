@@ -20,8 +20,10 @@
 - 生产 D1 已应用 0001→0006，迁移前 Time Travel 恢复书签已记录。
 - Worker 已部署到 `jntest.lonnet.uk`（版本 `113a6e0f-2ec1-449b-be5d-fcaa73bb2db2`）。
 - 线上冒烟验证通过：健康检查、CORS、鉴权、3 个场景、4 章/19 条短语及 5/4/3/4 题；临时测试账号已清理。
-- Flutter Web Release 已部署到 Cloudflare Pages：`https://jin-nang.pages.dev`。
-- Web 品牌信息、SPA 子路由回退和 Chrome 业务音频播放兼容已完成。
+- Flutter Web Release 已部署到 Git 原生 Cloudflare Pages 项目 `jin-nang-web`。
+- GitHub `master` 推送后由 Cloudflare Pages 自动执行 `scripts/build_web_cf_pages.sh` 并发布，首次自动构建验证成功。
+- Web 生产域名 `https://jn.lonnet.uk` 已生效；DNS、HTTPS、首页、PWA 静态资源、SPA 子路由回退和真实 Chrome 渲染验证通过。
+- Web 品牌信息和 Chrome 业务音频播放兼容已完成。
 
 ## 当前阶段剩余外部事项
 
