@@ -4,7 +4,7 @@ Developed by SHUers. 面向中文学习者的跨平台移动应用，基于 Flut
 
 后端部署于 Cloudflare Workers，API 地址：`https://jntest.lonnet.uk`
 
-在线 Web Demo：`https://jin-nang.pages.dev`
+在线 Web Demo：`https://jn.lonnet.uk`
 
 ---
 
@@ -53,7 +53,7 @@ flutter build apk --release  # 发布包
 
 ### Web / Cloudflare Pages
 
-线上地址：`https://jn.lonnet.uk`（Pages 默认域名：`https://jin-nang.pages.dev`）。
+线上地址：`https://jn.lonnet.uk`（Pages 默认域名：`https://jin-nang-web.pages.dev`）。
 
 Cloudflare Pages 已连接 GitHub `master` 分支。每次推送后自动执行：
 
@@ -73,11 +73,12 @@ flutter build web --release \
 
 cd backend
 npx wrangler pages deploy ../build/web \
-  --project-name=jin-nang \
+  --project-name=jin-nang-web \
   --branch=master
 ```
 
-Cloudflare Pages 项目名为 `jin-nang`。`web/_redirects` 提供单页应用子路由回退。
+Cloudflare Pages Git 项目名为 `jin-nang-web`。`web/_redirects` 提供单页应用子路由回退。
+旧的 Direct Upload 项目 `jin-nang` 保留为手动回退部署。
 
 ### iOS 真机
 
