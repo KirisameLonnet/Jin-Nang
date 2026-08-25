@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:audioplayers/audioplayers.dart';
+import '../../core/di.dart';
 import '../../core/models/phrase.dart';
 import '../../theme/app_colors.dart';
 import '../../theme/app_spacing.dart';
@@ -11,12 +13,14 @@ import '../../widgets/dashed_divider.dart';
 import '../../widgets/pressable.dart';
 
 class ToolboxChapterScreen extends StatefulWidget {
-  final Topic topic;
+  final int sceneId;
+  final Topic? initialTopic;
   final int initialChapter;
 
   const ToolboxChapterScreen({
     super.key,
-    required this.topic,
+    required this.sceneId,
+    this.initialTopic,
     this.initialChapter = 0,
   });
 
@@ -25,28 +29,59 @@ class ToolboxChapterScreen extends StatefulWidget {
 }
 
 class _ToolboxChapterScreenState extends State<ToolboxChapterScreen> {
-  late final PageController _pageController;
+  PageController? _pageController;
   late int _currentIndex;
   bool _sliderExpanded = false;
+  Topic? _topic;
+  String? _error;
+  final AudioPlayer _audioPlayer = AudioPlayer();
 
-  List<Chapter> get _chapters => widget.topic.chapters;
+  List<Chapter> get _chapters => _topic?.chapters ?? const [];
 
   @override
   void initState() {
     super.initState();
-    _currentIndex = widget.initialChapter.clamp(0, _chapters.length - 1);
+    _currentIndex = widget.initialChapter;
+    final initialTopic = widget.initialTopic;
+    if (initialTopic != null) {
+      _setTopic(initialTopic);
+    } else {
+      _loadTopic();
+    }
+  }
+
+  void _setTopic(Topic topic) {
+    _topic = topic;
+    _currentIndex = topic.chapters.isEmpty
+        ? 0
+        : widget.initialChapter.clamp(0, topic.chapters.length - 1);
     _pageController = PageController(initialPage: _currentIndex);
+  }
+
+  Future<void> _loadTopic() async {
+    try {
+      final topic = await Di.api.getScenePhrases(widget.sceneId);
+      if (!mounted) return;
+      setState(() {
+        _setTopic(topic);
+        _error = null;
+      });
+    } catch (error) {
+      if (!mounted) return;
+      setState(() => _error = error.toString());
+    }
   }
 
   @override
   void dispose() {
-    _pageController.dispose();
+    _pageController?.dispose();
+    _audioPlayer.dispose();
     super.dispose();
   }
 
   void _goToPage(int index) {
     if (index < 0 || index >= _chapters.length) return;
-    _pageController.animateToPage(
+    _pageController?.animateToPage(
       index,
       duration: const Duration(milliseconds: 300),
       curve: Curves.easeInOut,
@@ -55,6 +90,40 @@ class _ToolboxChapterScreenState extends State<ToolboxChapterScreen> {
 
   @override
   Widget build(BuildContext context) {
+    if (_topic == null) {
+      return Scaffold(
+        backgroundColor: AppColors.springWood14,
+        body: AppSafeArea(
+          child: Center(
+            child: _error == null
+                ? const CircularProgressIndicator()
+                : Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Padding(
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: AppSpacing.lg,
+                        ),
+                        child: Text(
+                          _error!,
+                          textAlign: TextAlign.center,
+                          style: const TextStyle(
+                            fontWeight: FontWeight.w700,
+                            color: AppColors.semanticRed,
+                          ),
+                        ),
+                      ),
+                      const SizedBox(height: AppSpacing.md),
+                      Pressable(
+                        onPressed: _loadTopic,
+                        child: const Text('Retry'),
+                      ),
+                    ],
+                  ),
+          ),
+        ),
+      );
+    }
     return Scaffold(
       backgroundColor: AppColors.springWood14,
       body: AppSafeArea(
@@ -77,11 +146,7 @@ class _ToolboxChapterScreenState extends State<ToolboxChapterScreen> {
                         bottom: 0,
                         child: _buildChapterSlider(),
                       ),
-                      Positioned(
-                        left: 0,
-                        top: 2,
-                        child: _buildBackButton(),
-                      ),
+                      Positioned(left: 0, top: 2, child: _buildBackButton()),
                     ],
                   ),
                 ),
@@ -139,7 +204,9 @@ class _ToolboxChapterScreenState extends State<ToolboxChapterScreen> {
                   final chapter = _chapters[pageIndex];
                   return ListView.separated(
                     clipBehavior: Clip.none,
-                    padding: const EdgeInsets.symmetric(horizontal: AppSpacing.lg),
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: AppSpacing.lg,
+                    ),
                     itemCount: chapter.phrases.length,
                     separatorBuilder: (_, _) => const SizedBox(height: 14),
                     itemBuilder: (context, i) {
@@ -192,9 +259,9 @@ class _ToolboxChapterScreenState extends State<ToolboxChapterScreen> {
                             Padding(
                               padding: const EdgeInsets.only(top: 4),
                               child: AudioButton(
-                                onTap: () {
-                                  // TODO: 接入音频播放
-                                },
+                                onTap: p.audioUrl == null
+                                    ? null
+                                    : () => _playAudio(p.audioUrl!),
                               ),
                             ),
                           ],
@@ -213,7 +280,9 @@ class _ToolboxChapterScreenState extends State<ToolboxChapterScreen> {
                 children: [
                   Expanded(
                     child: Pressable(
-                      onPressed: _currentIndex > 0 ? () => _goToPage(_currentIndex - 1) : null,
+                      onPressed: _currentIndex > 0
+                          ? () => _goToPage(_currentIndex - 1)
+                          : null,
                       child: AppCard(
                         color: Colors.white,
                         borderRadius: 16,
@@ -224,7 +293,9 @@ class _ToolboxChapterScreenState extends State<ToolboxChapterScreen> {
                             Icon(
                               Icons.arrow_back,
                               size: 20,
-                              color: _currentIndex > 0 ? AppColors.morandiText : AppColors.mercury25,
+                              color: _currentIndex > 0
+                                  ? AppColors.morandiText
+                                  : AppColors.mercury25,
                             ),
                             const SizedBox(width: 6),
                             Text(
@@ -232,7 +303,9 @@ class _ToolboxChapterScreenState extends State<ToolboxChapterScreen> {
                               style: TextStyle(
                                 fontSize: 17,
                                 fontWeight: FontWeight.w900,
-                                color: _currentIndex > 0 ? AppColors.morandiText : AppColors.mercury25,
+                                color: _currentIndex > 0
+                                    ? AppColors.morandiText
+                                    : AppColors.mercury25,
                               ),
                             ),
                           ],
@@ -247,27 +320,41 @@ class _ToolboxChapterScreenState extends State<ToolboxChapterScreen> {
                         if (_currentIndex < _chapters.length - 1) {
                           _goToPage(_currentIndex + 1);
                         } else {
-                          if (Navigator.of(context).canPop()) { context.pop(); } else { context.go('/toolbox'); }
+                          if (Navigator.of(context).canPop()) {
+                            context.pop();
+                          } else {
+                            context.go('/toolbox');
+                          }
                         }
                       },
                       child: AppCard(
-                        color: _currentIndex < _chapters.length - 1 ? AppColors.straw14 : AppColors.baliHai30,
+                        color: _currentIndex < _chapters.length - 1
+                            ? AppColors.straw14
+                            : AppColors.baliHai30,
                         borderRadius: 16,
                         padding: const EdgeInsets.symmetric(vertical: 16),
                         child: Row(
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: [
                             Text(
-                              _currentIndex < _chapters.length - 1 ? 'Next' : 'Finish',
+                              _currentIndex < _chapters.length - 1
+                                  ? 'Next'
+                                  : 'Finish',
                               style: TextStyle(
                                 fontSize: 17,
                                 fontWeight: FontWeight.w900,
-                                color: _currentIndex < _chapters.length - 1 ? AppColors.morandiText : Colors.white,
+                                color: _currentIndex < _chapters.length - 1
+                                    ? AppColors.morandiText
+                                    : Colors.white,
                               ),
                             ),
                             if (_currentIndex < _chapters.length - 1) ...[
                               const SizedBox(width: 6),
-                              const Icon(Icons.arrow_forward, size: 20, color: AppColors.morandiText),
+                              const Icon(
+                                Icons.arrow_forward,
+                                size: 20,
+                                color: AppColors.morandiText,
+                              ),
                             ],
                           ],
                         ),
@@ -282,6 +369,16 @@ class _ToolboxChapterScreenState extends State<ToolboxChapterScreen> {
         ),
       ),
     );
+  }
+
+  Future<void> _playAudio(String url) async {
+    try {
+      final file = await Di.audioCache.getSingleFile(url);
+      await _audioPlayer.stop();
+      await _audioPlayer.play(DeviceFileSource(file.path));
+    } catch (error) {
+      debugPrint('[Audio] Error playing $url: $error');
+    }
   }
 
   Widget _buildBackButton() {
@@ -346,7 +443,9 @@ class _ToolboxChapterScreenState extends State<ToolboxChapterScreen> {
                   style: TextStyle(
                     fontSize: 15,
                     fontWeight: FontWeight.w900,
-                    color: isActive ? AppColors.morandiText : AppColors.naturalGray19,
+                    color: isActive
+                        ? AppColors.morandiText
+                        : AppColors.naturalGray19,
                   ),
                 ),
               ),

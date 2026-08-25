@@ -12,7 +12,12 @@ class DialoguePracticeScreen extends StatefulWidget {
   final int sceneId;
   final String sceneName;
   final String sceneNameZh;
-  const DialoguePracticeScreen({super.key, required this.sceneId, this.sceneName = 'Scene', this.sceneNameZh = '场景'});
+  const DialoguePracticeScreen({
+    super.key,
+    required this.sceneId,
+    this.sceneName = 'Scene',
+    this.sceneNameZh = '场景',
+  });
 
   @override
   State<DialoguePracticeScreen> createState() => _DialoguePracticeScreenState();
@@ -31,9 +36,8 @@ class _DialoguePracticeScreenState extends State<DialoguePracticeScreen> {
 
   Future<void> _loadLevels() async {
     try {
-      final raw = await Di.api.getSceneLevels(widget.sceneId);
+      final levels = await Di.api.getSceneLevels(widget.sceneId);
       if (!mounted) return;
-      final levels = raw.map((l) => l.enrichForLocal()).toList();
       setState(() {
         _levels = levels;
         _totalPts = levels.fold(0, (sum, l) => sum + l.pointsReward);
@@ -61,9 +65,7 @@ class _DialoguePracticeScreenState extends State<DialoguePracticeScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: AppColors.springWood14,
-      body: AppSafeArea(
-        child: _buildBody(),
-      ),
+      body: AppSafeArea(child: _buildBody()),
     );
   }
 
@@ -81,9 +83,15 @@ class _DialoguePracticeScreenState extends State<DialoguePracticeScreen> {
           if (_error != null)
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: AppSpacing.lg),
-              child: Text(_error!,
-                  textAlign: TextAlign.center,
-                  style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w700, color: AppColors.semanticRed)),
+              child: Text(
+                _error!,
+                textAlign: TextAlign.center,
+                style: const TextStyle(
+                  fontSize: 14,
+                  fontWeight: FontWeight.w700,
+                  color: AppColors.semanticRed,
+                ),
+              ),
             )
           else
             const CircularProgressIndicator(),
@@ -102,10 +110,12 @@ class _DialoguePracticeScreenState extends State<DialoguePracticeScreen> {
           child: ListView(
             padding: const EdgeInsets.symmetric(horizontal: AppSpacing.lg),
             children: [
-              ..._levels!.map((l) => Padding(
-                    padding: const EdgeInsets.only(bottom: 16),
-                    child: _buildLevelCard(l),
-                  )),
+              ..._levels!.map(
+                (l) => Padding(
+                  padding: const EdgeInsets.only(bottom: 16),
+                  child: _buildLevelCard(l),
+                ),
+              ),
               const SizedBox(height: 48),
             ],
           ),
@@ -131,7 +141,9 @@ class _DialoguePracticeScreenState extends State<DialoguePracticeScreen> {
     final locked = !level.isUnlocked;
     final done = level.stars > 0;
     final totalQ = level.questions.length;
-    final hasRolePlay = level.questions.any((q) => q.type == QuestionType.rolePlay);
+    final hasRolePlay = level.questions.any(
+      (q) => q.type == QuestionType.rolePlay,
+    );
 
     return Opacity(
       opacity: locked ? 0.65 : 1.0,
@@ -141,7 +153,11 @@ class _DialoguePracticeScreenState extends State<DialoguePracticeScreen> {
           borderRadius: BorderRadius.circular(24),
           border: Border.all(color: AppColors.morandiText, width: 3),
           boxShadow: const [
-            BoxShadow(color: AppColors.morandiText, offset: Offset(4, 4), blurRadius: 0),
+            BoxShadow(
+              color: AppColors.morandiText,
+              offset: Offset(4, 4),
+              blurRadius: 0,
+            ),
           ],
         ),
         child: Column(
@@ -164,13 +180,24 @@ class _DialoguePracticeScreenState extends State<DialoguePracticeScreen> {
                         width: 26,
                         height: 40,
                         decoration: BoxDecoration(
-                          color: locked ? AppColors.mercury25 : AppColors.baliHai30,
+                          color: locked
+                              ? AppColors.mercury25
+                              : AppColors.baliHai30,
                           borderRadius: BorderRadius.circular(12),
-                          border: Border.all(color: AppColors.morandiText, width: 2),
+                          border: Border.all(
+                            color: AppColors.morandiText,
+                            width: 2,
+                          ),
                         ),
                         child: Center(
-                          child: Text('${level.levelNum}',
-                              style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w900, color: AppColors.morandiText)),
+                          child: Text(
+                            '${level.levelNum}',
+                            style: const TextStyle(
+                              fontSize: 16,
+                              fontWeight: FontWeight.w900,
+                              color: AppColors.morandiText,
+                            ),
+                          ),
                         ),
                       ),
                       const SizedBox(width: 12),
@@ -180,49 +207,116 @@ class _DialoguePracticeScreenState extends State<DialoguePracticeScreen> {
                             Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
-                                Text('第 ${level.levelNum} 关：${_levelTitle(level)}',
-                                    maxLines: 1, overflow: TextOverflow.ellipsis,
-                                    style: const TextStyle(fontSize: 18, fontWeight: FontWeight.w900, color: AppColors.morandiText)),
+                                Text(
+                                  '第 ${level.levelNum} 关：${_levelTitle(level)}',
+                                  maxLines: 1,
+                                  overflow: TextOverflow.ellipsis,
+                                  style: const TextStyle(
+                                    fontSize: 18,
+                                    fontWeight: FontWeight.w900,
+                                    color: AppColors.morandiText,
+                                  ),
+                                ),
                                 const SizedBox(height: 2),
-                                Text(_levelSubtitle(level),
-                                    maxLines: 1, overflow: TextOverflow.ellipsis,
-                                    style: const TextStyle(fontSize: 18, fontWeight: FontWeight.w900, color: AppColors.morandiText)),
+                                Text(
+                                  _levelSubtitle(level),
+                                  maxLines: 1,
+                                  overflow: TextOverflow.ellipsis,
+                                  style: const TextStyle(
+                                    fontSize: 18,
+                                    fontWeight: FontWeight.w900,
+                                    color: AppColors.morandiText,
+                                  ),
+                                ),
                               ],
                             ),
                             if (done)
-                              Positioned(top: 0, right: 0, child: _buildStatusBadge('已通关', Icons.check_circle, AppColors.oldRose15))
+                              Positioned(
+                                top: 0,
+                                right: 0,
+                                child: _buildStatusBadge(
+                                  '已通关',
+                                  Icons.check_circle,
+                                  AppColors.oldRose15,
+                                ),
+                              )
                             else if (locked)
-                              Positioned(top: 0, right: 0, child: _buildStatusBadge('未解锁', Icons.lock, AppColors.mercury25)),
+                              Positioned(
+                                top: 0,
+                                right: 0,
+                                child: _buildStatusBadge(
+                                  '未解锁',
+                                  Icons.lock,
+                                  AppColors.mercury25,
+                                ),
+                              ),
                           ],
                         ),
                       ),
                     ],
                   ),
                   const SizedBox(height: 10),
-                  Text(_levelDescription(level),
-                      style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w700,color: Colors.black54, height: 1.4)),
+                  Text(
+                    _levelDescription(level),
+                    style: const TextStyle(
+                      fontSize: 13,
+                      fontWeight: FontWeight.w700,
+                      color: Colors.black54,
+                      height: 1.4,
+                    ),
+                  ),
                   const SizedBox(height: 12),
                   const DashedDivider(color: AppColors.mercury25),
                   const SizedBox(height: 10),
                   Row(
                     children: [
-                      Text('通关: ${level.stars > 0 ? '${(level.bestScore / 100 * totalQ).round()}/$totalQ题' : '0/$totalQ题'}',
-                          style: const TextStyle(fontSize: 12, color: Colors.black54, fontWeight: FontWeight.w600)),
+                      Text(
+                        '通关: ${level.stars > 0 ? '${(level.bestScore / 100 * totalQ).round()}/$totalQ题' : '0/$totalQ题'}',
+                        style: const TextStyle(
+                          fontSize: 12,
+                          color: Colors.black54,
+                          fontWeight: FontWeight.w600,
+                        ),
+                      ),
                       const Spacer(),
-                      const Icon(Icons.star, size: 14, color: AppColors.straw14),
+                      const Icon(
+                        Icons.star,
+                        size: 14,
+                        color: AppColors.straw14,
+                      ),
                       const SizedBox(width: 2),
-                      Text('X${level.stars}',
-                          style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w900, color: AppColors.morandiText)),
+                      Text(
+                        'X${level.stars}',
+                        style: const TextStyle(
+                          fontSize: 12,
+                          fontWeight: FontWeight.w900,
+                          color: AppColors.morandiText,
+                        ),
+                      ),
                       const SizedBox(width: 8),
                       Container(
-                        padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
-                        decoration: BoxDecoration(
-                          color: AppColors.lavenderPurple.withValues(alpha: 0.1),
-                          borderRadius: BorderRadius.circular(6),
-                          border: Border.all(color: AppColors.lavenderPurple, width: 1),
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 6,
+                          vertical: 2,
                         ),
-                        child: Text('+${level.pointsReward} PTS',
-                            style: const TextStyle(fontSize: 11, fontWeight: FontWeight.w900, color: AppColors.lavenderPurple)),
+                        decoration: BoxDecoration(
+                          color: AppColors.lavenderPurple.withValues(
+                            alpha: 0.1,
+                          ),
+                          borderRadius: BorderRadius.circular(6),
+                          border: Border.all(
+                            color: AppColors.lavenderPurple,
+                            width: 1,
+                          ),
+                        ),
+                        child: Text(
+                          '+${level.pointsReward} PTS',
+                          style: const TextStyle(
+                            fontSize: 11,
+                            fontWeight: FontWeight.w900,
+                            color: AppColors.lavenderPurple,
+                          ),
+                        ),
                       ),
                     ],
                   ),
@@ -245,15 +339,25 @@ class _DialoguePracticeScreenState extends State<DialoguePracticeScreen> {
                   ? Row(
                       mainAxisAlignment: MainAxisAlignment.end,
                       children: const [
-                        Icon(Icons.lock_outline, size: 15, color: Colors.black38),
+                        Icon(
+                          Icons.lock_outline,
+                          size: 15,
+                          color: Colors.black38,
+                        ),
                         SizedBox(width: 6),
-                        Text('请先通关前一关卡',
-                            style: TextStyle(fontSize: 13, color: Colors.black38, fontWeight: FontWeight.w700)),
+                        Text(
+                          '请先通关前一关卡',
+                          style: TextStyle(
+                            fontSize: 13,
+                            color: Colors.black38,
+                            fontWeight: FontWeight.w700,
+                          ),
+                        ),
                       ],
                     )
                   : done && hasRolePlay
-                      ? _buildDualButtons(level)
-                      : _buildSingleActionBtn(level, done),
+                  ? _buildDualButtons(level)
+                  : _buildSingleActionBtn(level, done),
             ),
           ],
         ),
@@ -268,7 +372,9 @@ class _DialoguePracticeScreenState extends State<DialoguePracticeScreen> {
         mainAxisSize: MainAxisSize.min,
         children: [
           Pressable(
-            onPressed: () => context.push('/study/level/${level.id}/review?sceneId=${widget.sceneId}'),
+            onPressed: () => context.push(
+              '/study/level/${level.id}/review?sceneId=${widget.sceneId}',
+            ),
             child: Container(
               padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
               decoration: BoxDecoration(
@@ -276,15 +382,30 @@ class _DialoguePracticeScreenState extends State<DialoguePracticeScreen> {
                 borderRadius: BorderRadius.circular(14),
                 border: Border.all(color: AppColors.morandiText, width: 2.5),
                 boxShadow: const [
-                  BoxShadow(color: AppColors.morandiText, offset: Offset(3, 3), blurRadius: 0),
+                  BoxShadow(
+                    color: AppColors.morandiText,
+                    offset: Offset(3, 3),
+                    blurRadius: 0,
+                  ),
                 ],
               ),
               child: Row(
                 mainAxisSize: MainAxisSize.min,
                 children: const [
-                  Icon(Icons.play_arrow, size: 18, color: AppColors.morandiText),
+                  Icon(
+                    Icons.play_arrow,
+                    size: 18,
+                    color: AppColors.morandiText,
+                  ),
                   SizedBox(width: 4),
-                  Text(' Review', style: TextStyle(fontSize: 18, fontWeight: FontWeight.w900, color: AppColors.morandiText)),
+                  Text(
+                    ' Review',
+                    style: TextStyle(
+                      fontSize: 18,
+                      fontWeight: FontWeight.w900,
+                      color: AppColors.morandiText,
+                    ),
+                  ),
                 ],
               ),
             ),
@@ -299,15 +420,30 @@ class _DialoguePracticeScreenState extends State<DialoguePracticeScreen> {
                 borderRadius: BorderRadius.circular(14),
                 border: Border.all(color: AppColors.morandiText, width: 2.5),
                 boxShadow: const [
-                  BoxShadow(color: AppColors.morandiText, offset: Offset(3, 3), blurRadius: 0),
+                  BoxShadow(
+                    color: AppColors.morandiText,
+                    offset: Offset(3, 3),
+                    blurRadius: 0,
+                  ),
                 ],
               ),
               child: Row(
                 mainAxisSize: MainAxisSize.min,
                 children: [
-                  const Icon(Icons.play_arrow, size: 18, color: AppColors.morandiText),
+                  const Icon(
+                    Icons.play_arrow,
+                    size: 18,
+                    color: AppColors.morandiText,
+                  ),
                   const SizedBox(width: 4),
-                  const Text(' Replay', style: TextStyle(fontSize: 18, fontWeight: FontWeight.w900, color: AppColors.morandiText)),
+                  const Text(
+                    ' Replay',
+                    style: TextStyle(
+                      fontSize: 18,
+                      fontWeight: FontWeight.w900,
+                      color: AppColors.morandiText,
+                    ),
+                  ),
                 ],
               ),
             ),
@@ -329,16 +465,30 @@ class _DialoguePracticeScreenState extends State<DialoguePracticeScreen> {
             borderRadius: BorderRadius.circular(14),
             border: Border.all(color: AppColors.morandiText, width: 2.5),
             boxShadow: const [
-              BoxShadow(color: AppColors.morandiText, offset: Offset(3, 3), blurRadius: 0),
+              BoxShadow(
+                color: AppColors.morandiText,
+                offset: Offset(3, 3),
+                blurRadius: 0,
+              ),
             ],
           ),
           child: Row(
             mainAxisSize: MainAxisSize.min,
             children: [
-              const Icon(Icons.play_arrow, size: 18, color: AppColors.morandiText),
+              const Icon(
+                Icons.play_arrow,
+                size: 18,
+                color: AppColors.morandiText,
+              ),
               const SizedBox(width: 4),
-              Text(done ? ' Replay' : ' START',
-                  style: const TextStyle(fontSize: 18, fontWeight: FontWeight.w900, color: AppColors.morandiText)),
+              Text(
+                done ? ' Replay' : ' START',
+                style: const TextStyle(
+                  fontSize: 18,
+                  fontWeight: FontWeight.w900,
+                  color: AppColors.morandiText,
+                ),
+              ),
             ],
           ),
         ),
@@ -349,21 +499,35 @@ class _DialoguePracticeScreenState extends State<DialoguePracticeScreen> {
   String _levelTitle(Level level) {
     // CN → return as-is; EN → map to CN
     switch (level.title) {
-      case 'Level 1': case 'Vocab Match': return '词汇匹配';
-      case 'Level 2': case 'Listen & Choose': return '听力选择';
-      case 'Level 3': case 'Fill in Blanks': return '句子填空';
-      case 'Challenge': case 'Scenario Sort': return '点餐角色扮演';
-      default: return level.title;
+      case 'Level 1':
+      case 'Vocab Match':
+        return '词汇匹配';
+      case 'Level 2':
+      case 'Listen & Choose':
+        return '听力选择';
+      case 'Level 3':
+      case 'Fill in Blanks':
+        return '句子填空';
+      case 'Challenge':
+      case 'Scenario Sort':
+        return '点餐角色扮演';
+      default:
+        return level.title;
     }
   }
 
   String _levelSubtitle(Level level) {
     switch (level.subtitle) {
-      case 'Vocab Match': return '(Vocabulary Match)';
-      case 'Listen & Choose': return '(Listening Choice)';
-      case 'Fill in Blanks': return '(Blank Filling)';
-      case 'Scenario Sort': return '(Role Play)';
-      default: return level.subtitle;
+      case 'Vocab Match':
+        return '(Vocabulary Match)';
+      case 'Listen & Choose':
+        return '(Listening Choice)';
+      case 'Fill in Blanks':
+        return '(Blank Filling)';
+      case 'Scenario Sort':
+        return '(Role Play)';
+      default:
+        return level.subtitle;
     }
   }
 
@@ -396,13 +560,24 @@ class _DialoguePracticeScreenState extends State<DialoguePracticeScreen> {
         child: Row(
           mainAxisSize: MainAxisSize.min,
           children: [
-            Icon(icon, size: 11, color: bgColor == AppColors.mercury25 ? AppColors.morandiText : Colors.white),
+            Icon(
+              icon,
+              size: 11,
+              color: bgColor == AppColors.mercury25
+                  ? AppColors.morandiText
+                  : Colors.white,
+            ),
             const SizedBox(width: 3),
-            Text(label,
-                style: TextStyle(
-                    fontSize: 10,
-                    fontWeight: FontWeight.w800,
-                    color: bgColor == AppColors.mercury25 ? AppColors.morandiText : Colors.white)),
+            Text(
+              label,
+              style: TextStyle(
+                fontSize: 10,
+                fontWeight: FontWeight.w800,
+                color: bgColor == AppColors.mercury25
+                    ? AppColors.morandiText
+                    : Colors.white,
+              ),
+            ),
           ],
         ),
       ),
@@ -463,13 +638,21 @@ class DialoguePracticeHeader extends StatelessWidget {
               border: Border.all(color: AppColors.morandiText, width: 3),
               borderRadius: BorderRadius.circular(12),
               boxShadow: const [
-                BoxShadow(color: AppColors.morandiText, offset: Offset(4, 4), blurRadius: 0),
+                BoxShadow(
+                  color: AppColors.morandiText,
+                  offset: Offset(4, 4),
+                  blurRadius: 0,
+                ),
               ],
             ),
             child: Center(
               child: Text(
                 sceneNameZh,
-                style: const TextStyle(fontSize: 24, fontWeight: FontWeight.w900, color: AppColors.morandiText),
+                style: const TextStyle(
+                  fontSize: 24,
+                  fontWeight: FontWeight.w900,
+                  color: AppColors.morandiText,
+                ),
                 overflow: TextOverflow.ellipsis,
               ),
             ),
@@ -483,11 +666,13 @@ class DialoguePracticeHeader extends StatelessWidget {
 
   Widget _buildBackBtn(BuildContext context) {
     return Pressable(
-      onPressed: onBack ?? () {
-        if (Navigator.of(context).canPop()) {
-          Navigator.of(context).pop();
-        }
-      },
+      onPressed:
+          onBack ??
+          () {
+            if (Navigator.of(context).canPop()) {
+              Navigator.of(context).pop();
+            }
+          },
       child: Container(
         width: 44,
         height: 44,
@@ -496,7 +681,11 @@ class DialoguePracticeHeader extends StatelessWidget {
           border: Border.all(color: AppColors.morandiText, width: 3),
           borderRadius: BorderRadius.circular(16),
           boxShadow: const [
-            BoxShadow(color: AppColors.morandiText, offset: Offset(6, 6), blurRadius: 0),
+            BoxShadow(
+              color: AppColors.morandiText,
+              offset: Offset(6, 6),
+              blurRadius: 0,
+            ),
           ],
         ),
         child: const Icon(Icons.arrow_back, color: AppColors.morandiText),
@@ -514,16 +703,30 @@ class DialoguePracticeHeader extends StatelessWidget {
           border: Border.all(color: AppColors.morandiText, width: 2),
           borderRadius: BorderRadius.circular(10),
           boxShadow: const [
-            BoxShadow(color: AppColors.morandiText, offset: Offset(2, 2), blurRadius: 0),
+            BoxShadow(
+              color: AppColors.morandiText,
+              offset: Offset(2, 2),
+              blurRadius: 0,
+            ),
           ],
         ),
         child: Row(
           mainAxisSize: MainAxisSize.min,
           children: [
-            const Icon(Icons.auto_awesome, size: 14, color: AppColors.morandiText),
+            const Icon(
+              Icons.auto_awesome,
+              size: 14,
+              color: AppColors.morandiText,
+            ),
             const SizedBox(width: 4),
-            Text('$totalPts  PTS',
-                style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w900, color: AppColors.morandiText)),
+            Text(
+              '$totalPts  PTS',
+              style: const TextStyle(
+                fontSize: 13,
+                fontWeight: FontWeight.w900,
+                color: AppColors.morandiText,
+              ),
+            ),
           ],
         ),
       ),
@@ -555,13 +758,26 @@ class DialoguePracticeHeader extends StatelessWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.center,
               children: [
-                Text('${sceneName.toUpperCase()} QUEST MODULE',
-                    textAlign: TextAlign.center,
-                    style: TextStyle(fontSize: 13, color: Colors.white, fontWeight: FontWeight.w700, letterSpacing: 0.5)),
+                Text(
+                  '${sceneName.toUpperCase()} QUEST MODULE',
+                  textAlign: TextAlign.center,
+                  style: TextStyle(
+                    fontSize: 13,
+                    color: Colors.white,
+                    fontWeight: FontWeight.w700,
+                    letterSpacing: 0.5,
+                  ),
+                ),
                 const SizedBox(height: 4),
-                const Text('挑战即可获得金星星与丰厚积分！',
-                    textAlign: TextAlign.center,
-                    style: TextStyle(fontSize: 18, color: Colors.white, fontWeight: FontWeight.w900)),
+                const Text(
+                  '挑战即可获得金星星与丰厚积分！',
+                  textAlign: TextAlign.center,
+                  style: TextStyle(
+                    fontSize: 18,
+                    color: Colors.white,
+                    fontWeight: FontWeight.w900,
+                  ),
+                ),
               ],
             ),
           ),

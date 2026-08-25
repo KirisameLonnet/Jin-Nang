@@ -157,34 +157,104 @@ INSERT INTO questions (level_id, question_text, options, correct_index, explanat
   (1, '"多少钱" 是什么意思？','["how many","how much","what time","where"]',    1, '多少钱 (duōshao qián) = how much (money)', 5);
 
 -- Questions: Level 2 (level_id = 2)
-INSERT INTO questions (level_id, question_text, options, correct_index, explanation, sort_order) VALUES
-  (2, '听音选择："hē"',    '["吃","喝","水","茶"]',          1, '喝 (hē) = to drink', 1),
-  (2, '听音选择："chá"',   '["茶","菜","吃","查"]',          0, '茶 (chá) = tea',     2),
-  (2, '听音选择："mǎi"',   '["卖","买","麦","埋"]',          1, '买 (mǎi) = to buy',  3),
-  (2, '听音选择："piányi"','["便宜","片一","偏宜","便易"]',   0, '便宜 (piányi) = cheap', 4);
+INSERT INTO questions (
+  level_id, question_type, question_text, options, correct_index,
+  explanation, phonetic, instruction, audio_key, sort_order
+) VALUES
+  (2, 'listening_choice', '听音选择：“chī”', '["喝","吃","水","茶"]', 1,
+   '吃 (chī) = to eat', 'chī', '听音知意：播放音频，选择正确的汉字', 'restaurant/eat.mp3', 1),
+  (2, 'listening_choice', '听音选择：“chá”', '["茶","菜","吃","查"]', 0,
+   '茶 (chá) = tea', 'chá', '听音知意：播放音频，选择正确的汉字', 'restaurant/tea.mp3', 2),
+  (2, 'listening_choice', '听音选择：“shuǐ”', '["茶","水","米饭","面条"]', 1,
+   '水 (shuǐ) = water', 'shuǐ', '听音知意：播放音频，选择正确的汉字', 'restaurant/water.mp3', 3),
+  (2, 'listening_choice', '听音选择：“mǐ fàn”', '["面条","饭店","米饭","水"]', 2,
+   '米饭 (mǐ fàn) = cooked rice', 'mǐ fàn', '听音知意：播放音频，选择正确的汉字', 'restaurant/rice.mp3', 4);
 
 -- Questions: Level 3 (level_id = 3)
-INSERT INTO questions (level_id, question_text, options, correct_index, explanation, sort_order) VALUES
-  (3, '服务员：您好，您想____什么？\n顾客：我____一碗米饭。',
-   '["吃/要","喝/买","看/请","说/想"]', 0, '正确答案是 "吃/要"', 1),
-  (3, '请给我一____水。',
-   '["个","杯","张","本"]', 1, '一杯水 (yì bēi shuǐ) = a glass of water', 2),
-  (3, '这个菜很____，但是很好吃。',
-   '["便宜","贵","大","小"]', 1, '贵 (guì) = expensive', 3);
+INSERT INTO questions (
+  level_id, question_type, question_text, options, correct_index,
+  explanation, main_text, instruction, sort_order
+) VALUES
+  (3, 'blank_filling', '服务员：您好，您想____什么？\n顾客：我____一碗米饭。',
+   '["吃/要","喝/买","看/请","说/想"]', 0, '正确答案是 "吃/要"',
+   '服务员：您好，您想____什么？\n顾客：我____一碗米饭。', '填空：请选择最合适的词语补全对话', 1),
+  (3, 'blank_filling', '请给我一____水。',
+   '["个","杯","张","本"]', 1, '一杯水 (yì bēi shuǐ) = a glass of water',
+   '请给我一____水。', '填空：请选择最合适的词语补全对话', 2),
+  (3, 'blank_filling', '这个菜很____，但是很好吃。',
+   '["便宜","贵","大","小"]', 1, '贵 (guì) = expensive',
+   '这个菜很____，但是很好吃。', '填空：请选择最合适的词语补全对话', 3);
 
 -- Questions: Level 4 / 点餐角色扮演 (level_id = 4)
 INSERT INTO questions (level_id, question_type, question_text, options, correct_index, explanation, instruction, current_question, history, sort_order) VALUES
   (4, 'role_play',
-   '角色扮演', '["我要一份炒青菜和一碗米饭。","我喜欢蛋糕。","多少钱？"]', 0,
-   '蛋糕（cake）通常是甜点或下午茶。而在中餐饭店，一般先要点热菜下饭。',
+   '角色扮演', '["请给我菜单。","我想喝水。","有什么推荐吗？"]', 0,
+   '先向服务员索要菜单，再开始点餐。',
    '角色扮演：针对服务员的对话作答',
-   '好的，一杯茶。那您想吃点什么菜？我们有鱼香肉丝、麻婆豆腐、炒青菜。',
-   '[{"is_waiter":true,"text":"您好，欢迎光临！请坐。您想吃点什么？"},{"is_waiter":false,"text":"请给我菜单。","is_correct":true,"option_label":"B.请给我菜单。"},{"is_waiter":true,"text":"好的，这是菜单。\n您想喝点什么？"},{"is_waiter":false,"text":"我想喝茶。","is_correct":true,"option_label":"A.我想喝茶。"},{"is_waiter":true,"text":"好的，一杯茶。那您想吃什么菜？我们有鱼香肉丝、麻婆豆腐、炒青菜。"}]',
+   '您好，欢迎光临！请坐。您想吃点什么？',
+   '[]',
    1),
   (4, 'role_play',
-   '角色扮演', '["不用了，谢谢。","多少钱？","再给我一瓶啤酒。"]', 2,
-   '在中餐场合，吃完饭后可以向服务员请求结账，并询问价格。',
+   '角色扮演', '["我想喝茶。","我要咖啡。","来一杯水。"]', 0,
+   '用“我想喝……”表达饮品需求。',
    '角色扮演：针对服务员的对话作答',
-   '您吃好了吗？还需要加点什么吗？',
-   '[{"is_waiter":true,"text":"您好，欢迎光临！"},{"is_waiter":false,"text":"请给我菜单。","is_correct":true,"option_label":"B.请给我菜单。"},{"is_waiter":true,"text":"好的，这是菜单。您想喝点什么？"},{"is_waiter":false,"text":"我想喝茶。","is_correct":true,"option_label":"A.我想喝茶。"},{"is_waiter":true,"text":"好的，一杯茶。那您想吃什么菜？我们有鱼香肉丝、麻婆豆腐、炒青菜。"},{"is_waiter":false,"text":"我要一份炒青菜和一碗米饭。","is_correct":true,"option_label":"A.我要一份炒青菜和一碗米饭。"},{"is_waiter":true,"text":"好的。请慢用。\n（上菜后）您吃好了吗？还需要加点什么吗？"}]',
-   2);
+   '好的，这是菜单。您想喝点什么？',
+   '[{"is_waiter":true,"text":"您好，欢迎光临！请坐。您想吃点什么？"},{"is_waiter":false,"text":"请给我菜单。","is_correct":true,"option_label":"A.请给我菜单。"}]',
+   2),
+  (4, 'role_play',
+   '角色扮演', '["我要一份炒青菜和一碗米饭。","我不吃了。","有没有甜点？"]', 0,
+   '使用“我要……”清楚表达菜品需求。',
+   '角色扮演：针对服务员的对话作答',
+   '好的，一杯茶。那您想吃什么菜？我们有鱼香肉丝、麻婆豆腐、炒青菜。',
+   '[{"is_waiter":true,"text":"您好，欢迎光临！请坐。您想吃点什么？"},{"is_waiter":false,"text":"请给我菜单。","is_correct":true,"option_label":"A.请给我菜单。"},{"is_waiter":true,"text":"好的，这是菜单。您想喝点什么？"},{"is_waiter":false,"text":"我想喝茶。","is_correct":true,"option_label":"A.我想喝茶。"}]',
+   3),
+  (4, 'role_play',
+   '角色扮演', '["不用了，谢谢。请结账吧。","再来一份米饭。","打包带走可以吗？"]', 0,
+   '用“请结账”礼貌地结束用餐。',
+   '角色扮演：针对服务员的对话作答',
+   '好的。请慢用。（上菜后）您吃好了吗？还需要加点什么吗？',
+   '[{"is_waiter":true,"text":"您好，欢迎光临！请坐。您想吃点什么？"},{"is_waiter":false,"text":"请给我菜单。","is_correct":true,"option_label":"A.请给我菜单。"},{"is_waiter":true,"text":"好的，这是菜单。您想喝点什么？"},{"is_waiter":false,"text":"我想喝茶。","is_correct":true,"option_label":"A.我想喝茶。"},{"is_waiter":true,"text":"好的，一杯茶。那您想吃什么菜？"},{"is_waiter":false,"text":"我要一份炒青菜和一碗米饭。","is_correct":true,"option_label":"A.我要一份炒青菜和一碗米饭。"}]',
+   4);
+
+UPDATE questions SET
+  question_type = 'vocabulary_match',
+  instruction = '请翻译中文词组含义',
+  main_text = CASE sort_order
+    WHEN 1 THEN '吃'
+    WHEN 2 THEN '水'
+    WHEN 3 THEN '饭店'
+    WHEN 4 THEN '米饭'
+    WHEN 5 THEN '多少钱'
+  END
+WHERE level_id = 1;
+
+-- Toolbox useful phrases: Restaurant.
+INSERT INTO scene_phrase_topics (scene_id, category, title, icon_key)
+VALUES (1, 'USEFUL PHRASES', 'Ordering Food', 'restaurant');
+
+INSERT INTO phrase_chapters (scene_id, chapter_num, title, subtitle, sort_order) VALUES
+  (1, 1, '一、进入餐厅 & 找座位', '进入餐厅 & 找座位', 1),
+  (1, 2, '二、要菜单 & 开始点餐', '要菜单 & 开始点餐', 2),
+  (1, 3, '三、点菜与选择', '点菜与选择', 3),
+  (1, 4, '四、忌口与特殊要求', '忌口与特殊要求', 4);
+
+INSERT INTO phrases (chapter_id, chinese, pinyin, english, sort_order) VALUES
+  (1, '你好，请问有位置吗？', 'Nǐ hǎo, qǐng wèn yǒu wèizhi ma?', 'Hello, do you have a table available?', 1),
+  (1, '我有预订。', 'Wǒ yǒu yù dìng.', 'I have a reservation.', 2),
+  (1, '我没有预订。', 'Wǒ méiyǒu yùdìng.', 'I don''t have a reservation.', 3),
+  (1, '两位。', 'Liǎng wèi.', 'Two people.', 4),
+  (1, '我们有三个人。', 'Wǒmen yǒu sān gè rén.', 'There are three of us.', 5),
+  (1, '可以坐窗边吗？', 'Kěyǐ zuò chuāng biān ma?', 'Can we sit by the window?', 6),
+  (1, '要等多久？', 'Yào děng duō jiǔ?', 'How long is the wait?', 7),
+  (1, '我们愿意拼桌。', 'Wǒmen yuànyì pīn zhuō.', 'We''re willing to share a table.', 8),
+  (2, '请给我们菜单。', 'Qǐng gěi wǒmen càidān.', 'Please give us the menu.', 1),
+  (2, '有什么推荐？', 'Yǒu shénme tuījiàn?', 'What do you recommend?', 2),
+  (2, '这个辣吗？', 'Zhège là ma?', 'Is this spicy?', 3),
+  (2, '我不吃辣。', 'Wǒ bù chī là.', 'I don''t eat spicy food.', 4),
+  (2, '我对坚果过敏。', 'Wǒ duì jiānguǒ guòmǐn.', 'I''m allergic to nuts.', 5),
+  (2, '我要一杯水。', 'Wǒ yào yī bēi shuǐ.', 'I would like a glass of water.', 6),
+  (2, '可以打包吗？', 'Kěyǐ dǎbāo ma?', 'Can I get this to go?', 7),
+  (2, '买单！', 'Mǎidān!', 'Check, please!', 8),
+  (3, '我要这个。', 'Wǒ yào zhège.', 'I''ll have this.', 1),
+  (3, '再来一份。', 'Zài lái yī fèn.', 'One more portion, please.', 2),
+  (4, '请不要放葱。', 'Qǐng bùyào fàng cōng.', 'Please no green onions.', 1);

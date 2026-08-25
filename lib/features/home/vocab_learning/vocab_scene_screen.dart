@@ -19,6 +19,14 @@ class _VocabSceneScreenState extends State<VocabSceneScreen> {
   List<Scene>? _scenes;
   String? _error;
 
+  void _goBack() {
+    if (context.canPop()) {
+      context.pop();
+    } else {
+      context.go('/study');
+    }
+  }
+
   @override
   void initState() {
     super.initState();
@@ -66,7 +74,7 @@ class _VocabSceneScreenState extends State<VocabSceneScreen> {
                     AppHeader(
                       title: 'Vocab Learning',
                       titleColor: AppColors.straw14,
-                      onBack: () => context.go('/study'),
+                      onBack: _goBack,
                     ),
                     const SizedBox(height: 32),
                     const Text('Select a scene',

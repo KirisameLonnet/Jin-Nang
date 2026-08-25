@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
@@ -41,7 +42,7 @@ class _LevelScreenState extends State<LevelScreen> {
     try {
       final levels = await Di.api.getSceneLevels(widget.sceneId);
       if (!mounted) return;
-      final level = levels.firstWhere((l) => l.id == widget.levelId).enrichForLocal();
+      final level = levels.firstWhere((l) => l.id == widget.levelId);
       setState(() => _level = level);
     } catch (e) {
       if (!mounted) return;
@@ -70,8 +71,11 @@ class _LevelScreenState extends State<LevelScreen> {
     if (_currentQ.type == QuestionType.rolePlay) {
       Future.delayed(const Duration(milliseconds: 100), () {
         if (_chatScroll.hasClients) {
-          _chatScroll.animateTo(_chatScroll.position.maxScrollExtent,
-              duration: const Duration(milliseconds: 200), curve: Curves.easeOut);
+          _chatScroll.animateTo(
+            _chatScroll.position.maxScrollExtent,
+            duration: const Duration(milliseconds: 200),
+            curve: Curves.easeOut,
+          );
         }
       });
     }
@@ -79,8 +83,7 @@ class _LevelScreenState extends State<LevelScreen> {
 
   void _nextQuestion() {
     if (_isLastQ) {
-      final stars = _passed ? min(3, (_accuracy / 33).ceil()) : 0;
-      Di.api.submitProgress(widget.levelId, stars, _accuracy.round());
+      unawaited(Di.api.submitProgress(widget.levelId, _accuracy.round()));
       setState(() => _showResult = true);
     } else {
       setState(() {
@@ -93,8 +96,11 @@ class _LevelScreenState extends State<LevelScreen> {
       if (_currentQ.type == QuestionType.rolePlay) {
         Future.delayed(const Duration(milliseconds: 100), () {
           if (_chatScroll.hasClients) {
-            _chatScroll.animateTo(_chatScroll.position.maxScrollExtent,
-                duration: const Duration(milliseconds: 200), curve: Curves.easeOut);
+            _chatScroll.animateTo(
+              _chatScroll.position.maxScrollExtent,
+              duration: const Duration(milliseconds: 200),
+              curve: Curves.easeOut,
+            );
           }
         });
       }
@@ -103,6 +109,13 @@ class _LevelScreenState extends State<LevelScreen> {
 
   double get _accuracy => _totalQ > 0 ? (_correctCount / _totalQ) * 100 : 0;
   bool get _passed => _accuracy >= (_level?.passThreshold ?? 80);
+  int get _starCount => !_passed
+      ? 0
+      : _accuracy >= 100
+      ? 3
+      : _accuracy >= 90
+      ? 2
+      : 1;
 
   void _retry() {
     setState(() {
@@ -136,9 +149,15 @@ class _LevelScreenState extends State<LevelScreen> {
         backgroundColor: AppColors.springWood14,
         body: AppSafeArea(
           child: Center(
-            child: Text(_error!,
-                textAlign: TextAlign.center,
-                style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w700, color: AppColors.quizError)),
+            child: Text(
+              _error!,
+              textAlign: TextAlign.center,
+              style: const TextStyle(
+                fontSize: 14,
+                fontWeight: FontWeight.w700,
+                color: AppColors.quizError,
+              ),
+            ),
           ),
         ),
       );
@@ -181,7 +200,12 @@ class _LevelScreenState extends State<LevelScreen> {
               ),
             ),
             Padding(
-              padding: const EdgeInsets.fromLTRB(AppSpacing.lg, 0, AppSpacing.lg, AppSpacing.lg),
+              padding: const EdgeInsets.fromLTRB(
+                AppSpacing.lg,
+                0,
+                AppSpacing.lg,
+                AppSpacing.lg,
+              ),
               child: _buildBottomButton(),
             ),
           ],
@@ -203,14 +227,33 @@ class _LevelScreenState extends State<LevelScreen> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Text('LEVEL ${level.levelNum} / 4',
-                  style: const TextStyle(fontSize: 11, fontWeight: FontWeight.w800, color: Colors.black45, letterSpacing: 1)),
+              Text(
+                'LEVEL ${level.levelNum} / 4',
+                style: const TextStyle(
+                  fontSize: 11,
+                  fontWeight: FontWeight.w800,
+                  color: Colors.black45,
+                  letterSpacing: 1,
+                ),
+              ),
               const SizedBox(height: 2),
-              Text(level.title,
-                  style: const TextStyle(fontSize: 18, fontWeight: FontWeight.w900, color: AppColors.morandiText)),
+              Text(
+                level.title,
+                style: const TextStyle(
+                  fontSize: 18,
+                  fontWeight: FontWeight.w900,
+                  color: AppColors.morandiText,
+                ),
+              ),
               const SizedBox(height: 2),
-              Text(level.subtitle,
-                  style: const TextStyle(fontSize: 18, fontWeight: FontWeight.w900, color: AppColors.morandiText)),
+              Text(
+                level.subtitle,
+                style: const TextStyle(
+                  fontSize: 18,
+                  fontWeight: FontWeight.w900,
+                  color: AppColors.morandiText,
+                ),
+              ),
             ],
           ),
         ),
@@ -221,8 +264,14 @@ class _LevelScreenState extends State<LevelScreen> {
             borderRadius: BorderRadius.circular(10),
             border: Border.all(color: AppColors.morandiText, width: 2),
           ),
-          child: Text('${_currentQIndex + 1} / $_totalQ',
-              style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w900, color: AppColors.morandiText)),
+          child: Text(
+            '${_currentQIndex + 1} / $_totalQ',
+            style: const TextStyle(
+              fontSize: 16,
+              fontWeight: FontWeight.w900,
+              color: AppColors.morandiText,
+            ),
+          ),
         ),
       ],
     );
@@ -239,7 +288,11 @@ class _LevelScreenState extends State<LevelScreen> {
           border: Border.all(color: AppColors.morandiText, width: 3),
           borderRadius: BorderRadius.circular(16),
           boxShadow: const [
-            BoxShadow(color: AppColors.morandiText, offset: Offset(6, 6), blurRadius: 0),
+            BoxShadow(
+              color: AppColors.morandiText,
+              offset: Offset(6, 6),
+              blurRadius: 0,
+            ),
           ],
         ),
         child: const Icon(Icons.arrow_back, color: AppColors.morandiText),
@@ -311,7 +364,11 @@ class _LevelScreenState extends State<LevelScreen> {
             borderRadius: BorderRadius.circular(28),
             border: Border.all(color: AppColors.morandiText, width: 3),
             boxShadow: const [
-              BoxShadow(color: AppColors.morandiText, offset: Offset(5, 5), blurRadius: 0),
+              BoxShadow(
+                color: AppColors.morandiText,
+                offset: Offset(5, 5),
+                blurRadius: 0,
+              ),
             ],
           ),
           child: Padding(
@@ -363,30 +420,51 @@ class _LevelScreenState extends State<LevelScreen> {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         if (q.instruction != null)
-          Text(q.instruction!,
-              style: const TextStyle(fontSize: 13, color: Colors.black54, fontWeight: FontWeight.w600)),
+          Text(
+            q.instruction!,
+            style: const TextStyle(
+              fontSize: 13,
+              color: Colors.black54,
+              fontWeight: FontWeight.w600,
+            ),
+          ),
         if (q.instruction != null) const SizedBox(height: 6),
         Row(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Expanded(
-              child: Text(q.mainText ?? q.questionText,
-                  style: const TextStyle(fontSize: 48, fontWeight: FontWeight.w900, color: AppColors.morandiText)),
+              child: Text(
+                q.mainText ?? q.questionText,
+                style: const TextStyle(
+                  fontSize: 48,
+                  fontWeight: FontWeight.w900,
+                  color: AppColors.morandiText,
+                ),
+              ),
             ),
             if (q.audioUrl != null)
               Pressable(
                 onPressed: () => _playAudio(q.audioUrl!),
                 child: Container(
-                  width: 48, height: 48,
+                  width: 48,
+                  height: 48,
                   decoration: BoxDecoration(
                     color: Colors.white,
                     borderRadius: BorderRadius.circular(14),
                     border: Border.all(color: AppColors.morandiText, width: 2),
                     boxShadow: const [
-                      BoxShadow(color: AppColors.morandiText, offset: Offset(3, 3), blurRadius: 0),
+                      BoxShadow(
+                        color: AppColors.morandiText,
+                        offset: Offset(3, 3),
+                        blurRadius: 0,
+                      ),
                     ],
                   ),
-                  child: const Icon(Icons.volume_up, color: AppColors.morandiText, size: 22),
+                  child: const Icon(
+                    Icons.volume_up,
+                    color: AppColors.morandiText,
+                    size: 22,
+                  ),
                 ),
               ),
           ],
@@ -401,30 +479,53 @@ class _LevelScreenState extends State<LevelScreen> {
         const SizedBox(height: 8),
         Center(
           child: Pressable(
-            onPressed: q.audioUrl != null ? () => _playAudio(q.audioUrl!) : null,
+            onPressed: q.audioUrl != null
+                ? () => _playAudio(q.audioUrl!)
+                : null,
             child: Container(
-              width: 88, height: 88,
+              width: 88,
+              height: 88,
               decoration: BoxDecoration(
                 color: AppColors.baliHai30,
                 shape: BoxShape.circle,
                 border: Border.all(color: AppColors.morandiText, width: 3),
                 boxShadow: const [
-                  BoxShadow(color: AppColors.morandiText, offset: Offset(4, 4), blurRadius: 0),
+                  BoxShadow(
+                    color: AppColors.morandiText,
+                    offset: Offset(4, 4),
+                    blurRadius: 0,
+                  ),
                 ],
               ),
-              child: const Icon(Icons.volume_up, color: AppColors.morandiText, size: 40),
+              child: const Icon(
+                Icons.volume_up,
+                color: AppColors.morandiText,
+                size: 40,
+              ),
             ),
           ),
         ),
         const SizedBox(height: 16),
         const Center(
-          child: Text('请播放拼音音频',
-              style: TextStyle(fontSize: 13, color: Colors.black54, fontWeight: FontWeight.w600)),
+          child: Text(
+            '请播放拼音音频',
+            style: TextStyle(
+              fontSize: 13,
+              color: Colors.black54,
+              fontWeight: FontWeight.w600,
+            ),
+          ),
         ),
         const SizedBox(height: 6),
         Center(
-          child: Text(q.phonetic ?? '',
-              style: const TextStyle(fontSize: 20, fontWeight: FontWeight.w900, color: AppColors.morandiText)),
+          child: Text(
+            q.phonetic ?? '',
+            style: const TextStyle(
+              fontSize: 20,
+              fontWeight: FontWeight.w900,
+              color: AppColors.morandiText,
+            ),
+          ),
         ),
       ],
     );
@@ -438,20 +539,32 @@ class _LevelScreenState extends State<LevelScreen> {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         if (q.instruction != null)
-          Text(q.instruction!,
-              style: const TextStyle(fontSize: 14, color: Colors.black54, fontWeight: FontWeight.w600)),
+          Text(
+            q.instruction!,
+            style: const TextStyle(
+              fontSize: 14,
+              color: Colors.black54,
+              fontWeight: FontWeight.w600,
+            ),
+          ),
         if (q.instruction != null) const SizedBox(height: 10),
         if (parts.length == 2)
           Text.rich(
             TextSpan(
-              style: const TextStyle(fontSize: 26, fontWeight: FontWeight.w900, color: AppColors.morandiText, height: 1.4),
+              style: const TextStyle(
+                fontSize: 26,
+                fontWeight: FontWeight.w900,
+                color: AppColors.morandiText,
+                height: 1.4,
+              ),
               children: [
                 TextSpan(text: parts[0]),
                 WidgetSpan(
                   alignment: PlaceholderAlignment.baseline,
                   baseline: TextBaseline.alphabetic,
                   child: Container(
-                    width: 48, height: 3,
+                    width: 48,
+                    height: 3,
                     color: AppColors.morandiText,
                     margin: const EdgeInsets.symmetric(horizontal: 2),
                   ),
@@ -461,7 +574,14 @@ class _LevelScreenState extends State<LevelScreen> {
             ),
           )
         else
-          Text(text, style: const TextStyle(fontSize: 26, fontWeight: FontWeight.w900, color: AppColors.morandiText)),
+          Text(
+            text,
+            style: const TextStyle(
+              fontSize: 26,
+              fontWeight: FontWeight.w900,
+              color: AppColors.morandiText,
+            ),
+          ),
       ],
     );
   }
@@ -488,7 +608,7 @@ class _LevelScreenState extends State<LevelScreen> {
     if (isSel || showCorrect || showWrong) textColor = Colors.black;
 
     // 圆圈字母颜色
-    
+
     return Pressable(
       onPressed: () => _selectOption(index),
       feedback: PressFeedback.none,
@@ -499,29 +619,44 @@ class _LevelScreenState extends State<LevelScreen> {
           borderRadius: BorderRadius.circular(16),
           border: Border.all(color: borderColor, width: 2.5),
           boxShadow: const [
-            BoxShadow(color: AppColors.morandiText, offset: Offset(3, 3), blurRadius: 0),
+            BoxShadow(
+              color: AppColors.morandiText,
+              offset: Offset(3, 3),
+              blurRadius: 0,
+            ),
           ],
         ),
         child: Row(
           children: [
             Container(
-              width: 36, height: 36,
+              width: 36,
+              height: 36,
               decoration: BoxDecoration(
                 color: AppColors.mercury25,
                 borderRadius: BorderRadius.circular(10),
                 border: Border.all(color: AppColors.morandiText, width: 2),
               ),
               child: Center(
-                child: Text(label,
-                    style: TextStyle(
-                        fontSize: 15, fontWeight: FontWeight.w900, color: AppColors.morandiText)),
+                child: Text(
+                  label,
+                  style: TextStyle(
+                    fontSize: 15,
+                    fontWeight: FontWeight.w900,
+                    color: AppColors.morandiText,
+                  ),
+                ),
               ),
             ),
             const SizedBox(width: 14),
             Expanded(
-              child: Text(opt,
-                  style: TextStyle(
-                      fontSize: 17, fontWeight: FontWeight.w800, color: textColor)),
+              child: Text(
+                opt,
+                style: TextStyle(
+                  fontSize: 17,
+                  fontWeight: FontWeight.w800,
+                  color: textColor,
+                ),
+              ),
             ),
             if (showCorrect)
               Icon(Icons.check_circle, color: AppColors.quizCorrect, size: 22)
@@ -545,7 +680,10 @@ class _LevelScreenState extends State<LevelScreen> {
             ? AppColors.quizCorrect.withValues(alpha: 0.08)
             : AppColors.quizError.withValues(alpha: 0.08),
         borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: AppColors.shark40.withValues(alpha: 0.15), width: 3),
+        border: Border.all(
+          color: AppColors.shark40.withValues(alpha: 0.15),
+          width: 3,
+        ),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -553,23 +691,42 @@ class _LevelScreenState extends State<LevelScreen> {
           Row(
             children: [
               Container(
-                width: 24, height: 24,
+                width: 24,
+                height: 24,
                 decoration: BoxDecoration(
-                  color: _isCorrect ? AppColors.quizCorrect : AppColors.quizError,
+                  color: _isCorrect
+                      ? AppColors.quizCorrect
+                      : AppColors.quizError,
                   shape: BoxShape.circle,
                 ),
-                child: Icon(_isCorrect ? Icons.check : Icons.close, size: 16, color: Colors.white),
+                child: Icon(
+                  _isCorrect ? Icons.check : Icons.close,
+                  size: 16,
+                  color: Colors.white,
+                ),
               ),
               const SizedBox(width: 8),
-              Text(_isCorrect ? '回答正确 (Correct)' : '回答错误 (Incorrect)',
-                  style: TextStyle(
-                      fontSize: 16, fontWeight: FontWeight.w900,
-                      color: _isCorrect ? AppColors.quizCorrect : AppColors.quizError)),
+              Text(
+                _isCorrect ? '回答正确 (Correct)' : '回答错误 (Incorrect)',
+                style: TextStyle(
+                  fontSize: 16,
+                  fontWeight: FontWeight.w900,
+                  color: _isCorrect
+                      ? AppColors.quizCorrect
+                      : AppColors.quizError,
+                ),
+              ),
             ],
           ),
           const SizedBox(height: 8),
-          Text(q.explanation,
-              style: const TextStyle(fontSize: 13, color: Colors.black54, fontWeight: FontWeight.w600)),
+          Text(
+            q.explanation,
+            style: const TextStyle(
+              fontSize: 13,
+              color: Colors.black54,
+              fontWeight: FontWeight.w600,
+            ),
+          ),
         ],
       ),
     );
@@ -593,30 +750,62 @@ class _LevelScreenState extends State<LevelScreen> {
             borderRadius: BorderRadius.circular(16),
             border: Border.all(color: AppColors.morandiText, width: 3),
             boxShadow: const [
-              BoxShadow(color: AppColors.morandiText, offset: Offset(4, 4), blurRadius: 0),
+              BoxShadow(
+                color: AppColors.morandiText,
+                offset: Offset(4, 4),
+                blurRadius: 0,
+              ),
             ],
           ),
           child: isNext
               ? Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    Text(_isLastQ ? '查看结果' : '下一题',
-                        style: const TextStyle(fontSize: 17, fontWeight: FontWeight.w900, color: AppColors.morandiText)),
+                    Text(
+                      _isLastQ ? '查看结果' : '下一题',
+                      style: const TextStyle(
+                        fontSize: 17,
+                        fontWeight: FontWeight.w900,
+                        color: AppColors.morandiText,
+                      ),
+                    ),
                     const SizedBox(width: 6),
-                    Text(_isLastQ ? 'See Results' : 'Next Question',
-                        style: const TextStyle(fontSize: 17, fontWeight: FontWeight.w900, color: AppColors.morandiText)),
+                    Text(
+                      _isLastQ ? 'See Results' : 'Next Question',
+                      style: const TextStyle(
+                        fontSize: 17,
+                        fontWeight: FontWeight.w900,
+                        color: AppColors.morandiText,
+                      ),
+                    ),
                     const SizedBox(width: 6),
-                    const Icon(Icons.chevron_right, color: AppColors.morandiText, size: 22),
+                    const Icon(
+                      Icons.chevron_right,
+                      color: AppColors.morandiText,
+                      size: 22,
+                    ),
                   ],
                 )
               : Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: const [
-                    Text('确认提交',
-                        style: TextStyle(fontSize: 17, fontWeight: FontWeight.w900, color: AppColors.morandiText)),
+                    Text(
+                      '确认提交',
+                      style: TextStyle(
+                        fontSize: 17,
+                        fontWeight: FontWeight.w900,
+                        color: AppColors.morandiText,
+                      ),
+                    ),
                     SizedBox(width: 6),
-                    Text('Submit Answer',
-                        style: TextStyle(fontSize: 17, fontWeight: FontWeight.w900, color: AppColors.morandiText)),
+                    Text(
+                      'Submit Answer',
+                      style: TextStyle(
+                        fontSize: 17,
+                        fontWeight: FontWeight.w900,
+                        color: AppColors.morandiText,
+                      ),
+                    ),
                   ],
                 ),
         ),
@@ -642,15 +831,19 @@ class _LevelScreenState extends State<LevelScreen> {
     final q = _currentQ;
     // Assemble all visible turns: history + current waiter question + user response (if submitted)
     final turns = <DialogueTurn>[...q.history];
-    turns.add(DialogueTurn(isWaiter: true, text: q.currentQuestion ?? q.questionText));
+    turns.add(
+      DialogueTurn(isWaiter: true, text: q.currentQuestion ?? q.questionText),
+    );
     if (_hasSubmitted && _selectedOption != null) {
       final label = String.fromCharCode(65 + _selectedOption!);
-      turns.add(DialogueTurn(
-        isWaiter: false,
-        text: q.options[_selectedOption!],
-        isCorrect: _isCorrect,
-        optionLabel: '$label.${q.options[_selectedOption!]}',
-      ));
+      turns.add(
+        DialogueTurn(
+          isWaiter: false,
+          text: q.options[_selectedOption!],
+          isCorrect: _isCorrect,
+          optionLabel: '$label.${q.options[_selectedOption!]}',
+        ),
+      );
     }
 
     return Container(
@@ -660,7 +853,11 @@ class _LevelScreenState extends State<LevelScreen> {
         borderRadius: BorderRadius.circular(20),
         border: Border.all(color: AppColors.morandiText, width: 3),
         boxShadow: const [
-          BoxShadow(color: AppColors.morandiText, offset: Offset(4, 4), blurRadius: 0),
+          BoxShadow(
+            color: AppColors.morandiText,
+            offset: Offset(4, 4),
+            blurRadius: 0,
+          ),
         ],
       ),
       child: ClipRRect(
@@ -687,21 +884,33 @@ class _LevelScreenState extends State<LevelScreen> {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Container(
-              width: 36, height: 36,
+              width: 36,
+              height: 36,
               decoration: BoxDecoration(
                 color: const Color(0xFFD6C6F5),
                 shape: BoxShape.circle,
                 border: Border.all(color: AppColors.morandiText, width: 2),
                 boxShadow: const [
-                  BoxShadow(color: AppColors.morandiText, offset: Offset(4, 4), blurRadius: 0),
+                  BoxShadow(
+                    color: AppColors.morandiText,
+                    offset: Offset(4, 4),
+                    blurRadius: 0,
+                  ),
                 ],
               ),
-              child: const Icon(Icons.person_outline, color: AppColors.morandiText, size: 20),
+              child: const Icon(
+                Icons.person_outline,
+                color: AppColors.morandiText,
+                size: 20,
+              ),
             ),
             const SizedBox(width: 10),
             Expanded(
               child: Container(
-                padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 12,
+                  vertical: 10,
+                ),
                 decoration: BoxDecoration(
                   color: const Color(0xFFD6C6F5),
                   borderRadius: const BorderRadius.only(
@@ -712,8 +921,15 @@ class _LevelScreenState extends State<LevelScreen> {
                   ),
                   border: Border.all(color: AppColors.morandiText, width: 2),
                 ),
-                child: Text(turn.text,
-                    style: const TextStyle(fontSize: 14, color: AppColors.morandiText, height: 1.5, fontWeight: FontWeight.w600)),
+                child: Text(
+                  turn.text,
+                  style: const TextStyle(
+                    fontSize: 14,
+                    color: AppColors.morandiText,
+                    height: 1.5,
+                    fontWeight: FontWeight.w600,
+                  ),
+                ),
               ),
             ),
             const SizedBox(width: 36),
@@ -731,8 +947,13 @@ class _LevelScreenState extends State<LevelScreen> {
                 const SizedBox(width: 36),
                 const Spacer(),
                 Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
-                  constraints: BoxConstraints(maxWidth: MediaQuery.of(context).size.width * 0.55),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 12,
+                    vertical: 10,
+                  ),
+                  constraints: BoxConstraints(
+                    maxWidth: MediaQuery.of(context).size.width * 0.55,
+                  ),
                   decoration: BoxDecoration(
                     color: AppColors.baliHai30,
                     borderRadius: const BorderRadius.only(
@@ -745,7 +966,12 @@ class _LevelScreenState extends State<LevelScreen> {
                   ),
                   child: Text(
                     turn.optionLabel ?? turn.text,
-                    style: const TextStyle(fontSize: 14, color: Colors.white, height: 1.5, fontWeight: FontWeight.w600),
+                    style: const TextStyle(
+                      fontSize: 14,
+                      color: Colors.white,
+                      height: 1.5,
+                      fontWeight: FontWeight.w600,
+                    ),
                   ),
                 ),
               ],
@@ -758,8 +984,14 @@ class _LevelScreenState extends State<LevelScreen> {
                   children: const [
                     Icon(Icons.check, size: 13, color: AppColors.quizCorrect),
                     SizedBox(width: 4),
-                    Text('CORRECT',
-                        style: TextStyle(fontSize: 12, fontWeight: FontWeight.w900, color: AppColors.quizCorrect)),
+                    Text(
+                      'CORRECT',
+                      style: TextStyle(
+                        fontSize: 12,
+                        fontWeight: FontWeight.w900,
+                        color: AppColors.quizCorrect,
+                      ),
+                    ),
                   ],
                 ),
               )
@@ -771,8 +1003,14 @@ class _LevelScreenState extends State<LevelScreen> {
                   children: const [
                     Icon(Icons.close, size: 13, color: AppColors.quizError),
                     SizedBox(width: 4),
-                    Text('INCORRECT',
-                        style: TextStyle(fontSize: 12, fontWeight: FontWeight.w900, color: AppColors.quizError)),
+                    Text(
+                      'INCORRECT',
+                      style: TextStyle(
+                        fontSize: 12,
+                        fontWeight: FontWeight.w900,
+                        color: AppColors.quizError,
+                      ),
+                    ),
                   ],
                 ),
               ),
@@ -787,7 +1025,7 @@ class _LevelScreenState extends State<LevelScreen> {
   // ═══════════════════════════════════════════════════════════
 
   Widget _buildResultView() {
-    final starCount = _passed ? min(3, (_accuracy / 33).ceil()) : 0;
+    final starCount = _starCount;
     final level = _level!;
 
     return Scaffold(
@@ -802,8 +1040,14 @@ class _LevelScreenState extends State<LevelScreen> {
                 children: [
                   _buildBackBtn(),
                   const SizedBox(width: 12),
-                  const Text('闯关报告 (Summary)',
-                      style: TextStyle(fontSize: 18, fontWeight: FontWeight.w900, color: AppColors.morandiText)),
+                  const Text(
+                    '闯关报告 (Summary)',
+                    style: TextStyle(
+                      fontSize: 18,
+                      fontWeight: FontWeight.w900,
+                      color: AppColors.morandiText,
+                    ),
+                  ),
                 ],
               ),
             ),
@@ -811,7 +1055,9 @@ class _LevelScreenState extends State<LevelScreen> {
             Expanded(
               child: Center(
                 child: Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: AppSpacing.lg),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: AppSpacing.lg,
+                  ),
                   child: Stack(
                     clipBehavior: Clip.none,
                     alignment: Alignment.topCenter,
@@ -822,9 +1068,16 @@ class _LevelScreenState extends State<LevelScreen> {
                         decoration: BoxDecoration(
                           color: Colors.white,
                           borderRadius: BorderRadius.circular(28),
-                          border: Border.all(color: AppColors.morandiText, width: 3),
+                          border: Border.all(
+                            color: AppColors.morandiText,
+                            width: 3,
+                          ),
                           boxShadow: const [
-                            BoxShadow(color: AppColors.morandiText, offset: Offset(5, 5), blurRadius: 0),
+                            BoxShadow(
+                              color: AppColors.morandiText,
+                              offset: Offset(5, 5),
+                              blurRadius: 0,
+                            ),
                           ],
                         ),
                         child: Column(
@@ -835,22 +1088,48 @@ class _LevelScreenState extends State<LevelScreen> {
                               mainAxisAlignment: MainAxisAlignment.center,
                               children: List.generate(3, (i) {
                                 return Padding(
-                                  padding: const EdgeInsets.symmetric(horizontal: 6),
-                                  child: _buildSummaryStar(filled: i < starCount),
+                                  padding: const EdgeInsets.symmetric(
+                                    horizontal: 6,
+                                  ),
+                                  child: _buildSummaryStar(
+                                    filled: i < starCount,
+                                  ),
                                 );
                               }),
                             ),
                             const SizedBox(height: 10),
-                            const Text('得分 SCORE',
-                                style: TextStyle(fontSize: 13, color: Colors.black54, fontWeight: FontWeight.w700, letterSpacing: 0.5)),
+                            const Text(
+                              '得分 SCORE',
+                              style: TextStyle(
+                                fontSize: 13,
+                                color: Colors.black54,
+                                fontWeight: FontWeight.w700,
+                                letterSpacing: 0.5,
+                              ),
+                            ),
                             const SizedBox(height: 6),
                             Text.rich(
                               textAlign: TextAlign.center,
                               TextSpan(
-                                style: const TextStyle(fontWeight: FontWeight.w900, color: AppColors.morandiText),
+                                style: const TextStyle(
+                                  fontWeight: FontWeight.w900,
+                                  color: AppColors.morandiText,
+                                ),
                                 children: [
-                                  TextSpan(text: '$_correctCount', style: const TextStyle(fontSize: 56, height: 1.1)),
-                                  TextSpan(text: ' / $_totalQ', style: const TextStyle(fontSize: 24, color: Colors.black38)),
+                                  TextSpan(
+                                    text: '$_correctCount',
+                                    style: const TextStyle(
+                                      fontSize: 56,
+                                      height: 1.1,
+                                    ),
+                                  ),
+                                  TextSpan(
+                                    text: ' / $_totalQ',
+                                    style: const TextStyle(
+                                      fontSize: 24,
+                                      color: Colors.black38,
+                                    ),
+                                  ),
                                 ],
                               ),
                             ),
@@ -858,9 +1137,12 @@ class _LevelScreenState extends State<LevelScreen> {
                             Text(
                               _passed ? '恭喜通过本关！ Passed!' : '再来一次！ Try again!',
                               style: TextStyle(
-                                  fontSize: 13,
-                                  color: _passed ? AppColors.quizCorrect : AppColors.quizError,
-                                  fontWeight: FontWeight.w700),
+                                fontSize: 13,
+                                color: _passed
+                                    ? AppColors.quizCorrect
+                                    : AppColors.quizError,
+                                fontWeight: FontWeight.w700,
+                              ),
                               textAlign: TextAlign.center,
                             ),
                             const SizedBox(height: 20),
@@ -871,20 +1153,40 @@ class _LevelScreenState extends State<LevelScreen> {
                                 decoration: BoxDecoration(
                                   color: Colors.white,
                                   borderRadius: BorderRadius.circular(16),
-                                  border: Border.all(color: AppColors.morandiText, width: 2),
+                                  border: Border.all(
+                                    color: AppColors.morandiText,
+                                    width: 2,
+                                  ),
                                 ),
                                 child: Column(
                                   children: [
-                                    const Text('通关获得奖励 Rewards',
-                                        style: TextStyle(fontSize: 12, color: Colors.black54, fontWeight: FontWeight.w600)),
+                                    const Text(
+                                      '通关获得奖励 Rewards',
+                                      style: TextStyle(
+                                        fontSize: 12,
+                                        color: Colors.black54,
+                                        fontWeight: FontWeight.w600,
+                                      ),
+                                    ),
                                     const SizedBox(height: 8),
                                     Row(
-                                      mainAxisAlignment: MainAxisAlignment.center,
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.center,
                                       children: [
-                                        const Icon(Icons.auto_awesome, color: AppColors.straw14, size: 24),
+                                        const Icon(
+                                          Icons.auto_awesome,
+                                          color: AppColors.straw14,
+                                          size: 24,
+                                        ),
                                         const SizedBox(width: 6),
-                                        Text('+${level.pointsReward} PTS',
-                                            style: const TextStyle(fontSize: 20, fontWeight: FontWeight.w900, color: AppColors.morandiText)),
+                                        Text(
+                                          '+${level.pointsReward} PTS',
+                                          style: const TextStyle(
+                                            fontSize: 20,
+                                            fontWeight: FontWeight.w900,
+                                            color: AppColors.morandiText,
+                                          ),
+                                        ),
                                       ],
                                     ),
                                   ],
@@ -897,18 +1199,33 @@ class _LevelScreenState extends State<LevelScreen> {
                               onPressed: _goBack,
                               child: Container(
                                 width: double.infinity,
-                                padding: const EdgeInsets.symmetric(vertical: 14),
+                                padding: const EdgeInsets.symmetric(
+                                  vertical: 14,
+                                ),
                                 decoration: BoxDecoration(
                                   color: Colors.white,
                                   borderRadius: BorderRadius.circular(16),
-                                  border: Border.all(color: AppColors.morandiText, width: 2.5),
+                                  border: Border.all(
+                                    color: AppColors.morandiText,
+                                    width: 2.5,
+                                  ),
                                   boxShadow: const [
-                                    BoxShadow(color: AppColors.morandiText, offset: Offset(3, 3), blurRadius: 0),
+                                    BoxShadow(
+                                      color: AppColors.morandiText,
+                                      offset: Offset(3, 3),
+                                      blurRadius: 0,
+                                    ),
                                   ],
                                 ),
-                                child: const Text('返回关卡选择 Return',
-                                    textAlign: TextAlign.center,
-                                    style: TextStyle(fontSize: 16, fontWeight: FontWeight.w900, color: AppColors.morandiText)),
+                                child: const Text(
+                                  '返回关卡选择 Return',
+                                  textAlign: TextAlign.center,
+                                  style: TextStyle(
+                                    fontSize: 16,
+                                    fontWeight: FontWeight.w900,
+                                    color: AppColors.morandiText,
+                                  ),
+                                ),
                               ),
                             ),
                             const SizedBox(height: 12),
@@ -916,18 +1233,33 @@ class _LevelScreenState extends State<LevelScreen> {
                               onPressed: _retry,
                               child: Container(
                                 width: double.infinity,
-                                padding: const EdgeInsets.symmetric(vertical: 14),
+                                padding: const EdgeInsets.symmetric(
+                                  vertical: 14,
+                                ),
                                 decoration: BoxDecoration(
                                   color: AppColors.baliHai30,
                                   borderRadius: BorderRadius.circular(16),
-                                  border: Border.all(color: AppColors.morandiText, width: 2.5),
+                                  border: Border.all(
+                                    color: AppColors.morandiText,
+                                    width: 2.5,
+                                  ),
                                   boxShadow: const [
-                                    BoxShadow(color: AppColors.morandiText, offset: Offset(3, 3), blurRadius: 0),
+                                    BoxShadow(
+                                      color: AppColors.morandiText,
+                                      offset: Offset(3, 3),
+                                      blurRadius: 0,
+                                    ),
                                   ],
                                 ),
-                                child: const Text('重试 Retry Level',
-                                    textAlign: TextAlign.center,
-                                    style: TextStyle(fontSize: 16, fontWeight: FontWeight.w900, color: AppColors.morandiText)),
+                                child: const Text(
+                                  '重试 Retry Level',
+                                  textAlign: TextAlign.center,
+                                  style: TextStyle(
+                                    fontSize: 16,
+                                    fontWeight: FontWeight.w900,
+                                    color: AppColors.morandiText,
+                                  ),
+                                ),
                               ),
                             ),
                           ],
@@ -936,18 +1268,35 @@ class _LevelScreenState extends State<LevelScreen> {
                       Positioned(
                         top: -20,
                         child: Container(
-                          padding: const EdgeInsets.symmetric(horizontal: 28, vertical: 10),
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 28,
+                            vertical: 10,
+                          ),
                           decoration: BoxDecoration(
-                            color: _passed ? AppColors.baliHai30 : AppColors.quizError.withValues(alpha: 0.8),
+                            color: _passed
+                                ? AppColors.baliHai30
+                                : AppColors.quizError.withValues(alpha: 0.8),
                             borderRadius: BorderRadius.circular(16),
-                            border: Border.all(color: AppColors.morandiText, width: 3),
+                            border: Border.all(
+                              color: AppColors.morandiText,
+                              width: 3,
+                            ),
                             boxShadow: const [
-                              BoxShadow(color: AppColors.morandiText, offset: Offset(3, 3), blurRadius: 0),
+                              BoxShadow(
+                                color: AppColors.morandiText,
+                                offset: Offset(3, 3),
+                                blurRadius: 0,
+                              ),
                             ],
                           ),
                           child: Text(
                             _passed ? '闯关成功！' : '未通过',
-                            style: const TextStyle(fontSize: 28, fontWeight: FontWeight.w900, color: AppColors.morandiText,letterSpacing: 1.2),
+                            style: const TextStyle(
+                              fontSize: 28,
+                              fontWeight: FontWeight.w900,
+                              color: AppColors.morandiText,
+                              letterSpacing: 1.2,
+                            ),
                           ),
                         ),
                       ),
@@ -983,20 +1332,32 @@ class _StarPainter extends CustomPainter {
   final Color borderColor;
   final double borderWidth;
 
-  _StarPainter({required this.fillColor, required this.borderColor, required this.borderWidth});
+  _StarPainter({
+    required this.fillColor,
+    required this.borderColor,
+    required this.borderWidth,
+  });
 
   @override
   void paint(Canvas canvas, Size size) {
     final path = _starPath(size);
     // Fill
-    canvas.drawPath(path, Paint()..color = fillColor..style = PaintingStyle.fill);
+    canvas.drawPath(
+      path,
+      Paint()
+        ..color = fillColor
+        ..style = PaintingStyle.fill,
+    );
     // Border
-    canvas.drawPath(path, Paint()
-      ..color = borderColor
-      ..style = PaintingStyle.stroke
-      ..strokeWidth = borderWidth
-      ..strokeJoin = StrokeJoin.round
-      ..strokeCap = StrokeCap.round);
+    canvas.drawPath(
+      path,
+      Paint()
+        ..color = borderColor
+        ..style = PaintingStyle.stroke
+        ..strokeWidth = borderWidth
+        ..strokeJoin = StrokeJoin.round
+        ..strokeCap = StrokeCap.round,
+    );
   }
 
   Path _starPath(Size size) {
@@ -1023,5 +1384,7 @@ class _StarPainter extends CustomPainter {
 
   @override
   bool shouldRepaint(covariant _StarPainter old) =>
-      fillColor != old.fillColor || borderColor != old.borderColor || borderWidth != old.borderWidth;
+      fillColor != old.fillColor ||
+      borderColor != old.borderColor ||
+      borderWidth != old.borderWidth;
 }

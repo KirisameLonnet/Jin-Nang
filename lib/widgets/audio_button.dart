@@ -14,22 +14,27 @@ class AudioButton extends StatelessWidget {
   Widget build(BuildContext context) {
     return Pressable(
       onPressed: onTap,
-      child: Container(
-        width: 48,
-        height: 48,
-        decoration: BoxDecoration(
-          color: AppColors.baliHai30,
-          shape: BoxShape.circle,
-          border: Border.all(color: AppColors.morandiText, width: 2),
-          boxShadow: const [
-            BoxShadow(
-              color: AppColors.morandiText,
-              offset: Offset(4, 4),
-              blurRadius: 0,
-            ),
-          ],
+      child: Opacity(
+        opacity: onTap == null ? 0.35 : 1,
+        child: Container(
+          width: 48,
+          height: 48,
+          decoration: BoxDecoration(
+            color: AppColors.baliHai30,
+            shape: BoxShape.circle,
+            border: Border.all(color: AppColors.morandiText, width: 2),
+            boxShadow: onTap == null
+                ? null
+                : const [
+                    BoxShadow(
+                      color: AppColors.morandiText,
+                      offset: Offset(4, 4),
+                      blurRadius: 0,
+                    ),
+                  ],
+          ),
+          child: const Icon(Icons.volume_up, color: Colors.black, size: 22),
         ),
-        child: const Icon(Icons.volume_up, color: Colors.black, size: 22),
       ),
     );
   }

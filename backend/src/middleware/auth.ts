@@ -11,7 +11,7 @@ export const requireAuth = createMiddleware<{ Bindings: Env; Variables: Variable
     try {
       const payload = await verifyJwt(auth.slice(7), c.env.JWT_SECRET)
       c.set('userId', payload.sub)
-      await next()
+      return next()
     } catch {
       return c.json({ error: 'Invalid token' }, 401)
     }

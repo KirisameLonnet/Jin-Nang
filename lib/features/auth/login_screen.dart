@@ -83,7 +83,7 @@ class _LoginScreenState extends State<LoginScreen> {
                         Text("Don't have an account? ",
                             style: TextStyle(color: AppColors.morandiText.withValues(alpha: 0.6), fontWeight: FontWeight.w600)),
                         Pressable(
-                          onPressed: () => context.go('/register'),
+                          onPressed: () => context.push('/register'),
                           child: const Text('Sign Up',
                               style: TextStyle(color: AppColors.baliHai30, fontWeight: FontWeight.w900)),
                         ),

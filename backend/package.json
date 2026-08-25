@@ -5,17 +5,18 @@
   "scripts": {
     "dev": "wrangler dev",
     "deploy": "wrangler deploy",
-    "db:migrate": "wrangler d1 execute jin-nang-db --local --file=schema.sql",
-    "db:seed": "wrangler d1 execute jin-nang-db --local --file=seed.sql",
-    "db:migrate:prod": "wrangler d1 execute jin-nang-db --file=schema.sql",
-    "db:seed:prod": "wrangler d1 execute jin-nang-db --file=seed.sql"
+    "typecheck": "tsc --noEmit",
+    "db:init:local": "wrangler d1 execute jin-nang-db --local --file=schema.sql",
+    "db:seed:local": "wrangler d1 execute jin-nang-db --local --file=seed.sql",
+    "db:migrate:local": "wrangler d1 migrations apply jin-nang-db --local",
+    "db:migrate:prod": "wrangler d1 migrations apply jin-nang-db --remote"
   },
   "dependencies": {
-    "hono": "^4.7.0"
+    "hono": "^4.12.34"
   },
   "devDependencies": {
-    "@cloudflare/workers-types": "^4.20250515.0",
+    "@cloudflare/workers-types": "^5.20260820.1",
     "typescript": "^5.8.3",
-    "wrangler": "^4.13.2"
+    "wrangler": "^4.125.0"
   }
 }

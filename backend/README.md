@@ -29,9 +29,11 @@ backend/
 │       ├── scenes.ts         # GET /scenes  /scenes/:id/vocab|levels
 │       ├── vocab.ts          # GET /vocab/:id（Vocab Battle 详情）
 │       ├── progress.ts       # GET|POST /user/progress
+│       ├── vocab_seen.ts     # POST /user/vocab-seen
 │       └── audio.ts          # GET /audio/:scene/:file（R2 代理）
 ├── migrations/
-│   └── 0001_initial.sql      # 初始表结构
+│   ├── 0001_initial.sql      # 初始表结构
+│   └── 0006_complete_demo_backend.sql # 最新 Demo 数据模型
 ├── schema.sql                # 当前完整表结构（新环境一键建表用）
 ├── seed.sql                  # 初始词库数据
 ├── wrangler.toml             # Worker 配置
@@ -48,16 +50,19 @@ GET  /auth/me                 → 用户信息 + 统计
 
 GET  /scenes                  → 场景列表
 GET  /scenes/:id/vocab        → 场景词汇（学习卡，精简）
+GET  /scenes/:id/phrases      → Toolbox 章节 + 常用语
 GET  /scenes/:id/levels       → 关卡列表 + 题目 + 用户进度
 GET  /vocab/:id               → 词汇详情（Vocab Battle）
 
 GET  /user/progress           → 全部关卡进度
-POST /user/progress           { level_id, stars, score }
+POST /user/progress           { level_id, score }（服务端计算 stars / 解锁）
+POST /user/vocab-seen         { vocab_ids: number[] }
 
 GET  /audio/:scene/:file      → 从 R2 流式返回音频
 ```
 
-所有接口（`/auth/*` 除外）需要 `Authorization: Bearer <token>`。
+除 `/health`、`/auth/register`、`/auth/login` 和 `/audio/*` 外，接口均需要
+`Authorization: Bearer <token>`。
 
 ---
 
@@ -88,12 +93,17 @@ wrangler deploy
 
 3. 同步更新 `schema.sql`（保持完整表结构为最新）
 
-4. 推送到生产 D1：
+4. 先在本地应用并验证：
    ```bash
-   wrangler d1 execute jin-nang-db --remote --file=migrations/0002_add_user_avatar.sql
+   npm run db:migrate:local
    ```
 
-5. 重新部署 Worker（如果代码有变化）：
+5. 获得明确上线授权并确认生产备份后，应用生产迁移：
+   ```bash
+   npm run db:migrate:prod
+   ```
+
+6. 重新部署 Worker（如果代码有变化）：
    ```bash
    wrangler deploy
    ```
@@ -140,10 +150,11 @@ wrangler secret delete SECRET_NAME
 
 ```bash
 npm run dev          # 启动本地 Worker（使用本地 D1）
+npm run typecheck    # TypeScript 严格检查
 
 # 本地数据库初始化（仅首次）
-wrangler d1 execute jin-nang-db --local --file=schema.sql
-wrangler d1 execute jin-nang-db --local --file=seed.sql
+npm run db:init:local
+npm run db:seed:local
 ```
 
 本地开发时音频接口会返回 404（R2 无本地模拟），不影响其他接口测试。
@@ -165,7 +176,7 @@ wrangler r2 bucket create jin-nang-audio
 # 3. 设置 JWT 密钥
 wrangler secret put JWT_SECRET          # 输入一个强随机字符串
 
-# 4. 建表 + 写入初始数据
+# 4. 建表 + 写入初始数据（新环境）
 wrangler d1 execute jin-nang-db --remote --file=schema.sql
 wrangler d1 execute jin-nang-db --remote --file=seed.sql
 
@@ -187,3 +198,6 @@ wrangler deploy
 curl https://jin-nang-api.szfsy06.workers.dev/health
 # → {"ok":true}
 ```
+
+当前最新版上线顺序：确认生产 D1 状态和备份 → `npm run db:migrate:prod` →
+`npm run typecheck` → `npm run deploy` → 执行注册、场景、短语、关卡、进度接口冒烟测试。

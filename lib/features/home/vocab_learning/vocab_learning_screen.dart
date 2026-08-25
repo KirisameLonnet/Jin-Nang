@@ -70,6 +70,11 @@ class _VocabLearningScreenState extends State<VocabLearningScreen> {
     });
 
     final vocab = _vocabList![index];
+    unawaited(
+      Di.api.markVocabSeen([vocab.id]).catchError((Object error) {
+        debugPrint('[Progress] Error marking vocab ${vocab.id}: $error');
+      }),
+    );
     try {
       final file = await Di.audioCache.getSingleFile(vocab.audioUrl);
       await _player.stop();
@@ -83,7 +88,13 @@ class _VocabLearningScreenState extends State<VocabLearningScreen> {
 
   void _goToDialoguePractice() =>
       context.push('/study/dialogue-practice/${widget.sceneId}');
-  void _goBack() => context.go('/study/vocab-scene');
+  void _goBack() {
+    if (context.canPop()) {
+      context.pop();
+    } else {
+      context.go('/study/vocab-scene');
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -178,7 +189,11 @@ class _VocabLearningScreenState extends State<VocabLearningScreen> {
         border: Border.all(color: AppColors.morandiText, width: 2),
         borderRadius: BorderRadius.circular(14),
         boxShadow: const [
-          BoxShadow(color: AppColors.morandiText, offset: Offset(3, 3), blurRadius: 0),
+          BoxShadow(
+            color: AppColors.morandiText,
+            offset: Offset(3, 3),
+            blurRadius: 0,
+          ),
         ],
       ),
       child: const Text(
@@ -211,7 +226,11 @@ class _VocabLearningScreenState extends State<VocabLearningScreen> {
           ),
           borderRadius: BorderRadius.circular(16),
           boxShadow: const [
-            BoxShadow(color: AppColors.morandiText, offset: Offset(3, 3), blurRadius: 0),
+            BoxShadow(
+              color: AppColors.morandiText,
+              offset: Offset(3, 3),
+              blurRadius: 0,
+            ),
           ],
         ),
         child: Column(
@@ -252,9 +271,17 @@ class _VocabLearningScreenState extends State<VocabLearningScreen> {
             ),
             const SizedBox(height: 8),
             if (hasClicked)
-              const Icon(Icons.check_circle, size: 18, color: AppColors.semanticGreen)
+              const Icon(
+                Icons.check_circle,
+                size: 18,
+                color: AppColors.semanticGreen,
+              )
             else
-              Icon(Icons.volume_up, size: 18, color: AppColors.morandiText.withValues(alpha: 0.3)),
+              Icon(
+                Icons.volume_up,
+                size: 18,
+                color: AppColors.morandiText.withValues(alpha: 0.3),
+              ),
           ],
         ),
       ),
@@ -277,7 +304,13 @@ class _VocabLearningScreenState extends State<VocabLearningScreen> {
           ),
           borderRadius: BorderRadius.circular(14),
           boxShadow: _allClicked
-              ? const [BoxShadow(color: AppColors.morandiText, offset: Offset(3, 3), blurRadius: 0)]
+              ? const [
+                  BoxShadow(
+                    color: AppColors.morandiText,
+                    offset: Offset(3, 3),
+                    blurRadius: 0,
+                  ),
+                ]
               : null,
         ),
         child: Center(

@@ -30,7 +30,7 @@ class _ReviewScreenState extends State<ReviewScreen> {
     try {
       final levels = await Di.api.getSceneLevels(widget.sceneId);
       if (!mounted) return;
-      final level = levels.firstWhere((l) => l.id == widget.levelId).enrichForLocal();
+      final level = levels.firstWhere((l) => l.id == widget.levelId);
       final turns = <DialogueTurn>[];
       final lastQ = level.questions.last;
       // Role play: just use last question's complete dialogue
@@ -39,14 +39,17 @@ class _ReviewScreenState extends State<ReviewScreen> {
         if (lastQ.currentQuestion != null) {
           turns.add(DialogueTurn(isWaiter: true, text: lastQ.currentQuestion!));
         }
-        if (lastQ.correctIndex >= 0 && lastQ.correctIndex < lastQ.options.length) {
+        if (lastQ.correctIndex >= 0 &&
+            lastQ.correctIndex < lastQ.options.length) {
           final label = String.fromCharCode(65 + lastQ.correctIndex);
-          turns.add(DialogueTurn(
-            isWaiter: false,
-            text: lastQ.options[lastQ.correctIndex],
-            isCorrect: true,
-            optionLabel: '$label.${lastQ.options[lastQ.correctIndex]}',
-          ));
+          turns.add(
+            DialogueTurn(
+              isWaiter: false,
+              text: lastQ.options[lastQ.correctIndex],
+              isCorrect: true,
+              optionLabel: '$label.${lastQ.options[lastQ.correctIndex]}',
+            ),
+          );
         }
       } else {
         for (final q in level.questions) {
@@ -55,12 +58,14 @@ class _ReviewScreenState extends State<ReviewScreen> {
           }
           if (q.correctIndex >= 0 && q.correctIndex < q.options.length) {
             final label = String.fromCharCode(65 + q.correctIndex);
-            turns.add(DialogueTurn(
-              isWaiter: false,
-              text: q.options[q.correctIndex],
-              isCorrect: true,
-              optionLabel: '$label.${q.options[q.correctIndex]}',
-            ));
+            turns.add(
+              DialogueTurn(
+                isWaiter: false,
+                text: q.options[q.correctIndex],
+                isCorrect: true,
+                optionLabel: '$label.${q.options[q.correctIndex]}',
+              ),
+            );
           }
         }
       }
@@ -83,9 +88,7 @@ class _ReviewScreenState extends State<ReviewScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: AppColors.springWood14,
-      body: AppSafeArea(
-        child: _buildBody(),
-      ),
+      body: AppSafeArea(child: _buildBody()),
     );
   }
 
@@ -96,9 +99,15 @@ class _ReviewScreenState extends State<ReviewScreen> {
           const SizedBox(height: 48),
           _buildTopBar(),
           const Spacer(),
-          Text(_error!,
-              textAlign: TextAlign.center,
-              style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w700, color: AppColors.quizError)),
+          Text(
+            _error!,
+            textAlign: TextAlign.center,
+            style: const TextStyle(
+              fontSize: 14,
+              fontWeight: FontWeight.w700,
+              color: AppColors.quizError,
+            ),
+          ),
           const Spacer(),
         ],
       );
@@ -129,7 +138,11 @@ class _ReviewScreenState extends State<ReviewScreen> {
                 borderRadius: BorderRadius.circular(28),
                 border: Border.all(color: AppColors.morandiText, width: 3),
                 boxShadow: const [
-                  BoxShadow(color: AppColors.morandiText, offset: Offset(5, 5), blurRadius: 0),
+                  BoxShadow(
+                    color: AppColors.morandiText,
+                    offset: Offset(5, 5),
+                    blurRadius: 0,
+                  ),
                 ],
               ),
               child: ClipRRect(
@@ -143,7 +156,12 @@ class _ReviewScreenState extends State<ReviewScreen> {
           ),
         ),
         Padding(
-          padding: const EdgeInsets.fromLTRB(AppSpacing.lg, AppSpacing.md, AppSpacing.lg, AppSpacing.lg),
+          padding: const EdgeInsets.fromLTRB(
+            AppSpacing.lg,
+            AppSpacing.md,
+            AppSpacing.lg,
+            AppSpacing.lg,
+          ),
           child: Pressable(
             onPressed: _goBack,
             child: Container(
@@ -154,17 +172,39 @@ class _ReviewScreenState extends State<ReviewScreen> {
                 borderRadius: BorderRadius.circular(16),
                 border: Border.all(color: AppColors.morandiText, width: 3),
                 boxShadow: const [
-                  BoxShadow(color: AppColors.morandiText, offset: Offset(4, 4), blurRadius: 0),
+                  BoxShadow(
+                    color: AppColors.morandiText,
+                    offset: Offset(4, 4),
+                    blurRadius: 0,
+                  ),
                 ],
               ),
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: const [
-                  Text('完成', style: TextStyle(fontSize: 17, fontWeight: FontWeight.w900, color: AppColors.morandiText)),
+                  Text(
+                    '完成',
+                    style: TextStyle(
+                      fontSize: 17,
+                      fontWeight: FontWeight.w900,
+                      color: AppColors.morandiText,
+                    ),
+                  ),
                   SizedBox(width: 6),
-                  Text('Done', style: TextStyle(fontSize: 17, fontWeight: FontWeight.w900, color: AppColors.morandiText)),
+                  Text(
+                    'Done',
+                    style: TextStyle(
+                      fontSize: 17,
+                      fontWeight: FontWeight.w900,
+                      color: AppColors.morandiText,
+                    ),
+                  ),
                   SizedBox(width: 8),
-                  Icon(Icons.chevron_right, color: AppColors.morandiText, size: 22),
+                  Icon(
+                    Icons.chevron_right,
+                    color: AppColors.morandiText,
+                    size: 22,
+                  ),
                 ],
               ),
             ),
@@ -181,8 +221,14 @@ class _ReviewScreenState extends State<ReviewScreen> {
         children: [
           _buildCircleBackBtn(),
           const SizedBox(width: 12),
-          const Text('对话回顾（Review）',
-              style: TextStyle(fontSize: 18, fontWeight: FontWeight.w900, color: AppColors.morandiText)),
+          const Text(
+            '对话回顾（Review）',
+            style: TextStyle(
+              fontSize: 18,
+              fontWeight: FontWeight.w900,
+              color: AppColors.morandiText,
+            ),
+          ),
         ],
       ),
     );
@@ -199,10 +245,18 @@ class _ReviewScreenState extends State<ReviewScreen> {
           shape: BoxShape.circle,
           border: Border.all(color: AppColors.morandiText, width: 2.5),
           boxShadow: const [
-            BoxShadow(color: AppColors.morandiText, offset: Offset(3, 3), blurRadius: 0),
+            BoxShadow(
+              color: AppColors.morandiText,
+              offset: Offset(3, 3),
+              blurRadius: 0,
+            ),
           ],
         ),
-        child: const Icon(Icons.arrow_back, color: AppColors.morandiText, size: 20),
+        child: const Icon(
+          Icons.arrow_back,
+          color: AppColors.morandiText,
+          size: 20,
+        ),
       ),
     );
   }
@@ -223,15 +277,26 @@ class _ReviewScreenState extends State<ReviewScreen> {
                 shape: BoxShape.circle,
                 border: Border.all(color: AppColors.morandiText, width: 2),
                 boxShadow: const [
-                  BoxShadow(color: AppColors.morandiText, offset: Offset(4, 4), blurRadius: 0),
+                  BoxShadow(
+                    color: AppColors.morandiText,
+                    offset: Offset(4, 4),
+                    blurRadius: 0,
+                  ),
                 ],
               ),
-              child: const Icon(Icons.person_outline, color: AppColors.morandiText, size: 22),
+              child: const Icon(
+                Icons.person_outline,
+                color: AppColors.morandiText,
+                size: 22,
+              ),
             ),
             const SizedBox(width: 10),
             Expanded(
               child: Container(
-                padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 14,
+                  vertical: 12,
+                ),
                 decoration: BoxDecoration(
                   color: Color(0xFFD6C6F5),
                   borderRadius: const BorderRadius.only(
@@ -242,8 +307,15 @@ class _ReviewScreenState extends State<ReviewScreen> {
                   ),
                   border: Border.all(color: AppColors.morandiText, width: 2),
                 ),
-                child: Text(turn.text,
-                    style: const TextStyle(fontSize: 14, color: AppColors.morandiText, height: 1.5, fontWeight: FontWeight.w600)),
+                child: Text(
+                  turn.text,
+                  style: const TextStyle(
+                    fontSize: 14,
+                    color: AppColors.morandiText,
+                    height: 1.5,
+                    fontWeight: FontWeight.w600,
+                  ),
+                ),
               ),
             ),
             const SizedBox(width: 40),
@@ -262,8 +334,13 @@ class _ReviewScreenState extends State<ReviewScreen> {
                 const SizedBox(width: 40),
                 const Spacer(),
                 Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
-                  constraints: BoxConstraints(maxWidth: MediaQuery.of(context).size.width * 0.65),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 14,
+                    vertical: 12,
+                  ),
+                  constraints: BoxConstraints(
+                    maxWidth: MediaQuery.of(context).size.width * 0.65,
+                  ),
                   decoration: BoxDecoration(
                     color: AppColors.baliHai30,
                     borderRadius: const BorderRadius.only(
@@ -276,7 +353,12 @@ class _ReviewScreenState extends State<ReviewScreen> {
                   ),
                   child: Text(
                     turn.optionLabel ?? turn.text,
-                    style: const TextStyle(fontSize: 14, color: Colors.white, height: 1.5, fontWeight: FontWeight.w600),
+                    style: const TextStyle(
+                      fontSize: 14,
+                      color: Colors.white,
+                      height: 1.5,
+                      fontWeight: FontWeight.w600,
+                    ),
                   ),
                 ),
               ],
@@ -289,8 +371,14 @@ class _ReviewScreenState extends State<ReviewScreen> {
                   children: const [
                     Icon(Icons.check, size: 13, color: AppColors.quizCorrect),
                     SizedBox(width: 4),
-                    Text('CORRECT',
-                        style: TextStyle(fontSize: 12, fontWeight: FontWeight.w900, color: AppColors.quizCorrect)),
+                    Text(
+                      'CORRECT',
+                      style: TextStyle(
+                        fontSize: 12,
+                        fontWeight: FontWeight.w900,
+                        color: AppColors.quizCorrect,
+                      ),
+                    ),
                   ],
                 ),
               ),

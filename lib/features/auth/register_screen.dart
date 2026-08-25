@@ -22,6 +22,14 @@ class _RegisterScreenState extends State<RegisterScreen> {
   bool _loading = false;
   String? _error;
 
+  void _goToLogin() {
+    if (context.canPop()) {
+      context.pop();
+    } else {
+      context.go('/login');
+    }
+  }
+
   @override
   void dispose() {
     _nameCtrl.dispose();
@@ -88,7 +96,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                         Text('Already have an account? ',
                             style: TextStyle(color: AppColors.morandiText.withValues(alpha: 0.6), fontWeight: FontWeight.w600)),
                         Pressable(
-                          onPressed: () => context.go('/login'),
+                          onPressed: _goToLogin,
                           child: const Text('Sign In',
                               style: TextStyle(color: AppColors.lavenderPurple, fontWeight: FontWeight.w900)),
                         ),

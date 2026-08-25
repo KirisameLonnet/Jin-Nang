@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import '../../core/di.dart';
 import '../../core/models/scene.dart';
 import '../../theme/app_colors.dart';
@@ -96,7 +97,7 @@ class _ToolboxSceneScreenState extends State<ToolboxSceneScreen> {
                 icon: _iconForScene(scene.nameEn),
                 color: _colorFromHex(scene.colorHex),
                 onTap: scene.isUnlockedDefault
-                    ? () => Di.router!.go('/toolbox/${scene.id}')
+                    ? () => context.push('/toolbox/${scene.id}')
                     : null,
                 onLockedTap: scene.isUnlockedDefault
                     ? null

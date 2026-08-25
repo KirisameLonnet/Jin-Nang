@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import '../../core/di.dart';
 import '../../core/models/user.dart';
 import '../../theme/app_colors.dart';
@@ -21,7 +22,14 @@ class _HomeScreenState extends State<HomeScreen> {
   @override
   void initState() {
     super.initState();
+    Di.profileRevision.addListener(_loadProfile);
     _loadProfile();
+  }
+
+  @override
+  void dispose() {
+    Di.profileRevision.removeListener(_loadProfile);
+    super.dispose();
   }
 
   Future<void> _loadProfile() async {
@@ -81,11 +89,23 @@ class _HomeScreenState extends State<HomeScreen> {
         color: AppColors.baliHai30,
         border: Border.all(color: AppColors.morandiText, width: 3),
         borderRadius: BorderRadius.circular(12),
-        boxShadow: const [BoxShadow(color: AppColors.morandiText, offset: Offset(4, 4), blurRadius: 0)],
+        boxShadow: const [
+          BoxShadow(
+            color: AppColors.morandiText,
+            offset: Offset(4, 4),
+            blurRadius: 0,
+          ),
+        ],
       ),
-      child: Text(text,
-          style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w900,
-              color: AppColors.morandiText, letterSpacing: 0.35)),
+      child: Text(
+        text,
+        style: const TextStyle(
+          fontSize: 14,
+          fontWeight: FontWeight.w900,
+          color: AppColors.morandiText,
+          letterSpacing: 0.35,
+        ),
+      ),
     );
   }
 
@@ -106,28 +126,57 @@ class _HomeScreenState extends State<HomeScreen> {
       onPressed: () => _comingSoon(context),
       child: Container(
         height: 120,
-      padding: const EdgeInsets.all(14),
-      decoration: BoxDecoration(
-        color: AppColors.lavenderPurple,
-        border: Border.all(color: AppColors.morandiText, width: 3),
-        borderRadius: BorderRadius.circular(16),
-        boxShadow: const [BoxShadow(color: AppColors.morandiText, offset: Offset(4, 4), blurRadius: 0)],
-      ),
-      child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-          _buildStatIcon('assets/icon/fire.png'),
-          const SizedBox(height: 3),
-        const Text('STREAK',
-            style: TextStyle(fontSize: 13, fontWeight: FontWeight.w900, color: AppColors.morandiText)),
-          const SizedBox(height: 3),
-          Text.rich(
-            TextSpan(children: [
-              TextSpan(text: '$days ',
-                  style: const TextStyle(fontSize: 18, fontWeight: FontWeight.w900, color: AppColors.morandiText)),
-              const TextSpan(text: 'Days',
-                  style: TextStyle(fontSize: 14, fontWeight: FontWeight.w700, color: AppColors.morandiText)),
-            ]),
-          ),
-      ]),
+        padding: const EdgeInsets.all(14),
+        decoration: BoxDecoration(
+          color: AppColors.lavenderPurple,
+          border: Border.all(color: AppColors.morandiText, width: 3),
+          borderRadius: BorderRadius.circular(16),
+          boxShadow: const [
+            BoxShadow(
+              color: AppColors.morandiText,
+              offset: Offset(4, 4),
+              blurRadius: 0,
+            ),
+          ],
+        ),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            _buildStatIcon('assets/icon/fire.png'),
+            const SizedBox(height: 3),
+            const Text(
+              'STREAK',
+              style: TextStyle(
+                fontSize: 13,
+                fontWeight: FontWeight.w900,
+                color: AppColors.morandiText,
+              ),
+            ),
+            const SizedBox(height: 3),
+            Text.rich(
+              TextSpan(
+                children: [
+                  TextSpan(
+                    text: '$days ',
+                    style: const TextStyle(
+                      fontSize: 18,
+                      fontWeight: FontWeight.w900,
+                      color: AppColors.morandiText,
+                    ),
+                  ),
+                  const TextSpan(
+                    text: 'Days',
+                    style: TextStyle(
+                      fontSize: 14,
+                      fontWeight: FontWeight.w700,
+                      color: AppColors.morandiText,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }
@@ -146,29 +195,51 @@ class _HomeScreenState extends State<HomeScreen> {
       onPressed: () => _comingSoon(context),
       child: Container(
         height: 120,
-      padding: const EdgeInsets.all(14),
-      decoration: BoxDecoration(
-        color: AppColors.straw14,
-        border: Border.all(color: AppColors.morandiText, width: 3),
-        borderRadius: BorderRadius.circular(16),
-        boxShadow: const [BoxShadow(color: AppColors.morandiText, offset: Offset(4, 4), blurRadius: 0)],
-      ),
-      child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-          _buildStatIcon('assets/icon/cup.png'),
-          const SizedBox(height: 3),
-        const Text('RANK',
-            style: TextStyle(fontSize: 13, fontWeight: FontWeight.w900, color: AppColors.morandiText)),
-          const SizedBox(height: 3),
-        Text(rank,
-            style: const TextStyle(fontSize: 18, fontWeight: FontWeight.w900, color: AppColors.morandiText)),
-      ]),
+        padding: const EdgeInsets.all(14),
+        decoration: BoxDecoration(
+          color: AppColors.straw14,
+          border: Border.all(color: AppColors.morandiText, width: 3),
+          borderRadius: BorderRadius.circular(16),
+          boxShadow: const [
+            BoxShadow(
+              color: AppColors.morandiText,
+              offset: Offset(4, 4),
+              blurRadius: 0,
+            ),
+          ],
+        ),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            _buildStatIcon('assets/icon/cup.png'),
+            const SizedBox(height: 3),
+            const Text(
+              'RANK',
+              style: TextStyle(
+                fontSize: 13,
+                fontWeight: FontWeight.w900,
+                color: AppColors.morandiText,
+              ),
+            ),
+            const SizedBox(height: 3),
+            Text(
+              rank,
+              style: const TextStyle(
+                fontSize: 18,
+                fontWeight: FontWeight.w900,
+                color: AppColors.morandiText,
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }
 
   Widget _buildStatIcon(String assetPath) {
     return Container(
-      width: 32, height: 32,
+      width: 32,
+      height: 32,
       padding: const EdgeInsets.all(6),
       decoration: BoxDecoration(
         color: Colors.white,
@@ -180,31 +251,40 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   Widget _buildMissionsSection(BuildContext context) {
-    return Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-      const Text('MISSIONS',
-          style: TextStyle(fontSize: 26, fontWeight: FontWeight.w900,
-              color: AppColors.morandiText, letterSpacing: -0.65)),
-      const SizedBox(height: 16),
-      Pressable(
-        onPressed: () => Di.router!.go('/study/vocab-scene'),
-        child: _buildMissionCard(
-          title: 'Vocab\nLearning',
-          subtitle: '${_profile?.totalWordsSeen ?? 0} words learned',
-          color: AppColors.straw14,
-          iconPath: 'assets/icon/study.png',
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        const Text(
+          'MISSIONS',
+          style: TextStyle(
+            fontSize: 26,
+            fontWeight: FontWeight.w900,
+            color: AppColors.morandiText,
+            letterSpacing: -0.65,
+          ),
         ),
-      ),
-      const SizedBox(height: 16),
-      Pressable(
-        onPressed: () => Di.router!.go('/study/dialogue-scene'),
-        child: _buildMissionCard(
-          title: 'Dialogue\nPractice',
-          subtitle: '10 mins',
-          color: AppColors.baliHai30,
-          iconPath: 'assets/icon/dialogue_learning.png',
+        const SizedBox(height: 16),
+        Pressable(
+          onPressed: () => context.push('/study/vocab-scene'),
+          child: _buildMissionCard(
+            title: 'Vocab\nLearning',
+            subtitle: '${_profile?.totalWordsSeen ?? 0} words learned',
+            color: AppColors.straw14,
+            iconPath: 'assets/icon/study.png',
+          ),
         ),
-      ),
-    ]);
+        const SizedBox(height: 16),
+        Pressable(
+          onPressed: () => context.push('/study/dialogue-scene'),
+          child: _buildMissionCard(
+            title: 'Dialogue\nPractice',
+            subtitle: '10 mins',
+            color: AppColors.baliHai30,
+            iconPath: 'assets/icon/dialogue_learning.png',
+          ),
+        ),
+      ],
+    );
   }
 
   Widget _buildMissionCard({
@@ -219,34 +299,63 @@ class _HomeScreenState extends State<HomeScreen> {
         color: color,
         border: Border.all(color: AppColors.morandiText, width: 3),
         borderRadius: BorderRadius.circular(16),
-        boxShadow: const [BoxShadow(color: AppColors.morandiText, offset: Offset(4, 4), blurRadius: 0)],
+        boxShadow: const [
+          BoxShadow(
+            color: AppColors.morandiText,
+            offset: Offset(4, 4),
+            blurRadius: 0,
+          ),
+        ],
       ),
-      child: Row(children: [
+      child: Row(
+        children: [
           _buildMissionIcon(iconPath),
           const SizedBox(width: 12),
           Expanded(
-          child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-            Text(title,
-                style: const TextStyle(fontSize: 20, fontWeight: FontWeight.w900,
-                    color: AppColors.morandiText, height: 25 / 20)),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  title,
+                  style: const TextStyle(
+                    fontSize: 20,
+                    fontWeight: FontWeight.w900,
+                    color: AppColors.morandiText,
+                    height: 25 / 20,
+                  ),
+                ),
                 const SizedBox(height: 7),
-            Text(subtitle,
-                style: TextStyle(fontSize: 14, fontWeight: FontWeight.w700,
-                    color: AppColors.morandiText.withValues(alpha: 0.7))),
-          ]),
+                Text(
+                  subtitle,
+                  style: TextStyle(
+                    fontSize: 14,
+                    fontWeight: FontWeight.w700,
+                    color: AppColors.morandiText.withValues(alpha: 0.7),
+                  ),
+                ),
+              ],
+            ),
           ),
-      ]),
+        ],
+      ),
     );
   }
 
   Widget _buildMissionIcon(String iconPath) {
     return Container(
-      width: 48, height: 48,
+      width: 48,
+      height: 48,
       decoration: BoxDecoration(
         color: Colors.white,
         border: Border.all(color: AppColors.morandiText, width: 2),
         borderRadius: BorderRadius.circular(12),
-        boxShadow: const [BoxShadow(color: AppColors.morandiText, offset: Offset(4, 4), blurRadius: 0)],
+        boxShadow: const [
+          BoxShadow(
+            color: AppColors.morandiText,
+            offset: Offset(4, 4),
+            blurRadius: 0,
+          ),
+        ],
       ),
       child: Center(child: Image.asset(iconPath, width: 22, height: 22)),
     );

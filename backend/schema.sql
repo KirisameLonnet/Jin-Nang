@@ -85,11 +85,44 @@ CREATE TABLE IF NOT EXISTS questions (
   phonetic TEXT,
   instruction TEXT,
   audio_url TEXT,
+  audio_key TEXT,
   current_question TEXT,
   history TEXT,
   sort_order INTEGER NOT NULL DEFAULT 0
 );
 
+CREATE TABLE IF NOT EXISTS scene_phrase_topics (
+  scene_id INTEGER PRIMARY KEY REFERENCES scenes(id),
+  category TEXT NOT NULL,
+  title TEXT NOT NULL,
+  icon_key TEXT NOT NULL DEFAULT 'restaurant'
+);
+
+CREATE TABLE IF NOT EXISTS phrase_chapters (
+  id INTEGER PRIMARY KEY AUTOINCREMENT,
+  scene_id INTEGER NOT NULL REFERENCES scenes(id),
+  chapter_num INTEGER NOT NULL,
+  title TEXT NOT NULL,
+  subtitle TEXT NOT NULL,
+  sort_order INTEGER NOT NULL DEFAULT 0,
+  UNIQUE(scene_id, chapter_num)
+);
+
+CREATE TABLE IF NOT EXISTS phrases (
+  id INTEGER PRIMARY KEY AUTOINCREMENT,
+  chapter_id INTEGER NOT NULL REFERENCES phrase_chapters(id),
+  chinese TEXT NOT NULL,
+  pinyin TEXT NOT NULL,
+  english TEXT NOT NULL,
+  audio_key TEXT,
+  sort_order INTEGER NOT NULL DEFAULT 0
+);
+
+CREATE INDEX IF NOT EXISTS idx_vocab_scene ON vocab(scene_id, sort_order);
+CREATE INDEX IF NOT EXISTS idx_levels_scene ON levels(scene_id, sort_order);
+CREATE INDEX IF NOT EXISTS idx_questions_level ON questions(level_id, sort_order);
+CREATE INDEX IF NOT EXISTS idx_phrase_chapters_scene ON phrase_chapters(scene_id, sort_order);
+CREATE INDEX IF NOT EXISTS idx_phrases_chapter ON phrases(chapter_id, sort_order);
 CREATE TABLE IF NOT EXISTS user_level_progress (
   id INTEGER PRIMARY KEY AUTOINCREMENT,
   user_id INTEGER NOT NULL REFERENCES users(id),
@@ -107,3 +140,5 @@ CREATE TABLE IF NOT EXISTS user_vocab_seen (
   seen_at TEXT NOT NULL DEFAULT (datetime('now')),
   PRIMARY KEY (user_id, vocab_id)
 );
+
+CREATE INDEX IF NOT EXISTS idx_progress_user ON user_level_progress(user_id);
