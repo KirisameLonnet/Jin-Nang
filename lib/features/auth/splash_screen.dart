@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import '../../core/di.dart';
 import '../../theme/app_colors.dart';
+import '../../l10n/l10n.dart';
 
 class SplashScreen extends StatefulWidget {
   const SplashScreen({super.key});
@@ -45,7 +46,7 @@ class _SplashScreenState extends State<SplashScreen> {
             children: [
               // Jin Nang 标题
               Text(
-                'Jin Nang',
+                context.l10n.appTitle,
                 style: TextStyle(
                   fontSize: 36,
                   fontWeight: FontWeight.w900,
@@ -63,7 +64,10 @@ class _SplashScreenState extends State<SplashScreen> {
               const SizedBox(height: 28),
               // LOADING... 胶囊
               Container(
-                padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 10,
+                  vertical: 6,
+                ),
                 decoration: BoxDecoration(
                   color: AppColors.springWood14,
                   borderRadius: BorderRadius.circular(24),
@@ -76,9 +80,9 @@ class _SplashScreenState extends State<SplashScreen> {
                     ),
                   ],
                 ),
-                child: const Text(
-                  'LOADING...',
-                  style: TextStyle(
+                child: Text(
+                  context.l10n.loading,
+                  style: const TextStyle(
                     fontSize: 12,
                     fontWeight: FontWeight.w800,
                     color: AppColors.morandiText,

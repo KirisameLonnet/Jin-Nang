@@ -6,6 +6,7 @@ import '../../../theme/app_colors.dart';
 import '../../../theme/app_spacing.dart';
 import '../../../widgets/app_safe_area.dart';
 import '../../../widgets/pressable.dart';
+import '../../../l10n/l10n.dart';
 
 class ReviewScreen extends StatefulWidget {
   final int levelId;
@@ -100,7 +101,7 @@ class _ReviewScreenState extends State<ReviewScreen> {
           _buildTopBar(),
           const Spacer(),
           Text(
-            _error!,
+            context.l10n.loadFailed,
             textAlign: TextAlign.center,
             style: const TextStyle(
               fontSize: 14,
@@ -181,26 +182,17 @@ class _ReviewScreenState extends State<ReviewScreen> {
               ),
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.center,
-                children: const [
+                children: [
                   Text(
-                    '完成',
-                    style: TextStyle(
+                    context.l10n.done,
+                    style: const TextStyle(
                       fontSize: 17,
                       fontWeight: FontWeight.w900,
                       color: AppColors.morandiText,
                     ),
                   ),
-                  SizedBox(width: 6),
-                  Text(
-                    'Done',
-                    style: TextStyle(
-                      fontSize: 17,
-                      fontWeight: FontWeight.w900,
-                      color: AppColors.morandiText,
-                    ),
-                  ),
-                  SizedBox(width: 8),
-                  Icon(
+                  const SizedBox(width: 8),
+                  const Icon(
                     Icons.chevron_right,
                     color: AppColors.morandiText,
                     size: 22,
@@ -221,9 +213,9 @@ class _ReviewScreenState extends State<ReviewScreen> {
         children: [
           _buildCircleBackBtn(),
           const SizedBox(width: 12),
-          const Text(
-            '对话回顾（Review）',
-            style: TextStyle(
+          Text(
+            context.l10n.dialogueReview,
+            style: const TextStyle(
               fontSize: 18,
               fontWeight: FontWeight.w900,
               color: AppColors.morandiText,
@@ -368,12 +360,16 @@ class _ReviewScreenState extends State<ReviewScreen> {
                 padding: const EdgeInsets.only(top: 4, right: 4),
                 child: Row(
                   mainAxisSize: MainAxisSize.min,
-                  children: const [
-                    Icon(Icons.check, size: 13, color: AppColors.quizCorrect),
-                    SizedBox(width: 4),
+                  children: [
+                    const Icon(
+                      Icons.check,
+                      size: 13,
+                      color: AppColors.quizCorrect,
+                    ),
+                    const SizedBox(width: 4),
                     Text(
-                      'CORRECT',
-                      style: TextStyle(
+                      context.l10n.correctAnswer.toUpperCase(),
+                      style: const TextStyle(
                         fontSize: 12,
                         fontWeight: FontWeight.w900,
                         color: AppColors.quizCorrect,

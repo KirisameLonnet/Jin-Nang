@@ -9,6 +9,7 @@ import '../../../theme/app_spacing.dart';
 import '../../../widgets/app_header.dart';
 import '../../../widgets/app_safe_area.dart';
 import '../../../widgets/pressable.dart';
+import '../../../l10n/l10n.dart';
 
 class VocabLearningScreen extends StatefulWidget {
   final int sceneId;
@@ -114,13 +115,13 @@ class _VocabLearningScreenState extends State<VocabLearningScreen> {
         children: [
           const SizedBox(height: 48),
           AppHeader(
-            title: 'Vocab Learning',
+            title: context.l10n.vocabLearningSingleLine,
             titleColor: AppColors.baliHai30,
             onBack: _goBack,
           ),
           const Spacer(),
           Text(
-            _error!,
+            context.l10n.loadFailed,
             textAlign: TextAlign.center,
             style: const TextStyle(
               fontSize: 14,
@@ -138,7 +139,7 @@ class _VocabLearningScreenState extends State<VocabLearningScreen> {
         children: [
           const SizedBox(height: 48),
           AppHeader(
-            title: 'Vocab Learning',
+            title: context.l10n.vocabLearningSingleLine,
             titleColor: AppColors.baliHai30,
             onBack: _goBack,
           ),
@@ -153,7 +154,7 @@ class _VocabLearningScreenState extends State<VocabLearningScreen> {
       children: [
         const SizedBox(height: 48),
         AppHeader(
-          title: 'Vocab Learning',
+          title: context.l10n.vocabLearningSingleLine,
           titleColor: AppColors.baliHai30,
           onBack: _goBack,
         ),
@@ -195,8 +196,8 @@ class _VocabLearningScreenState extends State<VocabLearningScreen> {
           ),
         ],
       ),
-      child: const Text(
-        '先来学学这几个词',
+      child: Text(
+        context.l10n.learnTheseWords,
         textAlign: TextAlign.center,
         style: TextStyle(
           fontSize: 18,
@@ -315,8 +316,11 @@ class _VocabLearningScreenState extends State<VocabLearningScreen> {
         child: Center(
           child: Text(
             _allClicked
-                ? '学完了，去练习 →'
-                : '点击卡片学习 (${_clickedCards.length}/${_vocabList?.length ?? 0})',
+                ? context.l10n.startPractice
+                : context.l10n.cardsLearned(
+                    _clickedCards.length,
+                    _vocabList?.length ?? 0,
+                  ),
             style: TextStyle(
               fontSize: 15,
               fontWeight: FontWeight.w900,

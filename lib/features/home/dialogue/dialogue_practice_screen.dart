@@ -7,6 +7,7 @@ import '../../../theme/app_spacing.dart';
 import '../../../widgets/app_safe_area.dart';
 import '../../../widgets/dashed_divider.dart';
 import '../../../widgets/pressable.dart';
+import '../../../l10n/l10n.dart';
 
 class DialoguePracticeScreen extends StatefulWidget {
   final int sceneId;
@@ -15,8 +16,8 @@ class DialoguePracticeScreen extends StatefulWidget {
   const DialoguePracticeScreen({
     super.key,
     required this.sceneId,
-    this.sceneName = 'Scene',
-    this.sceneNameZh = '场景',
+    this.sceneName = '',
+    this.sceneNameZh = '',
   });
 
   @override
@@ -84,7 +85,7 @@ class _DialoguePracticeScreenState extends State<DialoguePracticeScreen> {
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: AppSpacing.lg),
               child: Text(
-                _error!,
+                context.l10n.loadFailed,
                 textAlign: TextAlign.center,
                 style: const TextStyle(
                   fontSize: 14,
@@ -208,18 +209,10 @@ class _DialoguePracticeScreenState extends State<DialoguePracticeScreen> {
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
                                 Text(
-                                  '第 ${level.levelNum} 关：${_levelTitle(level)}',
-                                  maxLines: 1,
-                                  overflow: TextOverflow.ellipsis,
-                                  style: const TextStyle(
-                                    fontSize: 18,
-                                    fontWeight: FontWeight.w900,
-                                    color: AppColors.morandiText,
+                                  context.l10n.levelTitle(
+                                    level.levelNum,
+                                    _levelTitle(level),
                                   ),
-                                ),
-                                const SizedBox(height: 2),
-                                Text(
-                                  _levelSubtitle(level),
                                   maxLines: 1,
                                   overflow: TextOverflow.ellipsis,
                                   style: const TextStyle(
@@ -235,7 +228,7 @@ class _DialoguePracticeScreenState extends State<DialoguePracticeScreen> {
                                 top: 0,
                                 right: 0,
                                 child: _buildStatusBadge(
-                                  '已通关',
+                                  context.l10n.passed,
                                   Icons.check_circle,
                                   AppColors.oldRose15,
                                 ),
@@ -245,7 +238,7 @@ class _DialoguePracticeScreenState extends State<DialoguePracticeScreen> {
                                 top: 0,
                                 right: 0,
                                 child: _buildStatusBadge(
-                                  '未解锁',
+                                  context.l10n.locked,
                                   Icons.lock,
                                   AppColors.mercury25,
                                 ),
@@ -271,7 +264,12 @@ class _DialoguePracticeScreenState extends State<DialoguePracticeScreen> {
                   Row(
                     children: [
                       Text(
-                        '通关: ${level.stars > 0 ? '${(level.bestScore / 100 * totalQ).round()}/$totalQ题' : '0/$totalQ题'}',
+                        context.l10n.passProgress(
+                          level.stars > 0
+                              ? (level.bestScore / 100 * totalQ).round()
+                              : 0,
+                          totalQ,
+                        ),
                         style: const TextStyle(
                           fontSize: 12,
                           color: Colors.black54,
@@ -286,7 +284,7 @@ class _DialoguePracticeScreenState extends State<DialoguePracticeScreen> {
                       ),
                       const SizedBox(width: 2),
                       Text(
-                        'X${level.stars}',
+                        context.l10n.starCount(level.stars),
                         style: const TextStyle(
                           fontSize: 12,
                           fontWeight: FontWeight.w900,
@@ -310,7 +308,7 @@ class _DialoguePracticeScreenState extends State<DialoguePracticeScreen> {
                           ),
                         ),
                         child: Text(
-                          '+${level.pointsReward} PTS',
+                          context.l10n.rewardPoints(level.pointsReward),
                           style: const TextStyle(
                             fontSize: 11,
                             fontWeight: FontWeight.w900,
@@ -338,16 +336,16 @@ class _DialoguePracticeScreenState extends State<DialoguePracticeScreen> {
               child: locked
                   ? Row(
                       mainAxisAlignment: MainAxisAlignment.end,
-                      children: const [
-                        Icon(
+                      children: [
+                        const Icon(
                           Icons.lock_outline,
                           size: 15,
                           color: Colors.black38,
                         ),
-                        SizedBox(width: 6),
+                        const SizedBox(width: 6),
                         Text(
-                          '请先通关前一关卡',
-                          style: TextStyle(
+                          context.l10n.completePreviousLevel,
+                          style: const TextStyle(
                             fontSize: 13,
                             color: Colors.black38,
                             fontWeight: FontWeight.w700,
@@ -391,16 +389,16 @@ class _DialoguePracticeScreenState extends State<DialoguePracticeScreen> {
               ),
               child: Row(
                 mainAxisSize: MainAxisSize.min,
-                children: const [
-                  Icon(
+                children: [
+                  const Icon(
                     Icons.play_arrow,
                     size: 18,
                     color: AppColors.morandiText,
                   ),
-                  SizedBox(width: 4),
+                  const SizedBox(width: 4),
                   Text(
-                    ' Review',
-                    style: TextStyle(
+                    context.l10n.review,
+                    style: const TextStyle(
                       fontSize: 18,
                       fontWeight: FontWeight.w900,
                       color: AppColors.morandiText,
@@ -436,9 +434,9 @@ class _DialoguePracticeScreenState extends State<DialoguePracticeScreen> {
                     color: AppColors.morandiText,
                   ),
                   const SizedBox(width: 4),
-                  const Text(
-                    ' Replay',
-                    style: TextStyle(
+                  Text(
+                    context.l10n.replay,
+                    style: const TextStyle(
                       fontSize: 18,
                       fontWeight: FontWeight.w900,
                       color: AppColors.morandiText,
@@ -482,7 +480,7 @@ class _DialoguePracticeScreenState extends State<DialoguePracticeScreen> {
               ),
               const SizedBox(width: 4),
               Text(
-                done ? ' Replay' : ' START',
+                done ? context.l10n.replay : context.l10n.start,
                 style: const TextStyle(
                   fontSize: 18,
                   fontWeight: FontWeight.w900,
@@ -497,55 +495,23 @@ class _DialoguePracticeScreenState extends State<DialoguePracticeScreen> {
   }
 
   String _levelTitle(Level level) {
-    // CN → return as-is; EN → map to CN
-    switch (level.title) {
-      case 'Level 1':
-      case 'Vocab Match':
-        return '词汇匹配';
-      case 'Level 2':
-      case 'Listen & Choose':
-        return '听力选择';
-      case 'Level 3':
-      case 'Fill in Blanks':
-        return '句子填空';
-      case 'Challenge':
-      case 'Scenario Sort':
-        return '点餐角色扮演';
-      default:
-        return level.title;
-    }
-  }
-
-  String _levelSubtitle(Level level) {
-    switch (level.subtitle) {
-      case 'Vocab Match':
-        return '(Vocabulary Match)';
-      case 'Listen & Choose':
-        return '(Listening Choice)';
-      case 'Fill in Blanks':
-        return '(Blank Filling)';
-      case 'Scenario Sort':
-        return '(Role Play)';
-      default:
-        return level.subtitle;
-    }
+    return switch (level.levelNum) {
+      1 => context.l10n.vocabMatch,
+      2 => context.l10n.listeningChoice,
+      3 => context.l10n.blankFilling,
+      4 => context.l10n.rolePlay,
+      _ => level.title,
+    };
   }
 
   String _levelDescription(Level level) {
-    if (level.description.isNotEmpty) return level.description;
-    final title = _levelTitle(level);
-    switch (title) {
-      case '词汇匹配':
-        return '识形、知意：选择正确的英文释义或匹配中文词。';
-      case '听力选择':
-        return '听音知意：播放音频，从备选中文汉字里选择正确的对应。';
-      case '句子填空':
-        return '选择最合适的词语补全餐厅对话。';
-      case '点餐角色扮演':
-        return '模拟真实餐厅场景，与服务员进行中文对话练习。';
-      default:
-        return '完成题目，解锁下一关。';
-    }
+    return switch (level.levelNum) {
+      1 => context.l10n.vocabMatchDescription,
+      2 => context.l10n.listeningChoiceDescription,
+      3 => context.l10n.blankFillingDescription,
+      4 => context.l10n.rolePlayDescription,
+      _ => context.l10n.unlockNextLevelDescription,
+    };
   }
 
   Widget _buildStatusBadge(String label, IconData icon, Color bgColor) {
@@ -597,8 +563,8 @@ class DialoguePracticeHeader extends StatelessWidget {
 
   const DialoguePracticeHeader({
     super.key,
-    this.sceneNameZh = '场景',
-    this.sceneName = 'Scene',
+    this.sceneNameZh = '',
+    this.sceneName = '',
     this.totalPts = 0,
     this.onBack,
   });
@@ -618,7 +584,7 @@ class DialoguePracticeHeader extends StatelessWidget {
           const SizedBox(height: 24),
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 5),
-            child: _buildBanner(),
+            child: _buildBanner(context),
           ),
         ],
       ),
@@ -647,7 +613,7 @@ class DialoguePracticeHeader extends StatelessWidget {
             ),
             child: Center(
               child: Text(
-                sceneNameZh,
+                sceneNameZh.isEmpty ? context.l10n.selectScene : sceneNameZh,
                 style: const TextStyle(
                   fontSize: 24,
                   fontWeight: FontWeight.w900,
@@ -659,7 +625,7 @@ class DialoguePracticeHeader extends StatelessWidget {
           ),
         ),
         const SizedBox(width: 12),
-        _buildPtsBadge(),
+        _buildPtsBadge(context),
       ],
     );
   }
@@ -693,7 +659,7 @@ class DialoguePracticeHeader extends StatelessWidget {
     );
   }
 
-  Widget _buildPtsBadge() {
+  Widget _buildPtsBadge(BuildContext context) {
     return Transform.rotate(
       angle: 0.07, // ~4 degrees
       child: Container(
@@ -720,7 +686,7 @@ class DialoguePracticeHeader extends StatelessWidget {
             ),
             const SizedBox(width: 4),
             Text(
-              '$totalPts  PTS',
+              context.l10n.points(totalPts),
               style: const TextStyle(
                 fontSize: 13,
                 fontWeight: FontWeight.w900,
@@ -733,7 +699,7 @@ class DialoguePracticeHeader extends StatelessWidget {
     );
   }
 
-  Widget _buildBanner() {
+  Widget _buildBanner(BuildContext context) {
     return Container(
       width: double.infinity,
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
@@ -759,9 +725,13 @@ class DialoguePracticeHeader extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.center,
               children: [
                 Text(
-                  '${sceneName.toUpperCase()} QUEST MODULE',
+                  context.l10n.questModule(
+                    sceneNameZh.isEmpty
+                        ? context.l10n.selectScene
+                        : sceneNameZh,
+                  ),
                   textAlign: TextAlign.center,
-                  style: TextStyle(
+                  style: const TextStyle(
                     fontSize: 13,
                     color: Colors.white,
                     fontWeight: FontWeight.w700,
@@ -769,10 +739,10 @@ class DialoguePracticeHeader extends StatelessWidget {
                   ),
                 ),
                 const SizedBox(height: 4),
-                const Text(
-                  '挑战即可获得金星星与丰厚积分！',
+                Text(
+                  context.l10n.questRewardHint,
                   textAlign: TextAlign.center,
-                  style: TextStyle(
+                  style: const TextStyle(
                     fontSize: 18,
                     color: Colors.white,
                     fontWeight: FontWeight.w900,

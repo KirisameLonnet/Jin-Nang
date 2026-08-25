@@ -2,29 +2,24 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import '../../theme/app_colors.dart';
 import '../../widgets/pressable.dart';
+import '../../l10n/l10n.dart';
 
 class MainShell extends StatelessWidget {
-  const MainShell({
-    required this.navigationShell,
-    super.key,
-  });
+  const MainShell({required this.navigationShell, super.key});
 
   final StatefulNavigationShell navigationShell;
 
   static const _navItems = [
     _NavItemData(
       iconPath: 'assets/icon/study.png',
-      label: 'STUDY',
       selectedColor: AppColors.straw14,
     ),
     _NavItemData(
       iconPath: 'assets/icon/toolbox.png',
-      label: 'TOOLBOX',
       selectedColor: AppColors.baliHai30,
     ),
     _NavItemData(
       iconPath: 'assets/icon/my.png',
-      label: 'MY',
       selectedColor: AppColors.oldRose15,
     ),
   ];
@@ -42,9 +37,7 @@ class MainShell extends StatelessWidget {
       height: 92,
       decoration: const BoxDecoration(
         color: Colors.white,
-        border: Border(
-          top: BorderSide(color: Colors.black, width: 4),
-        ),
+        border: Border(top: BorderSide(color: Colors.black, width: 4)),
         boxShadow: [
           BoxShadow(
             color: Colors.black12,
@@ -170,7 +163,7 @@ class MainShell extends StatelessWidget {
                     angle: angle,
                     alignment: Alignment.center,
                     child: Text(
-                      data.label,
+                      _labelFor(context, index),
                       style: TextStyle(
                         fontSize: 12,
                         fontWeight: FontWeight.w900,
@@ -189,16 +182,17 @@ class MainShell extends StatelessWidget {
       ),
     );
   }
+
+  String _labelFor(BuildContext context, int index) => switch (index) {
+    0 => context.l10n.studyTab,
+    1 => context.l10n.toolboxTab,
+    _ => context.l10n.profileTab,
+  };
 }
 
 class _NavItemData {
   final String iconPath;
-  final String label;
   final Color selectedColor;
 
-  const _NavItemData({
-    required this.iconPath,
-    required this.label,
-    required this.selectedColor,
-  });
+  const _NavItemData({required this.iconPath, required this.selectedColor});
 }

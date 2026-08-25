@@ -11,6 +11,7 @@ import '../../widgets/app_safe_area.dart';
 import '../../widgets/audio_button.dart';
 import '../../widgets/dashed_divider.dart';
 import '../../widgets/pressable.dart';
+import '../../l10n/l10n.dart';
 
 class ToolboxChapterScreen extends StatefulWidget {
   final int sceneId;
@@ -105,7 +106,7 @@ class _ToolboxChapterScreenState extends State<ToolboxChapterScreen> {
                           horizontal: AppSpacing.lg,
                         ),
                         child: Text(
-                          _error!,
+                          context.l10n.loadFailed,
                           textAlign: TextAlign.center,
                           style: const TextStyle(
                             fontWeight: FontWeight.w700,
@@ -116,7 +117,7 @@ class _ToolboxChapterScreenState extends State<ToolboxChapterScreen> {
                       const SizedBox(height: AppSpacing.md),
                       Pressable(
                         onPressed: _loadTopic,
-                        child: const Text('Retry'),
+                        child: Text(context.l10n.retry),
                       ),
                     ],
                   ),
@@ -160,7 +161,9 @@ class _ToolboxChapterScreenState extends State<ToolboxChapterScreen> {
                     angle: -0.01745,
                     alignment: Alignment.center,
                     child: ChapterHeader(
-                      title: 'Chapter ${_chapters[_currentIndex].index}',
+                      title: context.l10n.chapter(
+                        _chapters[_currentIndex].index,
+                      ),
                       titleColor: AppColors.straw14,
                       onBack: () {
                         if (Navigator.of(context).canPop()) {
@@ -299,7 +302,7 @@ class _ToolboxChapterScreenState extends State<ToolboxChapterScreen> {
                             ),
                             const SizedBox(width: 6),
                             Text(
-                              'Prev',
+                              context.l10n.previous,
                               style: TextStyle(
                                 fontSize: 17,
                                 fontWeight: FontWeight.w900,
@@ -338,8 +341,8 @@ class _ToolboxChapterScreenState extends State<ToolboxChapterScreen> {
                           children: [
                             Text(
                               _currentIndex < _chapters.length - 1
-                                  ? 'Next'
-                                  : 'Finish',
+                                  ? context.l10n.next
+                                  : context.l10n.finish,
                               style: TextStyle(
                                 fontSize: 17,
                                 fontWeight: FontWeight.w900,
@@ -438,7 +441,7 @@ class _ToolboxChapterScreenState extends State<ToolboxChapterScreen> {
               ),
               child: Center(
                 child: Text(
-                  'Chapter ${_chapters[i].index}',
+                  context.l10n.chapter(_chapters[i].index),
                   style: TextStyle(
                     fontSize: 15,
                     fontWeight: FontWeight.w900,

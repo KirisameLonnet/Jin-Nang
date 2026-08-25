@@ -7,6 +7,7 @@ import '../../../theme/app_spacing.dart';
 import '../../../widgets/app_header.dart';
 import '../../../widgets/app_safe_area.dart';
 import '../../../widgets/selectable_card.dart';
+import '../../../l10n/l10n.dart';
 
 class VocabSceneScreen extends StatefulWidget {
   const VocabSceneScreen({super.key});
@@ -54,7 +55,12 @@ class _VocabSceneScreenState extends State<VocabSceneScreen> {
             // Scrollable scene cards (behind header)
             Positioned.fill(
               child: Padding(
-                padding: const EdgeInsets.fromLTRB(AppSpacing.lg, 176, AppSpacing.lg, 0),
+                padding: const EdgeInsets.fromLTRB(
+                  AppSpacing.lg,
+                  176,
+                  AppSpacing.lg,
+                  0,
+                ),
                 child: _buildBody(context),
               ),
             ),
@@ -72,13 +78,19 @@ class _VocabSceneScreenState extends State<VocabSceneScreen> {
                   children: [
                     const SizedBox(height: 48),
                     AppHeader(
-                      title: 'Vocab Learning',
+                      title: context.l10n.vocabLearningSingleLine,
                       titleColor: AppColors.straw14,
                       onBack: _goBack,
                     ),
                     const SizedBox(height: 32),
-                    const Text('Select a scene',
-                        style: TextStyle(fontSize: 20, fontWeight: FontWeight.w900, color: AppColors.morandiText)),
+                    Text(
+                      context.l10n.selectScene,
+                      style: const TextStyle(
+                        fontSize: 20,
+                        fontWeight: FontWeight.w900,
+                        color: AppColors.morandiText,
+                      ),
+                    ),
                   ],
                 ),
               ),
@@ -92,9 +104,14 @@ class _VocabSceneScreenState extends State<VocabSceneScreen> {
   Widget _buildBody(BuildContext context) {
     if (_error != null) {
       return Center(
-        child: Text(_error!,
-            textAlign: TextAlign.center,
-            style: const TextStyle(color: AppColors.semanticRed, fontWeight: FontWeight.w600)),
+        child: Text(
+          context.l10n.loadFailed,
+          textAlign: TextAlign.center,
+          style: const TextStyle(
+            color: AppColors.semanticRed,
+            fontWeight: FontWeight.w600,
+          ),
+        ),
       );
     }
     if (_scenes == null) {
@@ -103,26 +120,28 @@ class _VocabSceneScreenState extends State<VocabSceneScreen> {
     return ListView(
       clipBehavior: Clip.none,
       children: [
-        ..._scenes!.map((scene) => Padding(
-              padding: const EdgeInsets.only(bottom: 24),
-              child: SelectableCard(
-                title: scene.nameEn,
-                subtitle: scene.subtitleEn,
-                icon: _iconForScene(scene.nameEn),
-                color: _colorFromHex(scene.colorHex),
-                onTap: scene.isUnlockedDefault
-                    ? () => context.push('/study/vocab-battle/${scene.id}')
-                    : null,
-                onLockedTap: scene.isUnlockedDefault
-                    ? null
-                    : () => ScaffoldMessenger.of(context).showSnackBar(
-                          const SnackBar(
-                            content: Text('This scene is coming soon.'),
-                            duration: Duration(seconds: 2),
-                          ),
-                        ),
-              ),
-            )),
+        ..._scenes!.map(
+          (scene) => Padding(
+            padding: const EdgeInsets.only(bottom: 24),
+            child: SelectableCard(
+              title: context.usesChinese ? scene.nameZh : scene.nameEn,
+              subtitle: localizeSceneSubtitle(context, scene.nameEn),
+              icon: _iconForScene(scene.nameEn),
+              color: _colorFromHex(scene.colorHex),
+              onTap: scene.isUnlockedDefault
+                  ? () => context.push('/study/vocab-battle/${scene.id}')
+                  : null,
+              onLockedTap: scene.isUnlockedDefault
+                  ? null
+                  : () => ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(
+                        content: Text(context.l10n.sceneComingSoon),
+                        duration: const Duration(seconds: 2),
+                      ),
+                    ),
+            ),
+          ),
+        ),
         const SizedBox(height: 48),
       ],
     );
@@ -130,10 +149,14 @@ class _VocabSceneScreenState extends State<VocabSceneScreen> {
 
   IconData _iconForScene(String name) {
     switch (name.toLowerCase()) {
-      case 'restaurant': return Icons.local_cafe;
-      case 'supermarket': return Icons.shopping_cart;
-      case 'airport': return Icons.flight;
-      default: return Icons.place;
+      case 'restaurant':
+        return Icons.local_cafe;
+      case 'supermarket':
+        return Icons.shopping_cart;
+      case 'airport':
+        return Icons.flight;
+      default:
+        return Icons.place;
     }
   }
 

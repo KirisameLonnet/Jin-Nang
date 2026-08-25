@@ -10,6 +10,7 @@ import '../../../theme/app_spacing.dart';
 import '../../../widgets/app_safe_area.dart';
 import '../../../widgets/dashed_divider.dart';
 import '../../../widgets/pressable.dart';
+import '../../../l10n/l10n.dart';
 
 class LevelScreen extends StatefulWidget {
   final int levelId;
@@ -150,7 +151,7 @@ class _LevelScreenState extends State<LevelScreen> {
         body: AppSafeArea(
           child: Center(
             child: Text(
-              _error!,
+              context.l10n.loadFailed,
               textAlign: TextAlign.center,
               style: const TextStyle(
                 fontSize: 14,
@@ -228,7 +229,7 @@ class _LevelScreenState extends State<LevelScreen> {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Text(
-                'LEVEL ${level.levelNum} / 4',
+                context.l10n.levelNumber(level.levelNum),
                 style: const TextStyle(
                   fontSize: 11,
                   fontWeight: FontWeight.w800,
@@ -238,16 +239,7 @@ class _LevelScreenState extends State<LevelScreen> {
               ),
               const SizedBox(height: 2),
               Text(
-                level.title,
-                style: const TextStyle(
-                  fontSize: 18,
-                  fontWeight: FontWeight.w900,
-                  color: AppColors.morandiText,
-                ),
-              ),
-              const SizedBox(height: 2),
-              Text(
-                level.subtitle,
+                _localizedLevelTitle(level),
                 style: const TextStyle(
                   fontSize: 18,
                   fontWeight: FontWeight.w900,
@@ -276,6 +268,14 @@ class _LevelScreenState extends State<LevelScreen> {
       ],
     );
   }
+
+  String _localizedLevelTitle(Level level) => switch (level.levelNum) {
+    1 => context.l10n.vocabMatch,
+    2 => context.l10n.listeningChoice,
+    3 => context.l10n.blankFilling,
+    4 => context.l10n.rolePlay,
+    _ => level.title,
+  };
 
   Widget _buildBackBtn() {
     return Pressable(
@@ -506,10 +506,10 @@ class _LevelScreenState extends State<LevelScreen> {
           ),
         ),
         const SizedBox(height: 16),
-        const Center(
+        Center(
           child: Text(
-            '请播放拼音音频',
-            style: TextStyle(
+            context.l10n.playPinyinAudio,
+            style: const TextStyle(
               fontSize: 13,
               color: Colors.black54,
               fontWeight: FontWeight.w600,
@@ -707,7 +707,9 @@ class _LevelScreenState extends State<LevelScreen> {
               ),
               const SizedBox(width: 8),
               Text(
-                _isCorrect ? '回答正确 (Correct)' : '回答错误 (Incorrect)',
+                _isCorrect
+                    ? context.l10n.correctAnswer
+                    : context.l10n.incorrectAnswer,
                 style: TextStyle(
                   fontSize: 16,
                   fontWeight: FontWeight.w900,
@@ -762,16 +764,9 @@ class _LevelScreenState extends State<LevelScreen> {
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
                     Text(
-                      _isLastQ ? '查看结果' : '下一题',
-                      style: const TextStyle(
-                        fontSize: 17,
-                        fontWeight: FontWeight.w900,
-                        color: AppColors.morandiText,
-                      ),
-                    ),
-                    const SizedBox(width: 6),
-                    Text(
-                      _isLastQ ? 'See Results' : 'Next Question',
+                      _isLastQ
+                          ? context.l10n.seeResults
+                          : context.l10n.nextQuestion,
                       style: const TextStyle(
                         fontSize: 17,
                         fontWeight: FontWeight.w900,
@@ -788,19 +783,10 @@ class _LevelScreenState extends State<LevelScreen> {
                 )
               : Row(
                   mainAxisAlignment: MainAxisAlignment.center,
-                  children: const [
+                  children: [
                     Text(
-                      '确认提交',
-                      style: TextStyle(
-                        fontSize: 17,
-                        fontWeight: FontWeight.w900,
-                        color: AppColors.morandiText,
-                      ),
-                    ),
-                    SizedBox(width: 6),
-                    Text(
-                      'Submit Answer',
-                      style: TextStyle(
+                      context.l10n.submitAnswer,
+                      style: const TextStyle(
                         fontSize: 17,
                         fontWeight: FontWeight.w900,
                         color: AppColors.morandiText,
@@ -980,12 +966,16 @@ class _LevelScreenState extends State<LevelScreen> {
                 padding: const EdgeInsets.only(top: 4, right: 4),
                 child: Row(
                   mainAxisSize: MainAxisSize.min,
-                  children: const [
-                    Icon(Icons.check, size: 13, color: AppColors.quizCorrect),
-                    SizedBox(width: 4),
+                  children: [
+                    const Icon(
+                      Icons.check,
+                      size: 13,
+                      color: AppColors.quizCorrect,
+                    ),
+                    const SizedBox(width: 4),
                     Text(
-                      'CORRECT',
-                      style: TextStyle(
+                      context.l10n.correctAnswer.toUpperCase(),
+                      style: const TextStyle(
                         fontSize: 12,
                         fontWeight: FontWeight.w900,
                         color: AppColors.quizCorrect,
@@ -999,12 +989,16 @@ class _LevelScreenState extends State<LevelScreen> {
                 padding: const EdgeInsets.only(top: 4, right: 4),
                 child: Row(
                   mainAxisSize: MainAxisSize.min,
-                  children: const [
-                    Icon(Icons.close, size: 13, color: AppColors.quizError),
-                    SizedBox(width: 4),
+                  children: [
+                    const Icon(
+                      Icons.close,
+                      size: 13,
+                      color: AppColors.quizError,
+                    ),
+                    const SizedBox(width: 4),
                     Text(
-                      'INCORRECT',
-                      style: TextStyle(
+                      context.l10n.incorrectAnswer.toUpperCase(),
+                      style: const TextStyle(
                         fontSize: 12,
                         fontWeight: FontWeight.w900,
                         color: AppColors.quizError,
@@ -1039,9 +1033,9 @@ class _LevelScreenState extends State<LevelScreen> {
                 children: [
                   _buildBackBtn(),
                   const SizedBox(width: 12),
-                  const Text(
-                    '闯关报告 (Summary)',
-                    style: TextStyle(
+                  Text(
+                    context.l10n.summary,
+                    style: const TextStyle(
                       fontSize: 18,
                       fontWeight: FontWeight.w900,
                       color: AppColors.morandiText,
@@ -1097,9 +1091,9 @@ class _LevelScreenState extends State<LevelScreen> {
                               }),
                             ),
                             const SizedBox(height: 10),
-                            const Text(
-                              '得分 SCORE',
-                              style: TextStyle(
+                            Text(
+                              context.l10n.score,
+                              style: const TextStyle(
                                 fontSize: 13,
                                 color: Colors.black54,
                                 fontWeight: FontWeight.w700,
@@ -1134,7 +1128,9 @@ class _LevelScreenState extends State<LevelScreen> {
                             ),
                             const SizedBox(height: 12),
                             Text(
-                              _passed ? '恭喜通过本关！ Passed!' : '再来一次！ Try again!',
+                              _passed
+                                  ? context.l10n.levelPassed
+                                  : context.l10n.tryAgain,
                               style: TextStyle(
                                 fontSize: 13,
                                 color: _passed
@@ -1159,9 +1155,9 @@ class _LevelScreenState extends State<LevelScreen> {
                                 ),
                                 child: Column(
                                   children: [
-                                    const Text(
-                                      '通关获得奖励 Rewards',
-                                      style: TextStyle(
+                                    Text(
+                                      context.l10n.rewards,
+                                      style: const TextStyle(
                                         fontSize: 12,
                                         color: Colors.black54,
                                         fontWeight: FontWeight.w600,
@@ -1179,7 +1175,9 @@ class _LevelScreenState extends State<LevelScreen> {
                                         ),
                                         const SizedBox(width: 6),
                                         Text(
-                                          '+${level.pointsReward} PTS',
+                                          context.l10n.rewardPoints(
+                                            level.pointsReward,
+                                          ),
                                           style: const TextStyle(
                                             fontSize: 20,
                                             fontWeight: FontWeight.w900,
@@ -1216,10 +1214,10 @@ class _LevelScreenState extends State<LevelScreen> {
                                     ),
                                   ],
                                 ),
-                                child: const Text(
-                                  '返回关卡选择 Return',
+                                child: Text(
+                                  context.l10n.returnToLevels,
                                   textAlign: TextAlign.center,
-                                  style: TextStyle(
+                                  style: const TextStyle(
                                     fontSize: 16,
                                     fontWeight: FontWeight.w900,
                                     color: AppColors.morandiText,
@@ -1250,10 +1248,10 @@ class _LevelScreenState extends State<LevelScreen> {
                                     ),
                                   ],
                                 ),
-                                child: const Text(
-                                  '重试 Retry Level',
+                                child: Text(
+                                  context.l10n.retryLevel,
                                   textAlign: TextAlign.center,
-                                  style: TextStyle(
+                                  style: const TextStyle(
                                     fontSize: 16,
                                     fontWeight: FontWeight.w900,
                                     color: AppColors.morandiText,
@@ -1289,7 +1287,9 @@ class _LevelScreenState extends State<LevelScreen> {
                             ],
                           ),
                           child: Text(
-                            _passed ? '闯关成功！' : '未通过',
+                            _passed
+                                ? context.l10n.challengePassed
+                                : context.l10n.challengeFailed,
                             style: const TextStyle(
                               fontSize: 28,
                               fontWeight: FontWeight.w900,

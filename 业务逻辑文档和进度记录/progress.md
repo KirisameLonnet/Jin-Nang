@@ -24,6 +24,11 @@
 - GitHub `master` 推送后由 Cloudflare Pages 自动执行 `scripts/build_web_cf_pages.sh` 并发布，首次自动构建验证成功。
 - Web 生产域名 `https://jn.lonnet.uk` 已生效；DNS、HTTPS、首页、PWA 静态资源、SPA 子路由回退和真实 Chrome 渲染验证通过。
 - Web 品牌信息和 Chrome 业务音频播放兼容已完成。
+- Flutter ARB i18n 已覆盖 English / 简体中文，界面语言与中文学习内容的语言边界已统一。
+- 应用默认跟随系统语言；登录/注册页与 Profile 均可切换语言，并使用 Secure Storage 记忆选择。
+- 登录、导航、首页、场景、关卡、答题反馈、Toolbox、Profile 及鉴权错误文案已移除英中硬编码混排。
+- Android / iOS 应用名称按系统语言显示 `Jin Nang` / `锦囊`，macOS 名称从脚手架 `test1` 修正为 `Jin Nang`。
+- i18n Widget 测试、Flutter Analyze、全部测试、Release Web 构建及真实 Chrome 双语切换/刷新持久化验证通过。
 
 ## 当前阶段剩余外部事项
 

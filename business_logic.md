@@ -125,8 +125,9 @@ Disabled 状态显示；上传音频并写入 `audio_key` 后，无需再改 Flu
 | Toolbox 章节/短语 D1 化 | ✅ |
 | Toolbox 短语音频内容 | ⏳ 等待 19 个音频文件 |
 | Supermarket / Airport 内容 | ⏳ 后续阶段 |
-| Profile 编辑、通知、语言、FAQ | ⏳ 后续阶段 |
-| 排行榜、成就、深色模式、i18n | ⏳ 后续阶段 |
+| English / 简体中文 i18n、跟随系统、语言选择持久化 | ✅ |
+| Profile 编辑、通知、FAQ | ⏳ 后续阶段 |
+| 排行榜、成就、深色模式 | ⏳ 后续阶段 |
 
 ## 8. 验收门禁
 

@@ -7,6 +7,7 @@ import '../../theme/app_spacing.dart';
 import '../../widgets/app_safe_area.dart';
 import '../../widgets/selectable_card.dart';
 import '../../widgets/title_section.dart';
+import '../../l10n/l10n.dart';
 
 class ToolboxSceneScreen extends StatefulWidget {
   const ToolboxSceneScreen({super.key});
@@ -46,7 +47,12 @@ class _ToolboxSceneScreenState extends State<ToolboxSceneScreen> {
             // Scrollable scene cards (behind header)
             Positioned.fill(
               child: Padding(
-                padding: const EdgeInsets.fromLTRB(AppSpacing.lg, 120, AppSpacing.lg, 0),
+                padding: const EdgeInsets.fromLTRB(
+                  AppSpacing.lg,
+                  120,
+                  AppSpacing.lg,
+                  0,
+                ),
                 child: _buildBody(context),
               ),
             ),
@@ -63,7 +69,10 @@ class _ToolboxSceneScreenState extends State<ToolboxSceneScreen> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     const SizedBox(height: 48),
-                    const TitleSection(title: 'TOOLBOX', subtitle: 'Useful phrases for real life.'),
+                    TitleSection(
+                      title: context.l10n.toolboxTitle,
+                      subtitle: context.l10n.toolboxSubtitle,
+                    ),
                   ],
                 ),
               ),
@@ -77,9 +86,14 @@ class _ToolboxSceneScreenState extends State<ToolboxSceneScreen> {
   Widget _buildBody(BuildContext context) {
     if (_error != null) {
       return Center(
-        child: Text(_error!,
-            textAlign: TextAlign.center,
-            style: const TextStyle(color: AppColors.semanticRed, fontWeight: FontWeight.w600)),
+        child: Text(
+          context.l10n.loadFailed,
+          textAlign: TextAlign.center,
+          style: const TextStyle(
+            color: AppColors.semanticRed,
+            fontWeight: FontWeight.w600,
+          ),
+        ),
       );
     }
     if (_scenes == null) {
@@ -89,26 +103,28 @@ class _ToolboxSceneScreenState extends State<ToolboxSceneScreen> {
       clipBehavior: Clip.none,
       children: [
         const SizedBox(height: 40),
-        ..._scenes!.map((scene) => Padding(
-              padding: const EdgeInsets.only(bottom: 24),
-              child: SelectableCard(
-                title: scene.nameEn,
-                subtitle: scene.subtitleEn,
-                icon: _iconForScene(scene.nameEn),
-                color: _colorFromHex(scene.colorHex),
-                onTap: scene.isUnlockedDefault
-                    ? () => context.push('/toolbox/${scene.id}')
-                    : null,
-                onLockedTap: scene.isUnlockedDefault
-                    ? null
-                    : () => ScaffoldMessenger.of(context).showSnackBar(
-                          const SnackBar(
-                            content: Text('This scene is coming soon.'),
-                            duration: Duration(seconds: 2),
-                          ),
-                        ),
-              ),
-            )),
+        ..._scenes!.map(
+          (scene) => Padding(
+            padding: const EdgeInsets.only(bottom: 24),
+            child: SelectableCard(
+              title: context.usesChinese ? scene.nameZh : scene.nameEn,
+              subtitle: localizeSceneSubtitle(context, scene.nameEn),
+              icon: _iconForScene(scene.nameEn),
+              color: _colorFromHex(scene.colorHex),
+              onTap: scene.isUnlockedDefault
+                  ? () => context.push('/toolbox/${scene.id}')
+                  : null,
+              onLockedTap: scene.isUnlockedDefault
+                  ? null
+                  : () => ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(
+                        content: Text(context.l10n.sceneComingSoon),
+                        duration: const Duration(seconds: 2),
+                      ),
+                    ),
+            ),
+          ),
+        ),
         const SizedBox(height: 48),
       ],
     );
@@ -116,10 +132,14 @@ class _ToolboxSceneScreenState extends State<ToolboxSceneScreen> {
 
   IconData _iconForScene(String name) {
     switch (name.toLowerCase()) {
-      case 'restaurant': return Icons.local_cafe;
-      case 'supermarket': return Icons.shopping_cart;
-      case 'airport': return Icons.flight;
-      default: return Icons.place;
+      case 'restaurant':
+        return Icons.local_cafe;
+      case 'supermarket':
+        return Icons.shopping_cart;
+      case 'airport':
+        return Icons.flight;
+      default:
+        return Icons.place;
     }
   }
 

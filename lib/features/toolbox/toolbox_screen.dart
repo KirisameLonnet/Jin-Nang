@@ -8,6 +8,7 @@ import '../../widgets/app_card.dart';
 import '../../widgets/app_header.dart';
 import '../../widgets/app_safe_area.dart';
 import '../../widgets/pressable.dart';
+import '../../l10n/l10n.dart';
 
 class ToolboxScreen extends StatefulWidget {
   final int sceneId;
@@ -70,14 +71,14 @@ class _ToolboxScreenState extends State<ToolboxScreen> {
         children: [
           const SizedBox(height: AppSpacing.xxl),
           AppHeader(
-            title: 'Useful Phrases',
+            title: context.l10n.usefulPhrases,
             titleColor: AppColors.straw14,
             onBack: _goBack,
           ),
           const Spacer(),
           if (_error != null) ...[
             Text(
-              _error!,
+              context.l10n.loadFailed,
               textAlign: TextAlign.center,
               style: const TextStyle(
                 fontSize: 14,
@@ -86,7 +87,7 @@ class _ToolboxScreenState extends State<ToolboxScreen> {
               ),
             ),
             const SizedBox(height: AppSpacing.md),
-            Pressable(onPressed: _loadTopic, child: const Text('Retry')),
+            Pressable(onPressed: _loadTopic, child: Text(context.l10n.retry)),
           ] else
             const CircularProgressIndicator(),
           const Spacer(),
@@ -99,7 +100,7 @@ class _ToolboxScreenState extends State<ToolboxScreen> {
       children: [
         const SizedBox(height: AppSpacing.xxl),
         AppHeader(
-          title: topic.sceneNameEn,
+          title: context.usesChinese ? topic.sceneNameZh : topic.sceneNameEn,
           titleColor: AppColors.straw14,
           onBack: _goBack,
         ),
@@ -127,7 +128,7 @@ class _ToolboxScreenState extends State<ToolboxScreen> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    topic.category,
+                    context.l10n.usefulPhrases.toUpperCase(),
                     style: const TextStyle(
                       fontSize: 12,
                       fontWeight: FontWeight.w700,
@@ -137,7 +138,7 @@ class _ToolboxScreenState extends State<ToolboxScreen> {
                   ),
                   const SizedBox(height: AppSpacing.xs),
                   Text(
-                    topic.title,
+                    localizeDialogueSceneTitle(context, topic.sceneNameEn),
                     style: const TextStyle(
                       fontSize: 20,
                       fontWeight: FontWeight.w900,
@@ -213,7 +214,7 @@ class _ToolboxScreenState extends State<ToolboxScreen> {
                             ),
                             const SizedBox(height: AppSpacing.xs),
                             Text(
-                              '${chapter.sentenceCount} sentences',
+                              context.l10n.sentenceCount(chapter.sentenceCount),
                               style: const TextStyle(
                                 fontSize: 13,
                                 fontWeight: FontWeight.w600,

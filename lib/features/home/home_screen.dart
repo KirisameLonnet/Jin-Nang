@@ -8,6 +8,7 @@ import '../../theme/app_spacing.dart';
 import '../../widgets/app_safe_area.dart';
 import '../../widgets/pressable.dart';
 import '../../widgets/title_section.dart';
+import '../../l10n/l10n.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -72,9 +73,9 @@ class _HomeScreenState extends State<HomeScreen> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              _buildNameCard('Yo! $name'),
+              _buildNameCard(context.l10n.greeting(name)),
               const SizedBox(height: 9),
-              const TitleSection(title: 'Ready to\nLevel Up?', subtitle: ''),
+              TitleSection(title: context.l10n.readyToLevelUp, subtitle: ''),
             ],
           ),
         ),
@@ -144,35 +145,21 @@ class _HomeScreenState extends State<HomeScreen> {
           children: [
             _buildStatIcon('assets/icon/fire.png'),
             const SizedBox(height: 3),
-            const Text(
-              'STREAK',
-              style: TextStyle(
+            Text(
+              context.l10n.streak,
+              style: const TextStyle(
                 fontSize: 13,
                 fontWeight: FontWeight.w900,
                 color: AppColors.morandiText,
               ),
             ),
             const SizedBox(height: 3),
-            Text.rich(
-              TextSpan(
-                children: [
-                  TextSpan(
-                    text: '$days ',
-                    style: const TextStyle(
-                      fontSize: 18,
-                      fontWeight: FontWeight.w900,
-                      color: AppColors.morandiText,
-                    ),
-                  ),
-                  const TextSpan(
-                    text: 'Days',
-                    style: TextStyle(
-                      fontSize: 14,
-                      fontWeight: FontWeight.w700,
-                      color: AppColors.morandiText,
-                    ),
-                  ),
-                ],
+            Text(
+              context.l10n.dayCount(days),
+              style: const TextStyle(
+                fontSize: 18,
+                fontWeight: FontWeight.w900,
+                color: AppColors.morandiText,
               ),
             ),
           ],
@@ -183,9 +170,9 @@ class _HomeScreenState extends State<HomeScreen> {
 
   void _comingSoon(BuildContext context) {
     ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(
-        content: Text('This feature is coming soon.'),
-        duration: Duration(seconds: 2),
+      SnackBar(
+        content: Text(context.l10n.featureComingSoon),
+        duration: const Duration(seconds: 2),
       ),
     );
   }
@@ -213,9 +200,9 @@ class _HomeScreenState extends State<HomeScreen> {
           children: [
             _buildStatIcon('assets/icon/cup.png'),
             const SizedBox(height: 3),
-            const Text(
-              'RANK',
-              style: TextStyle(
+            Text(
+              context.l10n.rank,
+              style: const TextStyle(
                 fontSize: 13,
                 fontWeight: FontWeight.w900,
                 color: AppColors.morandiText,
@@ -254,9 +241,9 @@ class _HomeScreenState extends State<HomeScreen> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        const Text(
-          'MISSIONS',
-          style: TextStyle(
+        Text(
+          context.l10n.missions,
+          style: const TextStyle(
             fontSize: 26,
             fontWeight: FontWeight.w900,
             color: AppColors.morandiText,
@@ -267,8 +254,8 @@ class _HomeScreenState extends State<HomeScreen> {
         Pressable(
           onPressed: () => context.push('/study/vocab-scene'),
           child: _buildMissionCard(
-            title: 'Vocab\nLearning',
-            subtitle: '${_profile?.totalWordsSeen ?? 0} words learned',
+            title: context.l10n.vocabLearning,
+            subtitle: context.l10n.wordsLearned(_profile?.totalWordsSeen ?? 0),
             color: AppColors.straw14,
             iconPath: 'assets/icon/study.png',
           ),
@@ -277,8 +264,8 @@ class _HomeScreenState extends State<HomeScreen> {
         Pressable(
           onPressed: () => context.push('/study/dialogue-scene'),
           child: _buildMissionCard(
-            title: 'Dialogue\nPractice',
-            subtitle: '10 mins',
+            title: context.l10n.dialoguePractice,
+            subtitle: context.l10n.minutes(10),
             color: AppColors.baliHai30,
             iconPath: 'assets/icon/dialogue_learning.png',
           ),

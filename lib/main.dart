@@ -3,6 +3,7 @@ import 'package:flutter/services.dart';
 import 'package:go_router/go_router.dart';
 
 import 'core/di.dart';
+import 'l10n/l10n.dart';
 import 'theme/app_theme.dart';
 import 'features/shell/main_shell.dart';
 import 'features/auth/splash_screen.dart';
@@ -22,8 +23,9 @@ import 'features/home/dialogue/dialogue_practice_screen.dart';
 import 'features/home/dialogue/level_screen.dart';
 import 'features/home/dialogue/review_screen.dart';
 
-void main() {
+Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
+  await Di.localeController.load();
   SystemChrome.setPreferredOrientations([DeviceOrientation.portraitUp]);
   SystemChannels.textInput.invokeMethod('TextInput.hide');
   Di.router = _router;
@@ -105,7 +107,8 @@ final GoRouter _router = GoRouter(
       path: '/study/dialogue-practice/:sceneId',
       pageBuilder: (context, state) {
         final sceneId = int.parse(state.pathParameters['sceneId']!);
-        final sceneName = state.uri.queryParameters['sceneName'] ?? 'Scene';
+        final sceneName =
+            state.uri.queryParameters['sceneName'] ?? context.l10n.selectScene;
         final sceneNameZh =
             state.uri.queryParameters['sceneNameZh'] ?? sceneName;
         return _slidePage(
@@ -203,10 +206,16 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp.router(
-      title: 'Jin Nang',
-      theme: AppTheme.lightTheme,
-      routerConfig: _router,
+    return ValueListenableBuilder<Locale?>(
+      valueListenable: Di.localeController,
+      builder: (context, locale, _) => MaterialApp.router(
+        onGenerateTitle: (context) => context.l10n.appTitle,
+        locale: locale,
+        supportedLocales: AppLocalizations.supportedLocales,
+        localizationsDelegates: AppLocalizations.localizationsDelegates,
+        theme: AppTheme.lightTheme,
+        routerConfig: _router,
+      ),
     );
   }
 }

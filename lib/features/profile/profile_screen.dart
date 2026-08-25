@@ -5,6 +5,8 @@ import '../../theme/app_colors.dart';
 import '../../theme/app_spacing.dart';
 import '../../widgets/app_safe_area.dart';
 import '../../widgets/pressable.dart';
+import '../../l10n/l10n.dart';
+import '../../widgets/language_picker.dart';
 
 class ProfileScreen extends StatefulWidget {
   const ProfileScreen({super.key});
@@ -67,7 +69,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
 
   Widget _buildTitle() {
     return Text(
-      'MY PROFILE',
+      context.l10n.myProfile,
       style: TextStyle(
         fontSize: 36,
         fontWeight: FontWeight.w900,
@@ -87,8 +89,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
 
   Widget _buildProfileCard() {
     final name = _profile?.displayName ?? '...';
-    final label = _profile?.levelLabel ?? '...';
-    final rank = _profile?.rank ?? '...';
+    final label = localizeRank(context, _profile?.levelLabel ?? '...');
+    final rank = localizeRank(context, _profile?.rank ?? '...');
 
     return Pressable(
       onPressed: () => _comingSoon(context),
@@ -166,7 +168,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
         borderRadius: BorderRadius.circular(8),
       ),
       child: Text(
-        '$rank Rank',
+        context.l10n.rankLabel(rank),
         style: const TextStyle(
           fontSize: 12,
           fontWeight: FontWeight.w900,
@@ -189,7 +191,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
           child: _buildStatCard(
             iconPath: 'assets/icon/fire.png',
             value: streak,
-            label: 'Day Streak',
+            label: context.l10n.dayStreak,
             color: AppColors.lavenderPurple,
           ),
         ),
@@ -198,7 +200,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
           child: _buildStatCard(
             iconPath: 'assets/icon/study.png',
             value: words,
-            label: 'Words',
+            label: context.l10n.words,
             color: AppColors.baliHai30,
           ),
         ),
@@ -207,7 +209,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
           child: _buildStatCard(
             iconPath: 'assets/icon/cup.png',
             value: score,
-            label: 'Avg Score',
+            label: context.l10n.averageScore,
             color: AppColors.straw14,
           ),
         ),
@@ -265,18 +267,22 @@ class _ProfileScreenState extends State<ProfileScreen> {
   }
 
   Widget _buildSettingsList() {
-    const items = [
-      ('Notifications', AppColors.lavenderPurple),
-      ('Language Settings', AppColors.baliHai30),
-      ('Help & FAQ', AppColors.straw14),
+    final items = [
+      (context.l10n.notifications, AppColors.lavenderPurple, _comingSoon),
+      (
+        context.l10n.languageSettings,
+        AppColors.baliHai30,
+        showAppLanguageDialog,
+      ),
+      (context.l10n.helpFaq, AppColors.straw14, _comingSoon),
     ];
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        const Text(
-          'SETTINGS',
-          style: TextStyle(
+        Text(
+          context.l10n.settings,
+          style: const TextStyle(
             fontSize: 20,
             fontWeight: FontWeight.w900,
             color: AppColors.morandiText,
@@ -287,7 +293,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
         ...items.map(
           (item) => Padding(
             padding: const EdgeInsets.only(bottom: 12),
-            child: _buildSettingsItem(item.$1, item.$2),
+            child: _buildSettingsItem(item.$1, item.$2, item.$3),
           ),
         ),
       ],
@@ -315,10 +321,10 @@ class _ProfileScreenState extends State<ProfileScreen> {
             ),
           ],
         ),
-        child: const Center(
+        child: Center(
           child: Text(
-            'Log Out',
-            style: TextStyle(
+            context.l10n.logOut,
+            style: const TextStyle(
               fontSize: 16,
               fontWeight: FontWeight.w900,
               color: AppColors.semanticRed,
@@ -329,9 +335,13 @@ class _ProfileScreenState extends State<ProfileScreen> {
     );
   }
 
-  Widget _buildSettingsItem(String label, Color iconColor) {
+  Widget _buildSettingsItem(
+    String label,
+    Color iconColor,
+    void Function(BuildContext) onPressed,
+  ) {
     return Pressable(
-      onPressed: () => _comingSoon(context),
+      onPressed: () => onPressed(context),
       child: Container(
         padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
         decoration: BoxDecoration(
@@ -383,9 +393,9 @@ class _ProfileScreenState extends State<ProfileScreen> {
 
   void _comingSoon(BuildContext context) {
     ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(
-        content: Text('Coming soon.'),
-        duration: Duration(seconds: 2),
+      SnackBar(
+        content: Text(context.l10n.comingSoon),
+        duration: const Duration(seconds: 2),
       ),
     );
   }
