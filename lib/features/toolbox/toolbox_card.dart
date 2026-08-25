@@ -71,9 +71,10 @@ class _ToolboxCardState extends State<ToolboxCard> {
   Future<void> _playAudio() async {
     if (_currentDetail == null) return;
     try {
-      final file = await Di.audioCache.getSingleFile(_currentDetail!.audioUrl);
       await _player.stop();
-      await _player.play(DeviceFileSource(file.path));
+      await _player.play(
+        await Di.audioCache.sourceFor(_currentDetail!.audioUrl),
+      );
     } catch (e) {
       debugPrint('[Audio] Error: $e');
     }

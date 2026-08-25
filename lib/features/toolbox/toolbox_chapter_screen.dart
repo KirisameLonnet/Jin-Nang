@@ -373,9 +373,8 @@ class _ToolboxChapterScreenState extends State<ToolboxChapterScreen> {
 
   Future<void> _playAudio(String url) async {
     try {
-      final file = await Di.audioCache.getSingleFile(url);
       await _audioPlayer.stop();
-      await _audioPlayer.play(DeviceFileSource(file.path));
+      await _audioPlayer.play(await Di.audioCache.sourceFor(url));
     } catch (error) {
       debugPrint('[Audio] Error playing $url: $error');
     }

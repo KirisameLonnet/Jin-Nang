@@ -817,9 +817,8 @@ class _LevelScreenState extends State<LevelScreen> {
 
   Future<void> _playAudio(String url) async {
     try {
-      final file = await Di.audioCache.getSingleFile(url);
       final player = AudioPlayer();
-      await player.play(DeviceFileSource(file.path));
+      await player.play(await Di.audioCache.sourceFor(url));
     } catch (_) {}
   }
 

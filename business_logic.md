@@ -13,7 +13,7 @@
 ```
 
 Flutter 只保留 UI 图标、字体和按钮音效；用户、场景、词汇、题目、进度及
-Toolbox 短语全部由 Cloudflare Workers API 提供。业务音频由 R2 提供并在设备端缓存。
+Toolbox 短语全部由 Cloudflare Workers API 提供。业务音频由 R2 提供：原生端下载到设备缓存后播放，Web 端通过 HTTPS URL 直接播放。
 
 ## 2. Flutter 路由
 

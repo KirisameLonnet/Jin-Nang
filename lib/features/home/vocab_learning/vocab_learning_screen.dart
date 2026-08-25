@@ -42,7 +42,7 @@ class _VocabLearningScreenState extends State<VocabLearningScreen> {
       if (!mounted) return;
       setState(() => _vocabList = list);
       for (final v in list) {
-        Di.audioCache.downloadFile(v.audioUrl);
+        Di.audioCache.prefetch(v.audioUrl);
       }
     } catch (e) {
       if (!mounted) return;
@@ -76,9 +76,8 @@ class _VocabLearningScreenState extends State<VocabLearningScreen> {
       }),
     );
     try {
-      final file = await Di.audioCache.getSingleFile(vocab.audioUrl);
       await _player.stop();
-      await _player.play(DeviceFileSource(file.path));
+      await _player.play(await Di.audioCache.sourceFor(vocab.audioUrl));
     } catch (e) {
       debugPrint('[Audio] Error playing ${vocab.audioUrl}: $e');
     } finally {

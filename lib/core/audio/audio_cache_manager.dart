@@ -1,3 +1,5 @@
+import 'package:audioplayers/audioplayers.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter_cache_manager/flutter_cache_manager.dart';
 
 class AudioCacheManager extends CacheManager {
@@ -12,4 +14,14 @@ class AudioCacheManager extends CacheManager {
           stalePeriod: const Duration(days: 30),
           maxNrOfCacheObjects: 500,
         ));
+
+  Future<Source> sourceFor(String url) async {
+    if (kIsWeb) return UrlSource(url);
+    final file = await getSingleFile(url);
+    return DeviceFileSource(file.path);
+  }
+
+  Future<void> prefetch(String url) async {
+    if (!kIsWeb) await downloadFile(url);
+  }
 }

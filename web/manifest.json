@@ -1,11 +1,11 @@
 {
-    "name": "test1",
-    "short_name": "test1",
+    "name": "锦囊 · Jin Nang",
+    "short_name": "锦囊",
     "start_url": ".",
     "display": "standalone",
-    "background_color": "#0175C2",
-    "theme_color": "#0175C2",
-    "description": "A new Flutter project.",
+    "background_color": "#FFFDF8",
+    "theme_color": "#888BD6",
+    "description": "面向真实生活场景的中文学习应用。",
     "orientation": "portrait-primary",
     "prefer_related_applications": false,
     "icons": [
