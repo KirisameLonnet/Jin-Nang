@@ -53,6 +53,20 @@ flutter build apk --release  # 发布包
 
 ### Web / Cloudflare Pages
 
+线上地址：`https://jn.lonnet.uk`（Pages 默认域名：`https://jin-nang.pages.dev`）。
+
+Cloudflare Pages 已连接 GitHub `master` 分支。每次推送后自动执行：
+
+```bash
+bash scripts/build_web_cf_pages.sh
+```
+
+构建输出目录为 `build/web`，PR 和非生产分支会生成预览部署。脚本固定使用 Flutter
+`3.35.6`，可通过 `FLUTTER_VERSION`、`CF_FLUTTER_SDK_DIR` 和 `API_BASE_URL`
+覆盖默认值。
+
+需要手动部署时：
+
 ```bash
 flutter build web --release \
   --dart-define=API_BASE_URL=https://jntest.lonnet.uk
